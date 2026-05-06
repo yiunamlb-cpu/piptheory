@@ -93,6 +93,24 @@ html, body, [class*="css"], [data-testid="stAppViewContainer"], .main {
   color: var(--text-primary);
   background: var(--bg) !important;
   -webkit-font-smoothing: antialiased;
+  /* Prevent horizontal page scroll on mobile from any one rogue element */
+  overflow-x: hidden !important;
+}
+
+/* Force long content to wrap rather than overflow horizontally */
+.surface-card, .stMarkdown, [data-testid="stMarkdownContainer"],
+.hero, .inst-card, .empty-state {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+/* Tables and pre/code blocks: scroll horizontally inside their own container
+   instead of pushing the page wide */
+.stDataFrame, [data-testid="stTable"], pre {
+  overflow-x: auto !important;
+  max-width: 100% !important;
 }
 
 .block-container {
@@ -160,22 +178,48 @@ header[data-testid="stHeader"] {
   height: auto !important;
 }
 
-/* Sidebar collapse button — keep visible, style monochrome */
+/* Sidebar collapse / expand controls — must stay visible regardless of state.
+   Streamlit changes selectors across versions and on mobile, so we cast a
+   wide net. */
 [data-testid="collapsedControl"],
 [data-testid="stSidebarCollapseButton"],
-[data-testid="stSidebarCollapsedControl"] {
+[data-testid="stSidebarCollapsedControl"],
+button[kind="header"],
+button[data-testid*="ollapse"],
+button[data-testid*="ollapsed"],
+[data-testid*="SidebarNav"] button {
   visibility: visible !important;
   display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   color: var(--text-primary) !important;
   background: var(--surface) !important;
   border: 1px solid var(--border) !important;
   border-radius: var(--radius-sm) !important;
-  padding: 4px !important;
+  padding: 6px !important;
   box-shadow: var(--shadow-sm);
+  z-index: 9999 !important;
+  opacity: 1 !important;
 }
 [data-testid="collapsedControl"] svg,
-[data-testid="stSidebarCollapseButton"] svg {
+[data-testid="stSidebarCollapseButton"] svg,
+button[kind="header"] svg {
   fill: var(--text-primary) !important;
+  stroke: var(--text-primary) !important;
+  width: 18px !important;
+  height: 18px !important;
+}
+
+/* Mobile: ensure the sidebar collapse handle is anchored top-left and tappable */
+@media (max-width: 768px) {
+  [data-testid="collapsedControl"] {
+    position: fixed !important;
+    top: 8px !important;
+    left: 8px !important;
+    width: 36px !important;
+    height: 36px !important;
+    z-index: 10000 !important;
+  }
 }
 
 /* === Buttons === */

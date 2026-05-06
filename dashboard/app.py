@@ -10,6 +10,7 @@ Run:
 """
 from __future__ import annotations
 
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -32,6 +33,7 @@ from dashboard.loader import (
     platform_symbol,
 )
 from dashboard.style import inject_css, status_pill
+from src.llm import OpenRouterClient
 
 
 def _priority_badge(priority: str) -> str:
@@ -87,6 +89,68 @@ with st.sidebar:
         runs,
         index=0,
         label_visibility="collapsed",
+    )
+
+    st.markdown('<div style="margin-top: 16px;"></div>', unsafe_allow_html=True)
+
+    # ---- Manual run trigger ----
+    if "run_pid" not in st.session_state:
+        st.session_state.run_pid = None
+    if "run_started_at" not in st.session_state:
+        st.session_state.run_started_at = None
+
+    pid = st.session_state.run_pid
+    running = False
+    if pid is not None:
+        try:
+            # Check if process still alive (Windows-friendly via tasklist)
+            result = subprocess.run(
+                ["tasklist", "/FI", f"PID eq {pid}"],
+                capture_output=True, text=True, timeout=5,
+            )
+            running = str(pid) in result.stdout
+        except Exception:
+            running = False
+        if not running:
+            st.session_state.run_pid = None
+
+    if running:
+        elapsed = (datetime.now() - st.session_state.run_started_at).total_seconds()
+        mins = int(elapsed // 60)
+        secs = int(elapsed % 60)
+        st.markdown(
+            f'<div style="padding:10px 12px; background: var(--brand-tint); '
+            f'border:1px solid var(--brand-border); border-radius: 8px; '
+            f'font-size:12px; color: var(--brand-strong);">'
+            f'⏳ Pipeline running — PID {pid}<br>'
+            f'<span style="font-family: var(--font-mono);">{mins:02d}:{secs:02d}</span> elapsed'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+        if st.button("Refresh", key="refresh_btn", use_container_width=True):
+            st.rerun()
+    else:
+        if st.button("▶ Run analysis now", key="run_btn", use_container_width=True):
+            try:
+                bat = ROOT / "scripts" / "run_daily.bat"
+                proc = subprocess.Popen(
+                    [str(bat)],
+                    cwd=str(ROOT),
+                    shell=True,
+                    creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if sys.platform == "win32" else 0,
+                )
+                st.session_state.run_pid = proc.pid
+                st.session_state.run_started_at = datetime.now()
+                st.rerun()
+            except Exception as e:
+                st.error(f"Could not start: {e}")
+
+    st.markdown(
+        '<p style="font-size:12px; color: var(--text-tertiary); margin-top: 24px; line-height: 1.5;">'
+        'A pipeline run takes 10-15 min and ~$0.20. New bias_cards land in '
+        'a folder for today\'s date — pick it from the dropdown above when done.'
+        '</p>',
+        unsafe_allow_html=True,
     )
 
     st.markdown(
@@ -264,9 +328,57 @@ for col, instrument in zip(cols, ACTIVE_UNIVERSE):
         )
 
 
-# ========================== Tabs (small, focused) ==========================
+# ========================== Wider watchlist (context only) ==========================
 
-tab_brief, tab_filter, tab_inspect = st.tabs(["PM Brief", "Tradability detail", "Inspect"])
+CONTEXT_INSTRUMENTS = [b.instrument for b in run.instrument_biases
+                      if b.instrument not in ACTIVE_UNIVERSE]
+
+if CONTEXT_INSTRUMENTS:
+    st.markdown('<div class="section-title">Wider watchlist (context only)</div>',
+                unsafe_allow_html=True)
+    st.markdown(
+        '<p style="font-size:13px; color: var(--text-secondary); margin: 0 0 12px 0;">'
+        'These instruments still get strategist-level analysis so you can see the '
+        'wider macro picture, but they don\'t pass through the structural filter or '
+        'appear as actionable setups. They are <strong>not</strong> "no-go" — '
+        'they are simply outside the active universe while we refine the system. '
+        'To promote one, edit <code>ACTIVE_UNIVERSE</code> in the pipeline config.'
+        '</p>',
+        unsafe_allow_html=True,
+    )
+
+    # Compact two-column grid
+    cols = st.columns(2)
+    sorted_context = sorted(
+        [b for b in run.instrument_biases if b.instrument in CONTEXT_INSTRUMENTS],
+        key=lambda b: -b.conviction,
+    )
+    for i, b in enumerate(sorted_context):
+        with cols[i % 2]:
+            full_name = display_label(b.instrument)
+            plat = platform_symbol(b.instrument)
+            plat_part = f' · MT5: {plat}' if plat != b.instrument else ''
+            st.markdown(
+                f'<div class="surface-card" style="margin-bottom: 8px;">'
+                f'<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">'
+                f'<div style="min-width: 0;">'
+                f'<div style="font-size:14px; font-weight:600;">{b.instrument} <span style="font-weight:400; color: var(--text-secondary); font-size:12px; margin-left:4px;">{full_name}{plat_part}</span></div>'
+                f'<div style="color: var(--text-secondary); font-size:13px; margin-top:2px; word-wrap: break-word;">{b.bias}</div>'
+                f'</div>'
+                f'<div style="display:flex; gap:6px; align-items:center; flex-shrink:0;">'
+                f'<span style="font-family: var(--font-mono); font-size:12px; color: var(--text-tertiary);">{b.conviction}/10</span>'
+                f'</div>'
+                f'</div>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+
+
+# ========================== Tabs ==========================
+
+tab_brief, tab_filter, tab_ask, tab_inspect = st.tabs(
+    ["PM Brief", "Tradability detail", "Ask", "Inspect"]
+)
 
 
 # ---- PM Brief ----
@@ -313,6 +425,103 @@ with tab_filter:
             for card in passed:
                 with st.expander(f"{display_name(card.instrument)} — Passed", expanded=False):
                     st.markdown(card.raw)
+
+
+# ---- Ask (chat about the brief) ----
+with tab_ask:
+    st.markdown(
+        '<p style="color: var(--text-secondary); font-size:14px; margin-bottom: 16px;">'
+        'Ask questions about today\'s brief, the macro picture, individual instruments, '
+        'or how the system works. The assistant has the full run loaded as context.'
+        '</p>',
+        unsafe_allow_html=True,
+    )
+
+    # Build the system prompt once per run
+    @st.cache_data(show_spinner=False)
+    def _build_chat_context(run_date: str) -> str:
+        r = load_run(run_date)
+        if r is None:
+            return "No run loaded."
+        themes_path = ROOT / "docs" / "THEMES.md"
+        themes_text = themes_path.read_text(encoding="utf-8") if themes_path.exists() else ""
+        # Compact: each layer's content with size cap
+        parts = [
+            f"# Run context: {run_date}",
+            "",
+            "You are an analyst helping the user understand today's bias-engine brief. "
+            "Answer questions about the brief, individual instruments, the macro reasoning, "
+            "or how the system works. Stay grounded in the content provided — do not invent. "
+            "If asked something the brief doesn't address, say so directly.",
+            "",
+            "## Active themes (THEMES.md)",
+            themes_text[:8000],
+            "",
+            "## PM Brief",
+            r.layer5_pm_brief or "(no PM brief)",
+            "",
+            "## Tradability Filter results",
+        ]
+        for inst, card in r.tradability.items():
+            parts.append(f"### {inst} — {card.verdict}")
+            parts.append(card.raw[:3000])
+        parts.extend([
+            "",
+            "## Strategist bias cards (full)",
+            r.layer2_strategist[:12000] if r.layer2_strategist else "(none)",
+            "",
+            "## Specialist outputs (Layer 1)",
+            "### Inflation Tracker",
+            r.layer1_inflation[:3000] if r.layer1_inflation else "(none)",
+            "### Positioning Analyst",
+            r.layer1_positioning[:3000] if r.layer1_positioning else "(none)",
+            "### Fed-Watcher",
+            r.layer1_fed[:3000] if r.layer1_fed else "(none)",
+        ])
+        return "\n".join(parts)
+
+    system_prompt = _build_chat_context(selected_date)
+
+    # Chat history per-run (resets when user picks a different date)
+    chat_key = f"chat_history_{selected_date}"
+    if chat_key not in st.session_state:
+        st.session_state[chat_key] = []
+
+    history = st.session_state[chat_key]
+
+    # Render history
+    for msg in history:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
+
+    if prompt := st.chat_input("Ask about the brief, an instrument, or how the system works"):
+        # Append user message
+        history.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+        # Build conversation: system + recent history
+        messages_user = []
+        for m in history[-12:]:  # cap context
+            messages_user.append(f"{m['role'].upper()}: {m['content']}")
+        user_msg = "\n\n".join(messages_user)
+
+        try:
+            client = OpenRouterClient()
+            with st.chat_message("assistant"):
+                with st.spinner("Thinking…"):
+                    result = client.complete(
+                        system=system_prompt,
+                        user=user_msg,
+                        tier="cheap",
+                        temperature=0.3,
+                    )
+                st.markdown(result.content)
+            history.append({"role": "assistant", "content": result.content})
+            st.session_state[chat_key] = history
+        except Exception as e:
+            with st.chat_message("assistant"):
+                st.error(f"Couldn't reach the model: {e}")
 
 
 # ---- Inspect (deep-dive: everything else) ----
