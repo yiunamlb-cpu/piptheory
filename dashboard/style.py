@@ -33,6 +33,12 @@ CSS = """
   --text-secondary: #57534E;
   --text-tertiary: #A8A29E;
 
+  /* === Brand accent (used persistently across the UI) === */
+  --brand: #0D9488;                    /* teal 600 — distinctive, finance-friendly */
+  --brand-tint: #F0FDFA;               /* teal 50 */
+  --brand-border: #99F6E4;             /* teal 200 */
+  --brand-strong: #115E59;             /* teal 800 */
+
   /* === Status accents (verdict-coded; used sparingly) === */
   --status-tradable: #059669;          /* emerald 600 */
   --status-tradable-tint: #ECFDF5;     /* emerald 50 */
@@ -45,6 +51,16 @@ CSS = """
   --status-pass: #78716C;              /* stone 500 */
   --status-pass-tint: #F5F5F4;         /* stone 100 */
   --status-pass-border: #D6D3D1;       /* stone 300 */
+
+  /* === Priority colors (for A+ / A / B / C badges) === */
+  --priority-aplus: #0D9488;           /* teal — top tier */
+  --priority-aplus-tint: #F0FDFA;
+  --priority-a: #059669;               /* emerald */
+  --priority-a-tint: #ECFDF5;
+  --priority-b: #D97706;               /* amber */
+  --priority-b-tint: #FFFBEB;
+  --priority-c: #78716C;               /* stone */
+  --priority-c-tint: #F5F5F4;
 
   /* === Type === */
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
@@ -283,13 +299,24 @@ header[data-testid="stHeader"] {
 
 .brand {
   font-family: var(--font-sans);
-  font-size: 16px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
   color: var(--text-primary);
   padding-bottom: var(--space-4);
   border-bottom: 1px solid var(--border);
   margin-bottom: var(--space-4);
+  position: relative;
+}
+.brand::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--brand);
+  margin-right: 8px;
+  transform: translateY(-2px);
 }
 .brand .meta {
   display: block;
@@ -297,16 +324,28 @@ header[data-testid="stHeader"] {
   color: var(--text-tertiary);
   font-weight: 400;
   margin-top: 4px;
+  margin-left: 16px;
   letter-spacing: 0;
 }
 
 .section-title {
   font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-tertiary);
+  letter-spacing: 0.1em;
+  color: var(--brand);
   font-weight: 600;
   margin: var(--space-6) 0 var(--space-3) 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  display: block;
+  width: 40px;
 }
 
 /* === Hero status card === */
@@ -319,12 +358,22 @@ header[data-testid="stHeader"] {
   margin-bottom: var(--space-6);
 }
 .hero-eyebrow {
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-tertiary);
+  letter-spacing: 0.12em;
+  color: var(--brand);
   margin-bottom: var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.hero-eyebrow::before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--brand);
 }
 .hero-headline {
   font-size: 28px;
@@ -344,7 +393,8 @@ header[data-testid="stHeader"] {
   background: linear-gradient(to right, var(--status-tradable-tint), var(--surface) 60%);
 }
 .hero.standby {
-  border-left: 4px solid var(--status-pass);
+  border-left: 4px solid var(--brand);
+  background: linear-gradient(to right, var(--brand-tint), var(--surface) 60%);
 }
 
 /* === Status pill === */
@@ -470,13 +520,57 @@ header[data-testid="stHeader"] {
   align-items: center;
   gap: var(--space-3);
   font-size: 12px;
-  color: var(--text-tertiary);
-  padding: 6px 12px;
-  background: var(--surface-muted);
+  color: var(--brand-strong);
+  padding: 6px 14px;
+  background: var(--brand-tint);
+  border: 1px solid var(--brand-border);
   border-radius: var(--radius-pill);
   font-family: var(--font-mono);
   margin-bottom: var(--space-4);
+  font-weight: 500;
 }
+
+/* === Priority badges (color-coded by tier) === */
+.priority-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  font-family: var(--font-mono);
+  border: 1px solid;
+}
+.priority-badge.aplus {
+  color: var(--priority-aplus);
+  background: var(--priority-aplus-tint);
+  border-color: var(--priority-aplus);
+}
+.priority-badge.a {
+  color: var(--priority-a);
+  background: var(--priority-a-tint);
+  border-color: var(--priority-a);
+}
+.priority-badge.b {
+  color: var(--priority-b);
+  background: var(--priority-b-tint);
+  border-color: var(--priority-b);
+}
+.priority-badge.c {
+  color: var(--priority-c);
+  background: var(--priority-c-tint);
+  border-color: var(--priority-c);
+}
+
+/* === Conviction indicator (subtle color by intensity) === */
+.conviction {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 13px;
+}
+.conviction.high { color: var(--brand-strong); }    /* 7-10 */
+.conviction.med  { color: var(--text-secondary); }   /* 4-6 */
+.conviction.low  { color: var(--text-tertiary); }    /* 1-3 */
 </style>
 """
 

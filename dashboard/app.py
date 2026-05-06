@@ -33,6 +33,25 @@ from dashboard.loader import (
 )
 from dashboard.style import inject_css, status_pill
 
+
+def _priority_badge(priority: str) -> str:
+    if not priority:
+        return ""
+    cls = {"A+": "aplus", "A": "a", "B": "b", "C": "c"}.get(priority, "")
+    return f'<span class="priority-badge {cls}">{priority}</span>' if cls else ""
+
+
+def _conviction_html(conviction: int) -> str:
+    if not conviction:
+        return ""
+    if conviction >= 7:
+        cls = "high"
+    elif conviction >= 4:
+        cls = "med"
+    else:
+        cls = "low"
+    return f'<span class="conviction {cls}">{conviction}/10</span>'
+
 # Active universe (matches ACTIVE_UNIVERSE in src/orchestration/pipeline.py)
 ACTIVE_UNIVERSE = ["ES", "NQ", "GC"]
 
@@ -216,7 +235,7 @@ for col, instrument in zip(cols, ACTIVE_UNIVERSE):
         if bias and bias.conviction:
             rows_html += (
                 f'<div class="inst-card-row"><span class="label">Conviction</span>'
-                f'<span class="value">{bias.conviction}/10</span></div>'
+                f'<span class="value">{_conviction_html(bias.conviction)}</span></div>'
             )
         if bias and bias.timeframe:
             rows_html += (
@@ -226,7 +245,7 @@ for col, instrument in zip(cols, ACTIVE_UNIVERSE):
         if bias and bias.priority:
             rows_html += (
                 f'<div class="inst-card-row"><span class="label">Priority</span>'
-                f'<span class="value">{bias.priority}</span></div>'
+                f'<span class="value">{_priority_badge(bias.priority)}</span></div>'
             )
 
         st.markdown(
@@ -328,8 +347,8 @@ with tab_inspect:
                     f'<div style="color: var(--text-secondary); font-size:14px; margin-top:4px;">{b.bias}</div>'
                     f'</div>'
                     f'<div style="display:flex; gap:8px; align-items:center;">'
-                    f'<span style="font-family: var(--font-mono); font-size:13px; color: var(--text-tertiary);">'
-                    f'{b.conviction}/10 · {b.priority or "—"}</span>'
+                    f'{_conviction_html(b.conviction)}'
+                    f'{_priority_badge(b.priority)}'
                     f'{badge}'
                     f'</div>'
                     f'</div>'
