@@ -65,98 +65,98 @@
     </div>
   </section>
 
-  <!-- ACTIVE UNIVERSE -->
+  <!-- UNIFIED WATCHLIST (single ranked list) -->
   <section class="section">
-    <h2 class="section-title">Active universe</h2>
-    <div class="grid grid-3">
-      {% for c in active_cards %}
-      <article class="inst-card inst-card-{{ c.verdict_class }}">
-        <header class="inst-card-head">
-          <div>
-            <div class="inst-card-symbol">{{ c.symbol }}
-              <span class="inst-card-name">{{ c.name }}</span>
-            </div>
-            <div class="inst-card-sub">
-              {% if c.platform_differs %}MT5: {{ c.platform }} · {% endif %}{{ c.bias }}
-            </div>
-          </div>
-          <span class="pill pill-{{ c.verdict_class }}">{{ c.verdict_label }}</span>
-        </header>
-        <dl class="inst-card-rows">
-          {% if c.conviction %}
-          <div class="inst-card-row">
-            <dt>Conviction</dt>
-            <dd><span class="conviction conviction-{{ c.conviction_class }}">{{ c.conviction }}/10</span></dd>
-          </div>
-          {% endif %}
-          {% if c.timeframe %}
-          <div class="inst-card-row">
-            <dt>Timeframe</dt><dd>{{ c.timeframe }}</dd>
-          </div>
-          {% endif %}
-          {% if c.priority %}
-          <div class="inst-card-row">
-            <dt>Priority</dt>
-            <dd><span class="badge badge-{{ c.priority_class }}">{{ c.priority }}</span></dd>
-          </div>
-          {% endif %}
-        </dl>
-      </article>
-      {% endfor %}
+    <div class="section-header">
+      <h2 class="section-title">Watchlist</h2>
+      <p class="section-help">
+        All instruments, ranked by what's actionable today. Conviction is the
+        Judge's final number when the council debate ran (active universe);
+        Strategist's otherwise. <strong>Same number everywhere.</strong>
+      </p>
     </div>
-  </section>
 
-  <!-- WIDER WATCHLIST -->
-  {% if context_high or context_low %}
-  <section class="section">
-    {% if context_high %}
-    <h2 class="section-title">Wider watchlist · worth a look</h2>
-    <p class="section-help">
-      Outside the active universe, conviction ≥ 7/10. No structural filter is run — context only.
-    </p>
+    {% if not watchlist_visible and not watchlist_collapsed %}
+    <div class="empty-state"><h3>No instruments parsed</h3></div>
+    {% else %}
+
     <div class="grid grid-2">
-      {% for b in context_high %}
-      <article class="surface-card">
-        <div class="ctx-row">
-          <div class="ctx-meta">
-            <div class="ctx-symbol">{{ b.symbol }}
-              <span class="ctx-name">{{ b.name }}{% if b.platform_differs %} · MT5: {{ b.platform }}{% endif %}</span>
+      {% for r in watchlist_visible %}
+      <article class="wl-card wl-card-{{ r.verdict_class if r.verdict else 'neutral' }}">
+        <div class="wl-card-head">
+          <div class="wl-card-id">
+            <div class="wl-symbol">{{ r.symbol }}
+              <span class="wl-name">{{ r.name }}{% if r.platform_differs %} · MT5: {{ r.platform }}{% endif %}</span>
             </div>
-            <div class="ctx-bias">{{ b.bias }}</div>
+            <div class="wl-bias">{{ r.bias }}</div>
           </div>
-          <span class="conviction conviction-{{ b.conviction_class }}">{{ b.conviction }}/10</span>
+          <div class="wl-card-tags">
+            {% if r.verdict %}
+              <span class="pill pill-{{ r.verdict_class }}">{{ r.verdict_label }}</span>
+            {% elif r.in_active %}
+              <span class="pill pill-neutral">Active · no filter</span>
+            {% else %}
+              <span class="pill pill-neutral">Context</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="wl-card-foot">
+          <span class="wl-conviction conviction-{{ r.conviction_class }}">
+            <span class="num">{{ r.conviction }}/10</span>
+            <span class="lbl">{{ 'Judge' if r.conviction_source == 'judge' else 'Strategist' }}</span>
+          </span>
+          {% if r.timeframe %}<span class="wl-meta">{{ r.timeframe }}</span>{% endif %}
+          {% if r.priority %}<span class="badge badge-{{ r.priority_class }}">{{ r.priority }}</span>{% endif %}
         </div>
       </article>
       {% endfor %}
     </div>
-    {% endif %}
 
-    {% if context_low %}
-    <details class="collapse">
+    {% if watchlist_collapsed %}
+    <details class="collapse" style="margin-top: 12px;">
       <summary>
-        Lower-conviction items ({{ context_low|length }} hidden):
-        <span class="muted">{{ context_low_summary }}</span>
+        Lower-priority items ({{ watchlist_collapsed|length }}):
+        <span class="muted">{{ watchlist_collapsed_summary }}</span>
       </summary>
-      <p class="section-help">Weak macro alignment today. Hidden to reduce noise.</p>
+      <p class="section-help">
+        Either <strong>passed despite bias</strong> (macro-aligned but structurally
+        unfavourable) or simply low macro conviction. Listed here for completeness.
+      </p>
       <div class="grid grid-2">
-        {% for b in context_low %}
-        <article class="surface-card">
-          <div class="ctx-row">
-            <div class="ctx-meta">
-              <div class="ctx-symbol">{{ b.symbol }}
-                <span class="ctx-name">{{ b.name }}{% if b.platform_differs %} · MT5: {{ b.platform }}{% endif %}</span>
+        {% for r in watchlist_collapsed %}
+        <article class="wl-card wl-card-{{ r.verdict_class if r.verdict else 'neutral' }}">
+          <div class="wl-card-head">
+            <div class="wl-card-id">
+              <div class="wl-symbol">{{ r.symbol }}
+                <span class="wl-name">{{ r.name }}{% if r.platform_differs %} · MT5: {{ r.platform }}{% endif %}</span>
               </div>
-              <div class="ctx-bias">{{ b.bias }}</div>
+              <div class="wl-bias">{{ r.bias }}</div>
             </div>
-            <span class="conviction conviction-{{ b.conviction_class }}">{{ b.conviction }}/10</span>
+            <div class="wl-card-tags">
+              {% if r.verdict %}
+                <span class="pill pill-{{ r.verdict_class }}">{{ r.verdict_label }}</span>
+              {% elif r.in_active %}
+                <span class="pill pill-neutral">Active · low conviction</span>
+              {% else %}
+                <span class="pill pill-neutral">Context</span>
+              {% endif %}
+            </div>
+          </div>
+          <div class="wl-card-foot">
+            <span class="wl-conviction conviction-{{ r.conviction_class }}">
+              <span class="num">{{ r.conviction }}/10</span>
+              <span class="lbl">{{ 'Judge' if r.conviction_source == 'judge' else 'Strategist' }}</span>
+            </span>
+            {% if r.priority %}<span class="badge badge-{{ r.priority_class }}">{{ r.priority }}</span>{% endif %}
           </div>
         </article>
         {% endfor %}
       </div>
     </details>
     {% endif %}
+
+    {% endif %}
   </section>
-  {% endif %}
 
   <!-- TABS -->
   <nav class="tabs" role="tablist">

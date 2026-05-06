@@ -64,6 +64,7 @@ class CouncilOutput:
     bull: str = ""
     bear: str = ""
     judge: str = ""
+    judge_conviction: int = 0  # parsed from the judge card; authoritative when present
 
 
 @dataclass
@@ -193,6 +194,12 @@ def load_run(run_date: str) -> Run | None:
                 continue
             entry = council.setdefault(instrument, CouncilOutput(instrument=instrument))
             setattr(entry, role, _read(f))
+        # Parse judge conviction (authoritative final number per instrument)
+        for instrument, co in council.items():
+            if co.judge:
+                m = _CONVICTION_PATTERN.search(co.judge)
+                if m:
+                    co.judge_conviction = int(m.group(1))
         run.council = council
 
     # Layer 4b — Tradability Filter outputs

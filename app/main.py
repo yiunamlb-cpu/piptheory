@@ -153,6 +153,81 @@ def _verdict_label(verdict: str) -> str:
     }.get(verdict, verdict)
 
 
+def _build_unified_watchlist(run: Run) -> list[dict]:
+    """One ranked list of all instruments. Authoritative conviction = Judge if
+    available, else Strategist. Each row carries: actionability tier, status pill,
+    and active-universe membership."""
+    rows: list[dict] = []
+    for b in run.instrument_biases:
+        # Resolve final conviction (Judge wins over Strategist)
+        co = run.council.get(b.instrument)
+        if co and co.judge_conviction:
+            final_conv = co.judge_conviction
+            conv_source = "judge"
+        else:
+            final_conv = b.conviction
+            conv_source = "strategist"
+
+        in_active = b.instrument in ACTIVE_UNIVERSE
+        filter_card = run.tradability.get(b.instrument)
+        verdict = filter_card.verdict if filter_card else None
+
+        # Actionability tier (sorts within the unified list)
+        # 0 = tradable_now (top)
+        # 1 = watch
+        # 2 = high-conviction context (≥7) without filter
+        # 3 = passed_despite_bias  (still informative — show with low priority)
+        # 4 = active universe with low conviction (no filter ran)
+        # 5 = low-conviction context
+        if verdict == "tradable_now":
+            tier = 0
+            tier_label = "tradable_now"
+        elif verdict == "watch":
+            tier = 1
+            tier_label = "watch"
+        elif verdict == "pass_despite_bias":
+            tier = 3
+            tier_label = "passed"
+        elif final_conv >= 7:
+            tier = 2
+            tier_label = "context"
+        elif in_active:
+            tier = 4
+            tier_label = "active_low"
+        else:
+            tier = 5
+            tier_label = "context_low"
+
+        rows.append({
+            "symbol": b.instrument,
+            "name": display_label(b.instrument),
+            "platform": platform_symbol(b.instrument),
+            "platform_differs": platform_symbol(b.instrument) != b.instrument,
+            "bias": b.bias.lower() or "no view",
+            "conviction": final_conv,
+            "conviction_class": _conviction_class(final_conv),
+            "conviction_source": conv_source,  # 'judge' or 'strategist'
+            "strategist_conviction": b.conviction,
+            "in_active": in_active,
+            "verdict": verdict or "",
+            "verdict_class": {
+                "tradable_now": "tradable",
+                "watch": "watch",
+                "pass_despite_bias": "passed",
+            }.get(verdict, "neutral"),
+            "verdict_label": _verdict_label(verdict) if verdict else "",
+            "tier": tier,
+            "tier_label": tier_label,
+            "priority": b.priority,
+            "priority_class": _priority_class(b.priority),
+            "timeframe": b.timeframe,
+        })
+
+    # Sort: tier ascending, then conviction descending, then symbol
+    rows.sort(key=lambda r: (r["tier"], -r["conviction"], r["symbol"]))
+    return rows
+
+
 # ---------- routes ----------
 
 @app.get("/", response_class=HTMLResponse)
@@ -177,50 +252,13 @@ async def run_page(request: Request, date: str):
     by_verdict = _categorise_filter(run)
     hero = _hero_state(run, by_verdict)
 
-    # Active universe cards
-    active_cards = []
-    for inst in ACTIVE_UNIVERSE:
-        bias = _bias_for(run, inst)
-        filter_card = run.tradability.get(inst)
-        active_cards.append({
-            "symbol": inst,
-            "name": display_label(inst),
-            "platform": platform_symbol(inst),
-            "platform_differs": platform_symbol(inst) != inst,
-            "bias": (bias.bias if bias else "no bias yet").lower(),
-            "conviction": bias.conviction if bias else 0,
-            "conviction_class": _conviction_class(bias.conviction if bias else 0),
-            "priority": bias.priority if bias else "",
-            "priority_class": _priority_class(bias.priority if bias else ""),
-            "timeframe": bias.timeframe if bias else "",
-            "verdict": filter_card.verdict if filter_card else "",
-            "verdict_class": {
-                "tradable_now": "tradable",
-                "watch": "watch",
-                "pass_despite_bias": "passed",
-            }.get(filter_card.verdict if filter_card else "", "neutral"),
-            "verdict_label": _verdict_label(filter_card.verdict) if filter_card else "no filter",
-        })
+    # Unified watchlist: one ranked list, authoritative conviction (Judge > Strategist)
+    watchlist = _build_unified_watchlist(run)
 
-    # Wider watchlist split by conviction
-    context = sorted(
-        [b for b in run.instrument_biases if b.instrument not in ACTIVE_UNIVERSE],
-        key=lambda b: -b.conviction,
-    )
-    high_conv = [b for b in context if b.conviction >= CONTEXT_CONVICTION_THRESHOLD]
-    low_conv = [b for b in context if b.conviction < CONTEXT_CONVICTION_THRESHOLD]
-
-    def _ctx_card(b: InstrumentBias) -> dict:
-        plat = platform_symbol(b.instrument)
-        return {
-            "symbol": b.instrument,
-            "name": display_label(b.instrument),
-            "platform": plat,
-            "platform_differs": plat != b.instrument,
-            "bias": b.bias,
-            "conviction": b.conviction,
-            "conviction_class": _conviction_class(b.conviction),
-        }
+    # Split into top-of-page (actionable + high conviction) and collapsed (rest)
+    # Tier 0-2 are visible; 3-5 collapsed by default
+    visible = [r for r in watchlist if r["tier"] <= 2]
+    collapsed = [r for r in watchlist if r["tier"] > 2]
 
     return templates.TemplateResponse(
         request,
@@ -230,11 +268,10 @@ async def run_page(request: Request, date: str):
             "runs": runs,
             "run": run,
             "hero": hero,
-            "active_cards": active_cards,
-            "context_high": [_ctx_card(b) for b in high_conv],
-            "context_low": [_ctx_card(b) for b in low_conv],
-            "context_low_summary": " · ".join(
-                f"{b.instrument} {b.conviction}/10" for b in low_conv
+            "watchlist_visible": visible,
+            "watchlist_collapsed": collapsed,
+            "watchlist_collapsed_summary": " · ".join(
+                f"{r['symbol']} {r['conviction']}/10" for r in collapsed
             ),
             "by_verdict": {
                 "tradable": [
