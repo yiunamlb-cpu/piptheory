@@ -44,6 +44,10 @@
   let pollTimer = null;
   let logVisible = false;
   let wasRunning = false;
+  // Latest completion timestamp at page load — used to detect 'a new run
+  // finished' even if it was started outside this browser tab (cron task,
+  // terminal, server restart, etc.)
+  let initialCompletedAt = null;
 
   function setBannerKind(kind) {
     banner.className = "run-banner" + (kind ? " " + kind : "");
@@ -125,6 +129,12 @@
       const data = await r.json();
       setLastUpdated(data.latest);
 
+      // Capture the initial completion timestamp the first time we see one.
+      const completed = (data.latest && data.latest.completed_at) || null;
+      if (initialCompletedAt === null && completed) {
+        initialCompletedAt = completed;
+      }
+
       if (data.running) {
         showRunningBanner(data);
         if (logVisible) fetchLog();
@@ -132,8 +142,17 @@
           runBtn.disabled = true;
           runBtn.querySelector("span:last-child").textContent = "Running…";
         }
+        // Start polling if we hit a running state from a static page load
+        if (!pollTimer) startPolling();
         wasRunning = true;
       } else {
+        // A run completed since this page loaded — pickup new data.
+        if (initialCompletedAt && completed && completed !== initialCompletedAt) {
+          showCompletedBanner();
+          setTimeout(() => location.reload(), 1500);
+          stopPolling();
+          return;
+        }
         if (wasRunning) {
           showCompletedBanner();
           setTimeout(() => location.reload(), 1500);
@@ -141,6 +160,10 @@
         } else {
           stopPolling();
           hideBanner();
+          if (runBtn && runBtn.disabled) {
+            runBtn.disabled = false;
+            runBtn.querySelector("span:last-child").textContent = "Run again";
+          }
         }
       }
     } catch (e) {

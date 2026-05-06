@@ -469,11 +469,15 @@ async def api_chat(req: ChatRequest):
 
 @app.post("/api/run")
 async def api_run():
-    if _is_run_alive(_run_state["pid"]):
+    # Don't start a second run if one is already going (whether internally
+    # tracked or detected from the log/process state).
+    detected = _detect_running_pipeline()
+    if detected:
         return JSONResponse({
             "status": "already_running",
-            "pid": _run_state["pid"],
-            "started_at": _run_state["started_at"].isoformat() if _run_state["started_at"] else None,
+            "pid": detected.get("pid"),
+            "source": detected.get("source"),
+            "started_at": detected.get("started_at"),
         })
     bat = PROJECT_ROOT / "scripts" / "run_daily.bat"
     if not bat.exists():
@@ -494,6 +498,80 @@ async def api_run():
 
 
 _LOG_PATH = PROJECT_ROOT / "logs" / "bias_engine.log"
+
+# Matches the timestamp written by run_daily.bat's "Run started DATE TIME"
+# header line, which uses Windows "DD/MM/YYYY  H:MM:SS.cc" format.
+_LOG_RUN_STARTED_RE = re.compile(
+    r"Run started\s+(\d{1,2}/\d{1,2}/\d{4})\s+(\d{1,2}:\d{2}:\d{2})"
+)
+
+
+def _find_recent_run_start(tail: list[str]) -> datetime | None:
+    """Walk a log tail backward for the most recent 'Run started' line.
+
+    Used when we're rendering an in-progress run that this uvicorn instance
+    didn't launch — e.g., the user clicked Run, server got restarted, the
+    pipeline kept going. We can still time it by reading the start timestamp
+    from the log header that run_daily.bat writes.
+    """
+    for ln in reversed(tail):
+        m = _LOG_RUN_STARTED_RE.search(ln)
+        if not m:
+            continue
+        date_str, time_str = m.groups()
+        for fmt in ("%d/%m/%Y %H:%M:%S", "%m/%d/%Y %H:%M:%S"):
+            try:
+                return datetime.strptime(f"{date_str} {time_str}", fmt)
+            except ValueError:
+                continue
+    return None
+
+
+def _detect_running_pipeline() -> dict | None:
+    """Return run-in-progress info if a pipeline is currently running.
+
+    Two detection paths:
+      1. Internal — _run_state['pid'] is alive. Cheap, exact start time.
+      2. Log-based — log file modified within last 5 min AND the tail
+         doesn't show a 'Run finished'. Catches runs the server didn't
+         start (cron task, terminal, or pre-restart). 5-minute threshold
+         is wide enough that slow agent calls (DeepSeek can take 3 min)
+         don't false-negative.
+    """
+    # 1. Internal
+    pid = _run_state.get("pid")
+    if pid and _is_run_alive(pid):
+        started = _run_state.get("started_at")
+        return {
+            "pid": pid,
+            "started_at": started.isoformat() if started else None,
+            "source": "internal",
+        }
+
+    # 2. Log-based
+    if not _LOG_PATH.exists():
+        return None
+    mtime = datetime.fromtimestamp(_LOG_PATH.stat().st_mtime)
+    age_seconds = (datetime.now() - mtime).total_seconds()
+    if age_seconds > 300:
+        return None
+    tail = _read_log_tail(30)
+    # Most-recent 'Run finished' line means we're past the run, not in it.
+    if any("Run finished" in ln for ln in tail[-10:]):
+        return None
+    # An agent call must be in flight (or some layer activity)
+    if not any(
+        ("openrouter_call_start" in ln or "run_agent_start" in ln or "layer" in ln)
+        for ln in tail
+    ):
+        return None
+    start_time = _find_recent_run_start(_read_log_tail(800))
+    return {
+        "pid": None,
+        "started_at": start_time.isoformat() if start_time else None,
+        "source": "external",
+    }
+
 
 # Pipeline stages, in order, with friendly labels. Used to render progress.
 _STAGES = [
@@ -573,31 +651,37 @@ def _latest_run_meta() -> dict | None:
 
 @app.get("/api/run/status")
 async def api_run_status():
-    pid = _run_state["pid"]
-    started = _run_state["started_at"]
-
-    # Always include "latest completed run" so the UI can show timestamp
     latest = _latest_run_meta()
 
-    if not pid:
+    detected = _detect_running_pipeline()
+    if not detected:
+        # No internal PID and no log activity — clear the stale internal state
+        # so a future button-press doesn't think a run is already going.
+        if _run_state.get("pid"):
+            _run_state["pid"] = None
+            _run_state["started_at"] = None
         return JSONResponse({"running": False, "latest": latest})
 
-    alive = _is_run_alive(pid)
-    if not alive:
-        _run_state["pid"] = None
-        return JSONResponse({"running": False, "pid": pid, "latest": latest})
-
-    elapsed_s = int((datetime.now() - started).total_seconds()) if started else 0
-    stage_info = _detect_current_stage(_read_log_tail(200))
-
-    # Estimate progress (rough). Pipeline avg ~12 min = 720s.
+    started_iso = detected.get("started_at")
+    started_dt: datetime | None = None
+    if started_iso:
+        try:
+            started_dt = datetime.fromisoformat(started_iso)
+        except ValueError:
+            started_dt = None
+    elapsed_s = (
+        int((datetime.now() - started_dt).total_seconds())
+        if started_dt else 0
+    )
     est_total = 900
-    pct = min(95, int(elapsed_s / est_total * 100))
+    pct = min(95, int(elapsed_s / est_total * 100)) if elapsed_s else 0
+    stage_info = _detect_current_stage(_read_log_tail(200))
 
     return JSONResponse({
         "running": True,
-        "pid": pid,
-        "started_at": started.isoformat() if started else None,
+        "pid": detected.get("pid"),
+        "source": detected.get("source"),
+        "started_at": started_iso,
         "elapsed_seconds": elapsed_s,
         "estimated_total_seconds": est_total,
         "estimated_pct": pct,
