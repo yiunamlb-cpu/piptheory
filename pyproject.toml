@@ -17,7 +17,6 @@ dependencies = [
     "pandas>=2.2.0",
     "numpy>=1.26.0",
     "tenacity>=9.0.0",
-    "streamlit>=1.40.0",
     "yfinance>=0.2.40",
 ]
 

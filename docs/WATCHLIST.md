@@ -4,16 +4,22 @@ Ten instruments. Cover every macro theme; minimize redundancy; all FTMO-tradeabl
 
 Composition: ~50% FX, 20% indices, 20% commodities, 10% rates. FX-weighted because FX is the most analytically tractable asset class for a solo operator with LLM agents — cleaner driver set, two-sided macro plays, COT data is rich, central bank communication is the master variable.
 
-## Active universe (Commits B onward)
+## Focus list (formerly "active universe")
 
-The pipeline now distinguishes **active universe** from **context watchlist**:
+The user-facing dashboard term is **focus list** — instruments that go through the full pipeline (Layer 1 macro → Layer 2 strategist → Layer 3 contrarian → Layer 4 council debate → Layer 4b Tradability Filter → Layer 5 PM brief). The internal code constant is still `ACTIVE_UNIVERSE` in `src/orchestration/pipeline.py`.
 
-| Tier | Instruments | Treatment |
-|---|---|---|
-| **Active** | **ES (US500), NQ (NAS100), GC (XAUUSD)** | Full pipeline: Layer 1 → 2 → 3 → 4 council → 4b Tradability Filter → 5 PM brief. These are the instruments whose setups can show up on the PM brief as `tradable_now`. |
-| **Context** | DXY, EURUSD, USDJPY, GBPUSD, AUDUSD, CL, ZN | Layer 1 → 2 only. Strategist produces bias cards for these so the human sees the wider macro picture, but they do not pass through the filter or appear on the PM brief as actionable. |
+**Current focus list: all 10 instruments** (DXY, EURUSD, USDJPY, GBPUSD, AUDUSD, ES, NQ, GC, CL, ZN).
 
-This narrowing is a deliberate consequence of the architectural review (priority #4): keep the active universe small while we refine output quality. If the system is consistently producing useful, selective briefs on these three for a few months, the active universe can expand (likely starting with EURUSD).
+The focus list started as the 3 most-tradeable on FTMO (ES, NQ, GC) per the architectural review's "keep the universe small while we refine" guidance. It was later expanded to all 10 once the pipeline was producing reliable output.
+
+**What "in the focus list" means concretely:**
+- The Layer 4 council (Bull / Bear / Judge) runs for the instrument when its Strategist conviction meets the threshold (currently 5/10).
+- The Layer 4b Tradability Filter runs after the Judge, producing a structural-review verdict: `tradable_now`, `watch`, or `pass_despite_bias`.
+- The PM brief categorizes setups in this instrument by filter verdict.
+
+Instruments outside the focus list (currently none) would still get Layer 1-3 analysis as wider macro context, but no chart-level review and no PM-brief categorization.
+
+**Cost trade-off**: full focus-list coverage runs ~$0.80-1.20 per pipeline run vs ~$0.30 with the original three. Daily cost ~$25-35/month at the expanded universe.
 
 ## FX (5)
 
