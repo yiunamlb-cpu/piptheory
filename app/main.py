@@ -150,6 +150,7 @@ def _verdict_label(verdict: str) -> str:
         "watch": "Watch",
         "pass_despite_bias": "Passed",
         "skip_no_data": "No data",
+        "below_threshold": "Below threshold",
         "unparseable": "Unparseable",
     }.get(verdict, verdict)
 
@@ -167,6 +168,15 @@ _FILTER_YAML_BLOCK_RE = re.compile(
 # regex fallback that tolerates indented continuation lines.
 _VERDICT_REASON_PLAIN_RE = re.compile(
     r"verdict_reason:\s*[\"']([^\"'\n]+)[\"']", re.IGNORECASE,
+)
+# Inline unquoted bare scalar — value continues to end-of-line. Used when the
+# agent emits `verdict_reason: Applied swing rules: price...` without quotes.
+# Such input fails YAML's mapping parser (the colon in the value looks like a
+# nested mapping), so we need a regex that doesn't depend on YAML.
+# The negative lookahead `(?![>|\s\n])` excludes the folded/literal markers
+# `>` and `|` and empty values — those use the multi-line block path.
+_VERDICT_REASON_INLINE_RE = re.compile(
+    r"verdict_reason:[ \t]+(?![>|\s\n])([^\n]+)", re.IGNORECASE,
 )
 _VERDICT_REASON_BLOCK_RE = re.compile(
     r"verdict_reason:\s*[>|]?\s*\n((?:[ \t]+[^\n]+\n?)+)", re.IGNORECASE,
@@ -203,7 +213,12 @@ def _filter_field(filter_md: str, key: str) -> str:
     if parsed and isinstance(parsed.get(key), str):
         return parsed[key].strip()
     if key == "verdict_reason":
+        # Try quoted single-line first (cleanest), then unquoted inline,
+        # then folded/literal block scalar.
         m = _VERDICT_REASON_PLAIN_RE.search(filter_md or "")
+        if m:
+            return m.group(1).strip()
+        m = _VERDICT_REASON_INLINE_RE.search(filter_md or "")
         if m:
             return m.group(1).strip()
         m = _VERDICT_REASON_BLOCK_RE.search(filter_md or "")
@@ -217,6 +232,16 @@ def _filter_field(filter_md: str, key: str) -> str:
 _STRATEGIST_NOTES_RE = re.compile(
     r"NOTES?:?\**\s*([^\n*]+(?:\n(?!#|\*\*)[^\n]+)*)", re.IGNORECASE,
 )
+# Judge's "JUDGMENT REASONING (3-5 sentences):" block — the substantive macro
+# story explaining WHY the bias is what it is. Captures the lines that follow
+# the heading until a blank line or the next ALL-CAPS section header.
+# Tolerates markdown emphasis (**JUDGMENT REASONING:**), trailing spaces,
+# and parenthetical asides ("(3-5 sentences)") between the label and colon.
+_JUDGE_REASONING_RE = re.compile(
+    r"\**\s*JUDGMENT\s+REASONING[^\n:]*:\**\s*\n+"
+    r"((?:.+?\n?)+?)(?=\n\s*\n|\n\**\s*[A-Z][A-Z ]+(?:[:(]|\s*\n)|\Z)",
+    re.IGNORECASE,
+)
 _JUDGE_PRIMARY_THEME_RE = re.compile(
     r"PRIMARY\s*THEME[^:]*:\s*([^\n]+)", re.IGNORECASE,
 )
@@ -228,16 +253,48 @@ _DRIVING_THEMES_RE = re.compile(
 )
 
 
+def _first_sentence(text: str, max_chars: int = 240) -> str:
+    """First sentence of a paragraph, truncated to max_chars.
+
+    Sentences end at `. ` or `.<newline>` or end-of-text. Em/en dashes inside
+    a sentence don't count as terminators. If the first 'sentence' is longer
+    than max_chars, hard-truncate at a word boundary.
+    """
+    text = re.sub(r"\s+", " ", text).strip()
+    # First sentence: up to first period followed by space or end-of-string.
+    m = re.search(r"^(.+?\.)(?:\s|$)", text)
+    if m:
+        first = m.group(1).strip()
+    else:
+        first = text
+    if len(first) > max_chars:
+        cut = first[:max_chars].rsplit(" ", 1)[0]
+        first = cut + "…"
+    return first
+
+
 def _extract_macro_summary(b: InstrumentBias, co) -> str:
     """One-sentence macro driver summary: why is the bias what it is?
 
-    Priority:
-      1. Judge's PRIMARY THEME line (most authoritative when council ran)
-      2. Strategist's first 'Primary:' theme line
-      3. Strategist DRIVING THEMES block (first line)
-      4. Bias direction + conviction (composed fallback)
+    Priority (best content first):
+      1. Judge's JUDGMENT REASONING first sentence — substantive macro story
+      2. Judge's PRIMARY THEME line (label only — fallback when reasoning
+         block can't be extracted)
+      3. Strategist's first 'Primary:' theme line
+      4. Strategist DRIVING THEMES block (first line)
+      5. Bias direction + conviction (composed fallback)
     """
     if co and co.judge:
+        m = _JUDGE_REASONING_RE.search(co.judge)
+        if m:
+            block = m.group(1).strip()
+            # Drop leading bullet/numbering noise and markdown emphasis chars
+            block = re.sub(r"^[-*#>•\s]+", "", block).lstrip()
+            block = block.replace("**", "").replace("*", "")
+            first = _first_sentence(block, max_chars=260)
+            if 30 <= len(first) <= 260:
+                return f"Macro: {first}"
+
         m = _JUDGE_PRIMARY_THEME_RE.search(co.judge)
         if m:
             theme = m.group(1).strip().strip("[]").rstrip(".")
@@ -248,7 +305,6 @@ def _extract_macro_summary(b: InstrumentBias, co) -> str:
         m = _STRATEGIST_PRIMARY_RE.search(b.raw_section)
         if m:
             theme = m.group(1).strip().strip("*").rstrip(".")
-            # Strip "(bullish USD)" parens or directional hints — often noisy
             if 5 <= len(theme) <= 200:
                 return f"Macro: {theme}."
         m = _DRIVING_THEMES_RE.search(b.raw_section)
@@ -320,25 +376,43 @@ def _build_unified_watchlist(run: Run) -> list[dict]:
         verdict = filter_card.verdict if filter_card else None
 
         # Actionability tier.
-        # Filter verdict ALWAYS wins over conviction — if the structural
-        # review said skip, it's collapsed regardless of how high the
-        # macro conviction is. Visibility: tiers 0-2 visible (cards),
-        # 3-4 collapsed (compact list).
-        if verdict == "tradable_now":
+        # Two principles:
+        #   (a) Filter verdict ALWAYS wins over conviction — if structural
+        #       review said skip, it's collapsed regardless of macro conviction.
+        #   (b) Conviction < 5 ALWAYS collapses, even if Filter said watch.
+        #       This is the defensive layer in case the pipeline lets a
+        #       sub-threshold case slip through to the Filter agent.
+        # Visibility: tiers 0-2 visible (cards), 3-4 collapsed (compact list).
+        if final_conv < 5 and verdict not in ("tradable_now",):
+            # Sub-threshold conviction — collapse regardless of Filter verdict.
+            # tradable_now is the one carve-out: if the Filter genuinely thinks
+            # the chart is so clean that conviction can be revisited, surface it.
+            tier, tier_label = 4, "low_conv"
+        elif verdict == "tradable_now":
             tier, tier_label = 0, "tradable_now"
         elif verdict == "watch":
             tier, tier_label = 1, "watch"
         elif verdict == "pass_despite_bias":
             tier, tier_label = 3, "passed"
+        elif verdict == "below_threshold":
+            tier, tier_label = 4, "low_conv"
         elif final_conv >= 6:
             tier, tier_label = 2, "high_conv_no_filter"  # high conv but no filter ran
         else:
             tier, tier_label = 4, "low_conv"
 
-        # Single pill label (plain English)
+        # Single pill label (plain English).
+        # Sub-threshold conviction (<5) is the dominant fact; the Filter
+        # verdict is suppressed in the pill because the structural review
+        # shouldn't have been treated as authoritative on a thin macro view.
+        # tradable_now is the carve-out — if the chart is exceptionally clean
+        # we still surface it.
         if verdict == "tradable_now":
             pill_text = "Tradable now"
             pill_class = "tradable"
+        elif final_conv < 5:
+            pill_text = "Low conviction"
+            pill_class = "neutral"
         elif verdict == "watch":
             pill_text = "Watch"
             pill_class = "watch"
@@ -352,10 +426,14 @@ def _build_unified_watchlist(run: Run) -> list[dict]:
             pill_text = "Low conviction"
             pill_class = "neutral"
 
-        # Short one-line explanation suitable for a compact row in the
-        # collapsed 'Other' section. Falls back through several sources.
+        # Short one-line explanation for the compact 'Other' row.
+        # Priority:
+        #   1. Filter's verdict_reason — if a structural review happened,
+        #      use what it concluded (informative regardless of verdict).
+        #   2. Sub-threshold conviction message
+        #   3. Generic per-verdict fallback
         simple_summary = ""
-        if verdict == "pass_despite_bias" and filter_card and filter_card.raw:
+        if filter_card and filter_card.raw:
             reason = _filter_field(filter_card.raw, "verdict_reason")
             if reason:
                 simple_summary = reason.rstrip(".") + "."

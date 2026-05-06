@@ -249,12 +249,45 @@ class BiasEngine:
         soon as that instrument's Judge finishes, without waiting for
         other instruments' councils to complete.
 
+        Re-gate after Judge: if the Judge knocks conviction below the council
+        threshold, the macro view is no longer strong enough to justify a
+        structural review. Skip the Filter API call AND emit a synthetic
+        below-threshold card so the dashboard tier logic can handle it
+        cleanly. (The Filter agent's own prompt says "skip if Judge < 5",
+        but it has been observed to run anyway on borderline cases — this
+        gate makes the rule architectural, not advisory.)
+
         Returns: {"council": {bull, bear, judge}, "filter": {...filter card dict}}.
         """
         council = self.run_council_for_instrument(
             instrument, strategist_output, contrarian_output, themes,
         )
-        filter_card = self.run_setup_filter(instrument, council["judge"], themes)
+        judge_conv = self._extract_conviction(council["judge"])
+        if judge_conv < COUNCIL_CONVICTION_THRESHOLD:
+            log.info(
+                "filter_skipped_below_threshold",
+                instrument=instrument,
+                judge_conviction=judge_conv,
+                threshold=COUNCIL_CONVICTION_THRESHOLD,
+            )
+            filter_card = {
+                "instrument": instrument,
+                "verdict": "below_threshold",
+                "agent_output": (
+                    "```yaml\n"
+                    f"instrument: {instrument}\n"
+                    f"judge_conviction: {judge_conv}\n"
+                    f"verdict: below_threshold\n"
+                    f"verdict_reason: \"Judge conviction {judge_conv}/10 is "
+                    f"below the {COUNCIL_CONVICTION_THRESHOLD}/10 threshold; "
+                    f"no structural review performed. Macro view too weak "
+                    f"to justify gating on chart structure.\"\n"
+                    "```\n"
+                ),
+                "setup_context": None,
+            }
+        else:
+            filter_card = self.run_setup_filter(instrument, council["judge"], themes)
         return {"instrument": instrument, "council": council, "filter": filter_card}
 
     # --- Layer 4b — Tradability Filter ---
