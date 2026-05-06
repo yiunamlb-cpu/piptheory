@@ -1,0 +1,81 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Virtual environments ---
+venv/
+.venv/
+env/
+.env/
+
+# --- Secrets / credentials (NEVER commit) ---
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.token
+secrets.*
+config.local.*
+
+# --- IDE / editor ---
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# --- OS ---
+desktop.ini
+Thumbs.db
+.DS_Store
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Data caches (large / derivable / refetchable) ---
+.cache/
+data/cache/
+data/raw/
+*.parquet
+*.feather
+*.h5
+
+# --- Trade journal & positions (sensitive trading data) ---
+journal/
+trades/
+positions/
+fills/
+
+# --- Backtest outputs ---
+backtest_results/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- Model artifacts ---
+models/checkpoints/
+*.pkl
+*.joblib
+
+# --- Agent traces (Langfuse exports, debug dumps) ---
+traces/
+
+# --- NT8 compiled / build artifacts ---
+*.dll
+*.pdb
+*.user
+
+# --- Misc ---
+*.bak
+*.tmp
