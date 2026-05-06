@@ -20,6 +20,7 @@ from pathlib import Path
 import structlog
 
 import json
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from src.agents import run_agent
 from src.config import BIAS_CARDS_DIR
@@ -128,6 +129,30 @@ class BiasEngine:
         user_msg = fed_watcher_input(snapshot)
         result = run_agent("layer1_specialists/fed_watcher", user_msg, client=self.client)
         return result.content
+
+    def run_layer1_parallel(self) -> dict[str, str]:
+        """Run the three Layer 1 specialists concurrently.
+
+        Each reads its own data sources and produces an independent output;
+        no cross-specialist dependencies. Three threads, OpenRouter calls
+        block on network I/O, GIL-friendly.
+        """
+        log.info("layer1_parallel_start")
+        with ThreadPoolExecutor(max_workers=3, thread_name_prefix="L1") as ex:
+            futures = {
+                "inflation": ex.submit(self.run_inflation_tracker),
+                "positioning": ex.submit(self.run_positioning_analyst),
+                "fed": ex.submit(self.run_fed_watcher),
+            }
+            outputs: dict[str, str] = {}
+            for key, fut in futures.items():
+                try:
+                    outputs[key] = fut.result()
+                except Exception as e:
+                    log.error("layer1_parallel_failed", specialist=key, error=str(e))
+                    outputs[key] = f"(specialist failed: {e})"
+        log.info("layer1_parallel_complete")
+        return outputs
 
     # --- Layer 2 ---
 
@@ -303,13 +328,12 @@ class BiasEngine:
         result = PipelineResult(run_date=run_date)
         themes = load_themes()
 
-        # Layer 1
-        result.layer1["inflation"] = self.run_inflation_tracker()
-        (out_dir / "01_layer1_inflation.md").write_text(result.layer1["inflation"], encoding="utf-8")
-        result.layer1["positioning"] = self.run_positioning_analyst()
-        (out_dir / "01_layer1_positioning.md").write_text(result.layer1["positioning"], encoding="utf-8")
-        result.layer1["fed"] = self.run_fed_watcher()
-        (out_dir / "01_layer1_fed.md").write_text(result.layer1["fed"], encoding="utf-8")
+        # Layer 1 — three specialists run in parallel (independent data sources)
+        layer1 = self.run_layer1_parallel()
+        result.layer1 = layer1
+        (out_dir / "01_layer1_inflation.md").write_text(layer1.get("inflation", ""), encoding="utf-8")
+        (out_dir / "01_layer1_positioning.md").write_text(layer1.get("positioning", ""), encoding="utf-8")
+        (out_dir / "01_layer1_fed.md").write_text(layer1.get("fed", ""), encoding="utf-8")
 
         # Layer 2
         result.layer2_strategist = self.run_strategist(result.layer1, themes)
