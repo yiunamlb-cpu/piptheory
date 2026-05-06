@@ -257,9 +257,43 @@ button, .stButton > button {
   font-weight: 500 !important;
 }
 
-/* Hide Streamlit chrome */
-#MainMenu, footer, [data-testid="stToolbar"] { visibility: hidden; }
-header[data-testid="stHeader"] { background: transparent !important; }
+/* Streamlit chrome — hide the deploy/share/menu items, but KEEP the sidebar
+   collapse control so the user can re-open the sidebar after hiding it. */
+#MainMenu, footer { visibility: hidden !important; }
+[data-testid="stDeployButton"], .stDeployButton { display: none !important; }
+[data-testid="stStatusWidget"] { display: none !important; }
+header[data-testid="stHeader"] {
+  background: transparent !important;
+  height: auto !important;
+}
+
+/* Sidebar collapse / expand chevron — must remain visible.
+   Style it to fit the monochrome design. */
+[data-testid="collapsedControl"],
+[data-testid="stSidebarCollapseButton"],
+[data-testid="stSidebarCollapsedControl"] {
+  visibility: visible !important;
+  display: flex !important;
+  color: var(--color-inkwell) !important;
+  background: var(--color-paper-white) !important;
+  border: 1px solid var(--color-divider) !important;
+  border-radius: var(--radius-input) !important;
+  padding: 4px !important;
+  z-index: 999 !important;
+}
+
+[data-testid="collapsedControl"] svg,
+[data-testid="stSidebarCollapseButton"] svg,
+[data-testid="stSidebarCollapsedControl"] svg {
+  fill: var(--color-inkwell) !important;
+  color: var(--color-inkwell) !important;
+}
+
+[data-testid="collapsedControl"]:hover,
+[data-testid="stSidebarCollapseButton"]:hover,
+[data-testid="stSidebarCollapsedControl"]:hover {
+  background: var(--color-parchment) !important;
+}
 
 /* === Custom components === */
 
