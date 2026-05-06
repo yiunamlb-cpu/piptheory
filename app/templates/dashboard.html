@@ -23,7 +23,24 @@
   </div>
 </header>
 
-<div id="run-status-banner" class="run-banner" hidden></div>
+<div id="run-status-banner" class="run-banner" hidden>
+  <div class="run-banner-row">
+    <div class="run-banner-spinner" aria-hidden="true"></div>
+    <div class="run-banner-text">
+      <div class="run-banner-stage" id="run-stage">Starting…</div>
+      <div class="run-banner-meta">
+        <span id="run-elapsed">00:00</span>
+        <span class="dot-sep" aria-hidden="true">·</span>
+        <span id="run-pct">0%</span>
+        <span class="dot-sep" aria-hidden="true">·</span>
+        <span id="run-pid"></span>
+      </div>
+    </div>
+    <button class="btn btn-secondary btn-sm" id="run-log-toggle">Show log</button>
+  </div>
+  <div class="run-banner-progress"><div class="run-banner-bar" id="run-bar"></div></div>
+  <pre class="run-banner-log" id="run-log" hidden></pre>
+</div>
 
 <main class="container">
 
@@ -33,17 +50,19 @@
     <h1 class="hero-headline">{{ hero.headline }}</h1>
     <p class="hero-subline">{{ hero.subline }}</p>
 
-    {% if run.run_summary.get('total_cost_usd') is not none %}
     <div class="hero-meta">
       <span>{{ run_date }}</span>
+      {% if run.run_summary.get('total_cost_usd') is not none %}
       <span class="dot-sep" aria-hidden="true">·</span>
       <span>${{ "%.4f"|format(run.run_summary['total_cost_usd']) }} run cost</span>
+      {% endif %}
       {% if run.tradability %}
       <span class="dot-sep" aria-hidden="true">·</span>
       <span>{{ run.tradability|length }} filter cards</span>
       {% endif %}
+      <span class="dot-sep" aria-hidden="true">·</span>
+      <span>last updated <span id="last-updated">…</span></span>
     </div>
-    {% endif %}
   </section>
 
   <!-- ACTIVE UNIVERSE -->

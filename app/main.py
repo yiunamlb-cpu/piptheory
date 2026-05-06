@@ -396,23 +396,123 @@ async def api_run():
     })
 
 
+_LOG_PATH = PROJECT_ROOT / "logs" / "bias_engine.log"
+
+# Pipeline stages, in order, with friendly labels. Used to render progress.
+_STAGES = [
+    ("layer1_inflation_start", "Layer 1 — Inflation Tracker"),
+    ("layer1_positioning_start", "Layer 1 — Positioning Analyst"),
+    ("layer1_fed_start", "Layer 1 — Fed-Watcher"),
+    ("layer2_strategist_start", "Layer 2 — Strategist (synthesis)"),
+    ("layer3_contrarian_start", "Layer 3 — Contrarian (red team)"),
+    ("layer4_council_start", "Layer 4 — Bias Council debate"),
+    ("layer4b_filter_start", "Layer 4b — Tradability Filter"),
+    ("layer5_pm_start", "Layer 5 — PM Brief"),
+]
+
+
+def _read_log_tail(n: int = 50) -> list[str]:
+    if not _LOG_PATH.exists():
+        return []
+    try:
+        with _LOG_PATH.open("r", encoding="utf-8", errors="replace") as f:
+            lines = f.readlines()
+        return [ln.rstrip("\n") for ln in lines[-n:]]
+    except Exception:
+        return []
+
+
+def _detect_current_stage(log_tail: list[str]) -> dict:
+    """Find the most recent stage start line in the log."""
+    stage_label = "Starting…"
+    instrument: str | None = None
+    agent: str | None = None
+    last_event_line: str | None = None
+    # walk backward through log; first matching event wins
+    for ln in reversed(log_tail):
+        if not last_event_line and "[info" in ln:
+            last_event_line = ln
+        for marker, label in _STAGES:
+            if marker in ln:
+                stage_label = label
+                # try pull instrument= from same line
+                if "instrument=" in ln:
+                    try:
+                        instrument = ln.split("instrument=")[1].split()[0]
+                    except Exception:
+                        pass
+                if "agent=" in ln:
+                    try:
+                        agent = ln.split("agent=")[1].split()[0]
+                    except Exception:
+                        pass
+                if instrument:
+                    stage_label = f"{stage_label} · {instrument}"
+                if agent and "agent_start" in ln:
+                    stage_label = f"{stage_label} ({agent})"
+                return {"stage": stage_label, "last_event_line": last_event_line}
+    return {"stage": stage_label, "last_event_line": last_event_line}
+
+
+def _latest_run_meta() -> dict | None:
+    """Read most recent completed run's summary."""
+    runs = list_runs()
+    if not runs:
+        return None
+    summary_path = PROJECT_ROOT / "bias_cards" / runs[0] / "run_summary.json"
+    if not summary_path.exists():
+        return {"run_date": runs[0], "completed_at": None, "cost_usd": None}
+    try:
+        data = json.loads(summary_path.read_text(encoding="utf-8"))
+        mtime = datetime.fromtimestamp(summary_path.stat().st_mtime)
+        return {
+            "run_date": data.get("run_date", runs[0]),
+            "completed_at": mtime.isoformat(timespec="seconds"),
+            "cost_usd": data.get("total_cost_usd"),
+        }
+    except Exception:
+        return {"run_date": runs[0], "completed_at": None, "cost_usd": None}
+
+
 @app.get("/api/run/status")
 async def api_run_status():
     pid = _run_state["pid"]
     started = _run_state["started_at"]
+
+    # Always include "latest completed run" so the UI can show timestamp
+    latest = _latest_run_meta()
+
     if not pid:
-        return JSONResponse({"running": False})
+        return JSONResponse({"running": False, "latest": latest})
+
     alive = _is_run_alive(pid)
     if not alive:
         _run_state["pid"] = None
-        return JSONResponse({"running": False, "pid": pid})
-    elapsed_s = (datetime.now() - started).total_seconds() if started else 0
+        return JSONResponse({"running": False, "pid": pid, "latest": latest})
+
+    elapsed_s = int((datetime.now() - started).total_seconds()) if started else 0
+    stage_info = _detect_current_stage(_read_log_tail(200))
+
+    # Estimate progress (rough). Pipeline avg ~12 min = 720s.
+    est_total = 900
+    pct = min(95, int(elapsed_s / est_total * 100))
+
     return JSONResponse({
         "running": True,
         "pid": pid,
         "started_at": started.isoformat() if started else None,
-        "elapsed_seconds": int(elapsed_s),
+        "elapsed_seconds": elapsed_s,
+        "estimated_total_seconds": est_total,
+        "estimated_pct": pct,
+        "stage": stage_info["stage"],
+        "last_event_line": stage_info["last_event_line"],
+        "latest": latest,
     })
+
+
+@app.get("/api/run/log")
+async def api_run_log(lines: int = 30):
+    return JSONResponse({"lines": _read_log_tail(lines)})
 
 
 # ---------- markdown rendering helper for templates ----------

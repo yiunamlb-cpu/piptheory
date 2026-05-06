@@ -32,46 +32,110 @@
   // ----- Run-now button + status banner -----
   const runBtn = document.getElementById("run-now-btn");
   const banner = document.getElementById("run-status-banner");
-  let pollTimer = null;
+  const stageEl = document.getElementById("run-stage");
+  const elapsedEl = document.getElementById("run-elapsed");
+  const pctEl = document.getElementById("run-pct");
+  const pidEl = document.getElementById("run-pid");
+  const barEl = document.getElementById("run-bar");
+  const logEl = document.getElementById("run-log");
+  const logToggle = document.getElementById("run-log-toggle");
+  const lastUpdatedEl = document.getElementById("last-updated");
 
-  function showBanner(msg, kind) {
-    if (!banner) return;
-    banner.textContent = msg;
+  let pollTimer = null;
+  let logVisible = false;
+  let wasRunning = false;
+
+  function setBannerKind(kind) {
     banner.className = "run-banner" + (kind ? " " + kind : "");
-    banner.hidden = false;
   }
+
+  function fmtElapsed(seconds) {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+  }
+
+  function fmtRelativeTime(isoStr) {
+    if (!isoStr) return "—";
+    const t = new Date(isoStr);
+    const now = new Date();
+    const diffMs = now - t;
+    const diffMin = Math.floor(diffMs / 60000);
+    if (diffMin < 1) return "just now";
+    if (diffMin < 60) return diffMin + " min ago";
+    const diffHr = Math.floor(diffMin / 60);
+    if (diffHr < 24) return diffHr + " hr ago";
+    const diffDays = Math.floor(diffHr / 24);
+    return diffDays + " day" + (diffDays !== 1 ? "s" : "") + " ago";
+  }
+
+  function setLastUpdated(latest) {
+    if (!lastUpdatedEl) return;
+    if (!latest || !latest.completed_at) {
+      lastUpdatedEl.textContent = "—";
+      return;
+    }
+    const t = new Date(latest.completed_at);
+    const local = t.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    lastUpdatedEl.textContent = `${local} (${fmtRelativeTime(latest.completed_at)})`;
+  }
+
+  function showRunningBanner(data) {
+    setBannerKind(null);
+    banner.hidden = false;
+    if (stageEl) stageEl.textContent = data.stage || "Running…";
+    if (elapsedEl) elapsedEl.textContent = fmtElapsed(data.elapsed_seconds || 0);
+    if (pctEl) pctEl.textContent = (data.estimated_pct || 0) + "%";
+    if (pidEl) pidEl.textContent = "PID " + (data.pid || "?");
+    if (barEl) barEl.style.width = (data.estimated_pct || 0) + "%";
+  }
+
+  function showCompletedBanner() {
+    setBannerKind("success");
+    if (stageEl) stageEl.textContent = "✓ Pipeline finished — refreshing to load the new brief…";
+    if (pctEl) pctEl.textContent = "100%";
+    if (barEl) barEl.style.width = "100%";
+    if (logToggle) logToggle.style.display = "none";
+  }
+
   function hideBanner() {
-    if (!banner) return;
     banner.hidden = true;
   }
 
   function startPolling() {
     if (pollTimer) return;
-    pollTimer = setInterval(checkStatus, 5000);
+    pollTimer = setInterval(checkStatus, 4000);
     checkStatus();
   }
   function stopPolling() {
     if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
   }
 
+  async function fetchLog() {
+    try {
+      const r = await fetch("/api/run/log?lines=30");
+      const data = await r.json();
+      if (logEl) logEl.textContent = (data.lines || []).join("\n");
+    } catch (e) { /* ignore */ }
+  }
+
   async function checkStatus() {
     try {
       const r = await fetch("/api/run/status");
       const data = await r.json();
+      setLastUpdated(data.latest);
+
       if (data.running) {
-        const m = Math.floor(data.elapsed_seconds / 60);
-        const s = data.elapsed_seconds % 60;
-        const mm = String(m).padStart(2, "0");
-        const ss = String(s).padStart(2, "0");
-        showBanner(`⏳ Pipeline running · PID ${data.pid} · ${mm}:${ss} elapsed · refresh page when complete`, null);
+        showRunningBanner(data);
+        if (logVisible) fetchLog();
         if (runBtn) {
           runBtn.disabled = true;
           runBtn.querySelector("span:last-child").textContent = "Running…";
         }
+        wasRunning = true;
       } else {
-        if (runBtn && runBtn.disabled) {
-          // Just finished
-          showBanner("✓ Pipeline finished. Refresh to load the new run.", null);
+        if (wasRunning) {
+          showCompletedBanner();
           setTimeout(() => location.reload(), 1500);
           stopPolling();
         } else {
@@ -80,35 +144,57 @@
         }
       }
     } catch (e) {
-      // ignore transient
+      // transient — keep polling
     }
+  }
+
+  if (logToggle) {
+    logToggle.addEventListener("click", () => {
+      logVisible = !logVisible;
+      if (logEl) logEl.hidden = !logVisible;
+      logToggle.textContent = logVisible ? "Hide log" : "Show log";
+      if (logVisible) fetchLog();
+    });
   }
 
   if (runBtn) {
     runBtn.addEventListener("click", async () => {
       if (runBtn.disabled) return;
+      const ok = confirm(
+        "Run a fresh pipeline now?\n\n" +
+        "This takes 10-15 minutes and ~$0.20.\n" +
+        "It overwrites today's existing brief — only one run per date is kept.\n\n" +
+        "Continue?"
+      );
+      if (!ok) return;
       runBtn.disabled = true;
       runBtn.querySelector("span:last-child").textContent = "Starting…";
+      wasRunning = true;
       try {
         const r = await fetch("/api/run", { method: "POST" });
         const data = await r.json();
         if (r.ok) {
-          showBanner("⏳ Pipeline started · PID " + data.pid, null);
           startPolling();
         } else {
-          showBanner("Could not start: " + (data.detail || "unknown"), "error");
+          banner.hidden = false;
+          setBannerKind("error");
+          stageEl.textContent = "Could not start: " + (data.detail || "unknown");
           runBtn.disabled = false;
           runBtn.querySelector("span:last-child").textContent = "Run analysis";
         }
       } catch (e) {
-        showBanner("Could not start: " + e.message, "error");
+        banner.hidden = false;
+        setBannerKind("error");
+        stageEl.textContent = "Could not start: " + e.message;
         runBtn.disabled = false;
         runBtn.querySelector("span:last-child").textContent = "Run analysis";
       }
     });
 
-    // Check on load — maybe a run is already in progress
+    // Check on load — picks up an in-progress run started elsewhere (e.g. cron)
     checkStatus();
+    // Light polling regardless — every 30s we refresh the "last updated"
+    setInterval(checkStatus, 30000);
   }
 
   // ----- Ask (chat) -----
