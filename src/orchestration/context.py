@@ -17,22 +17,43 @@ def load_themes() -> str:
     return path.read_text(encoding="utf-8")
 
 
+# Block prepended to every agent input message that consumes data carrying
+# freshness tags. Keep short - the rule is the value, not the wording.
+FRESHNESS_INSTRUCTION = (
+    "Each datum below carries a freshness tag in the form "
+    "[fresh|recent|stale · obs DATE · released DATE · Nd old]. Treat stale data "
+    "with caution: do NOT state high-confidence directional conclusions when the "
+    "primary supporting evidence is `stale`. Reduce confidence at least one level "
+    "(high→medium, medium→low) when reasoning leans on stale-tagged inputs. "
+    "Note this freshness consideration explicitly in your output."
+)
+
+
 def fred_snapshot_to_text(snapshot: pd.DataFrame) -> str:
-    """Render FRED snapshot DataFrame as a readable text block."""
-    lines = ["FRED snapshot (latest available values):"]
+    """Render FRED snapshot DataFrame as a readable text block with freshness tags."""
+    lines = ["FRED snapshot (latest values, with freshness tags):"]
     for _, row in snapshot.iterrows():
         if pd.isna(row["value"]):
             lines.append(f"  {row['series']:24s} ({row['fred_id']}): no data")
-        else:
-            lines.append(
-                f"  {row['series']:24s} ({row['fred_id']:14s}): "
-                f"{row['value']:>10.3f}  as of {row['date']}"
-            )
+            continue
+        delta = ""
+        if row.get("change") is not None and not pd.isna(row.get("change")):
+            arrow = "+" if row["change"] >= 0 else ""
+            delta = f"  Δ {arrow}{row['change']:.3f}"
+        tag = row.get("freshness_tag", "")
+        lines.append(
+            f"  {row['series']:24s} ({row['fred_id']:14s}): "
+            f"{row['value']:>10.3f}{delta}  {tag}"
+        )
     return "\n".join(lines)
 
 
 def cot_summaries_to_text(summaries: list[dict]) -> str:
-    """Render COT summaries as JSON for agent consumption."""
+    """Render COT summaries as JSON for agent consumption.
+
+    Each summary already carries freshness_label and freshness_tag fields
+    (see src/data/cot.py).
+    """
     return json.dumps(summaries, indent=2, default=str)
 
 
@@ -40,7 +61,8 @@ def inflation_tracker_input(snapshot: pd.DataFrame, yoy_data: dict[str, float]) 
     today = datetime.now().date().isoformat()
     return (
         f"# Inflation Tracker — Live Data, {today}\n\n"
-        f"Apply the methodology in your prompt against this data.\n"
+        f"{FRESHNESS_INSTRUCTION}\n\n"
+        f"Apply the methodology in your prompt against this data. "
         f"Produce the structured output schema specified in your prompt.\n\n"
         f"## Latest FRED prints\n\n{fred_snapshot_to_text(snapshot)}\n\n"
         f"## Year-over-year computed values\n\n"
@@ -53,8 +75,11 @@ def positioning_analyst_input(summaries: list[dict]) -> str:
     today = datetime.now().date().isoformat()
     return (
         f"# Positioning Analyst — Live COT Data, {today}\n\n"
+        f"{FRESHNESS_INSTRUCTION}\n\n"
         f"Apply your methodology (positioning.md). Produce per-instrument structured "
-        f"output, then a 1-2 line summary identifying the most extreme positioning.\n\n"
+        f"output, then a 1-2 line summary identifying the most extreme positioning. "
+        f"Each summary in the JSON below has a `freshness_label` and `freshness_tag` "
+        f"field — surface these in your reasoning and conviction calibration.\n\n"
         f"## COT data\n\n```json\n{cot_summaries_to_text(summaries)}\n```\n"
     )
 
@@ -63,6 +88,7 @@ def fed_watcher_input(rate_snapshot: pd.DataFrame) -> str:
     today = datetime.now().date().isoformat()
     return (
         f"# Fed-Watcher — Live Rate Data, {today}\n\n"
+        f"{FRESHNESS_INSTRUCTION}\n\n"
         f"NOTE: FOMC statement text is not yet wired in (Phase B). For this run, "
         f"reason from rate path data alone — Fed funds target, market pricing "
         f"via Treasury yields, breakevens. Produce your structured output schema, "
@@ -77,9 +103,14 @@ def strategist_input(layer1_outputs: dict[str, str], themes: str) -> str:
         f"# FX + Cross-Asset Strategist — Synthesis, {today}",
         "",
         "Synthesize the Layer 1 specialist outputs into per-instrument bias cards "
-        "for the watchlist (DXY, EURUSD, USDJPY, GBPUSD, AUDUSD, ES, NQ, GC, CL, ZN). "
-        "Apply your methodology. Produce one bias card per instrument plus the "
-        "summary table, exactly per your output schema.",
+        "for the watchlist. Apply your methodology. Produce one bias card per "
+        "instrument plus the summary table, exactly per your output schema.",
+        "",
+        "**Freshness note:** Layer 1 specialists were instructed to flag the "
+        "freshness of their underlying inputs (`fresh` / `recent` / `stale`). "
+        "Respect those assessments. Do not upgrade conviction beyond what the "
+        "freshest supporting evidence justifies. Note where stale data is "
+        "doing load-bearing work in your synthesis.",
         "",
         "## Active themes (from docs/THEMES.md)",
         "",

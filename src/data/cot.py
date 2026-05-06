@@ -15,6 +15,7 @@ import pandas as pd
 import structlog
 
 from src.config import STATE_DIR
+from src.data.freshness import Freshness
 
 log = structlog.get_logger(__name__)
 
@@ -220,11 +221,28 @@ class CotClient:
         else:
             extreme_weeks = 0
 
+        # Freshness: COT publishes Friday for Tuesday close. Use report_date
+        # as the observation_date and approximate release_date as +3 days.
+        if latest_date is not None and not pd.isna(latest_date):
+            obs_date = latest_date.date() if hasattr(latest_date, "date") else latest_date
+            from datetime import timedelta
+            release_date = obs_date + timedelta(days=3)
+            fresh = Freshness.from_observation(obs_date, release_date=release_date)
+            freshness_label = fresh.label
+            freshness_tag = fresh.render()
+            data_age_days = fresh.age_days
+        else:
+            freshness_label = "stale"
+            freshness_tag = "[unavailable]"
+            data_age_days = None
+
         return {
             "instrument": instrument,
             "status": "ok",
             "report_date": latest_date.isoformat() if latest_date is not None and not pd.isna(latest_date) else None,
-            "data_age_days": (datetime.now() - latest_date).days if latest_date is not None and not pd.isna(latest_date) else None,
+            "data_age_days": data_age_days,
+            "freshness_label": freshness_label,
+            "freshness_tag": freshness_tag,
             "primary_category": long_col.replace("_Positions_Long_All", "").replace("_Long_All", ""),
             "net_position": int(latest_net),
             "percentile_3yr": round(pct, 1),

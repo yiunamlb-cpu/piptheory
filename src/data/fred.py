@@ -17,6 +17,7 @@ from fredapi import Fred
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from src.config import STATE_DIR, settings
+from src.data.freshness import Freshness
 
 log = structlog.get_logger(__name__)
 
@@ -175,19 +176,43 @@ class FredClient:
         return (s / s.shift(periods) - 1.0) * 100.0
 
     def snapshot(self, names: Iterable[str] | None = None) -> pd.DataFrame:
-        """Return a snapshot DataFrame with the latest value of each series.
+        """Return a snapshot DataFrame with the latest value + freshness metadata.
 
-        Useful for handing the agent a 'state of macro right now' summary.
+        Columns:
+            series, fred_id, observation_date, value, previous_value,
+            change, freshness_label, age_days, freshness_tag
         """
         names = list(names) if names else list(self._name_to_id)
         rows = []
         for name in names:
+            fred_id = self._name_to_id[name]
             try:
-                d, v = self.latest(name)
-                rows.append({"series": name, "fred_id": self._name_to_id[name],
-                             "date": d.date().isoformat(), "value": v})
+                series = self.series(name).dropna()
+                if series.empty:
+                    raise ValueError("empty series")
+                obs_date = series.index[-1].date()
+                value = float(series.iloc[-1])
+                previous_value = float(series.iloc[-2]) if len(series) >= 2 else None
+                fresh = Freshness.from_observation(
+                    obs_date, series_id=fred_id,
+                )
+                rows.append({
+                    "series": name,
+                    "fred_id": fred_id,
+                    "observation_date": obs_date.isoformat(),
+                    "value": round(value, 4),
+                    "previous_value": round(previous_value, 4) if previous_value is not None else None,
+                    "change": round(value - previous_value, 4) if previous_value is not None else None,
+                    "freshness_label": fresh.label,
+                    "age_days": fresh.age_days,
+                    "freshness_tag": fresh.render(),
+                })
             except Exception as e:
                 log.warning("snapshot_failed", series=name, error=str(e))
-                rows.append({"series": name, "fred_id": self._name_to_id[name],
-                             "date": None, "value": None})
+                rows.append({
+                    "series": name, "fred_id": fred_id,
+                    "observation_date": None, "value": None, "previous_value": None,
+                    "change": None, "freshness_label": "stale",
+                    "age_days": None, "freshness_tag": "[unavailable]",
+                })
         return pd.DataFrame(rows)
