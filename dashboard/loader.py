@@ -10,6 +10,42 @@ from pathlib import Path
 from src.config import BIAS_CARDS_DIR
 
 
+# Human-readable names + MT5/FTMO platform symbol where it differs.
+# Format kept short so it fits in card headers and selectboxes.
+INSTRUMENT_DISPLAY: dict[str, dict[str, str]] = {
+    "DXY":    {"name": "US Dollar Index",      "platform": "DXY"},
+    "EURUSD": {"name": "Euro / US Dollar",     "platform": "EURUSD"},
+    "USDJPY": {"name": "US Dollar / Yen",      "platform": "USDJPY"},
+    "GBPUSD": {"name": "Pound / US Dollar",    "platform": "GBPUSD"},
+    "AUDUSD": {"name": "Aussie / US Dollar",   "platform": "AUDUSD"},
+    "ES":     {"name": "S&P 500",              "platform": "US500"},
+    "NQ":     {"name": "Nasdaq 100",           "platform": "NAS100"},
+    "GC":     {"name": "Gold",                 "platform": "XAUUSD"},
+    "CL":     {"name": "WTI Crude Oil",        "platform": "USOIL"},
+    "ZN":     {"name": "US 10Y Treasury Note", "platform": "USTNOTE"},
+}
+
+
+def display_name(symbol: str) -> str:
+    """Return e.g. 'ES — S&P 500' or just the symbol if unknown."""
+    info = INSTRUMENT_DISPLAY.get(symbol.upper())
+    if not info:
+        return symbol
+    return f"{symbol} — {info['name']}"
+
+
+def display_label(symbol: str) -> str:
+    """Just the human-readable name (no symbol prefix), e.g. 'S&P 500'."""
+    info = INSTRUMENT_DISPLAY.get(symbol.upper())
+    return info["name"] if info else symbol
+
+
+def platform_symbol(symbol: str) -> str:
+    """Return the MT5/FTMO platform symbol if it differs (e.g. ES -> US500)."""
+    info = INSTRUMENT_DISPLAY.get(symbol.upper())
+    return info["platform"] if info else symbol
+
+
 @dataclass
 class InstrumentBias:
     """A single instrument's bias card extracted from the strategist output."""

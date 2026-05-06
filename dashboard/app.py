@@ -21,17 +21,20 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from dashboard.loader import (
+    INSTRUMENT_DISPLAY,
     InstrumentBias,
     Run,
     TradabilityFilterCard,
+    display_label,
+    display_name,
     list_runs,
     load_run,
+    platform_symbol,
 )
 from dashboard.style import inject_css, status_pill
 
 # Active universe (matches ACTIVE_UNIVERSE in src/orchestration/pipeline.py)
 ACTIVE_UNIVERSE = ["ES", "NQ", "GC"]
-ACTIVE_LABELS = {"ES": "S&P 500", "NQ": "Nasdaq 100", "GC": "Gold"}
 
 
 st.set_page_config(
@@ -136,7 +139,8 @@ st.markdown(
 # Hero card content depends on whether anything is tradable_now
 if tradable:
     n = len(tradable)
-    insts = ", ".join(c.instrument for c in tradable)
+    # Show "GC (Gold), NQ (Nasdaq 100)" rather than just "GC, NQ"
+    insts = ", ".join(f"{c.instrument} ({display_label(c.instrument)})" for c in tradable)
     hero_html = (
         f'<div class="hero tradable">'
         f'<div class="hero-eyebrow">Today\'s brief</div>'
@@ -204,7 +208,9 @@ for col, instrument in zip(cols, ACTIVE_UNIVERSE):
 
         direction = (bias.bias if bias else "").lower() or "no bias yet"
         conviction = bias.conviction if bias else 0
-        label = ACTIVE_LABELS.get(instrument, instrument)
+        label = display_label(instrument)
+        platform = platform_symbol(instrument)
+        sub_label = f"{label} · MT5: {platform}" if platform != instrument else label
 
         rows_html = ""
         if bias and bias.conviction:
@@ -227,8 +233,9 @@ for col, instrument in zip(cols, ACTIVE_UNIVERSE):
             f'<div class="inst-card {verdict_class}">'
             f'<div class="inst-card-header">'
             f'<div>'
-            f'<div class="inst-card-symbol">{instrument}</div>'
-            f'<div class="inst-card-direction">{label} · {direction}</div>'
+            f'<div class="inst-card-symbol">{instrument} <span style="font-weight:400; '
+            f'color: var(--text-secondary); font-size:14px; margin-left:6px;">{label}</span></div>'
+            f'<div class="inst-card-direction">{sub_label} · {direction}</div>'
             f'</div>'
             f'{status_pill(_verdict_label(verdict) if filter_card else "no filter", verdict_class)}'
             f'</div>'
@@ -270,7 +277,7 @@ with tab_filter:
             st.markdown('<div class="section-title">Tradable now</div>',
                         unsafe_allow_html=True)
             for card in tradable:
-                with st.expander(f"{card.instrument} — {_verdict_label(card.verdict)}",
+                with st.expander(f"{display_name(card.instrument)} — {_verdict_label(card.verdict)}",
                                  expanded=True):
                     st.markdown(card.raw)
 
@@ -278,14 +285,14 @@ with tab_filter:
             st.markdown('<div class="section-title">Watch — bias supported, location not yet tradable</div>',
                         unsafe_allow_html=True)
             for card in watching:
-                with st.expander(f"{card.instrument} — Watch", expanded=False):
+                with st.expander(f"{display_name(card.instrument)} — Watch", expanded=False):
                     st.markdown(card.raw)
 
         if passed:
             st.markdown('<div class="section-title">Passed — macro-aligned but structurally unfavorable</div>',
                         unsafe_allow_html=True)
             for card in passed:
-                with st.expander(f"{card.instrument} — Passed", expanded=False):
+                with st.expander(f"{display_name(card.instrument)} — Passed", expanded=False):
                     st.markdown(card.raw)
 
 
@@ -309,12 +316,16 @@ with tab_inspect:
             for b in biases_sorted:
                 in_active = b.instrument in ACTIVE_UNIVERSE
                 badge = '<span class="status-pill neutral">Active</span>' if in_active else ""
+                full_name = display_label(b.instrument)
+                plat = platform_symbol(b.instrument)
+                plat_part = f' · MT5: {plat}' if plat != b.instrument else ''
                 st.markdown(
                     f'<div class="surface-card">'
                     f'<div style="display:flex; justify-content:space-between; align-items:center;">'
                     f'<div>'
                     f'<span style="font-size:16px; font-weight:600;">{b.instrument}</span> '
-                    f'<span style="color: var(--text-secondary); font-size:14px; margin-left: 8px;">{b.bias}</span>'
+                    f'<span style="color: var(--text-secondary); font-size:13px; margin-left: 8px;">{full_name}{plat_part}</span>'
+                    f'<div style="color: var(--text-secondary); font-size:14px; margin-top:4px;">{b.bias}</div>'
                     f'</div>'
                     f'<div style="display:flex; gap:8px; align-items:center;">'
                     f'<span style="font-family: var(--font-mono); font-size:13px; color: var(--text-tertiary);">'
@@ -332,8 +343,13 @@ with tab_inspect:
             st.markdown('<div class="empty-state">No instruments parsed.</div>',
                         unsafe_allow_html=True)
         else:
-            pick = st.selectbox("Instrument", instruments, key="detail_pick",
-                                label_visibility="collapsed")
+            pick = st.selectbox(
+                "Instrument",
+                instruments,
+                key="detail_pick",
+                label_visibility="collapsed",
+                format_func=display_name,
+            )
             bias = _bias_for(pick)
             if bias:
                 with st.expander("Strategist bias card", expanded=True):
@@ -380,7 +396,7 @@ with tab_inspect:
                         unsafe_allow_html=True)
         else:
             for instrument, co in run.council.items():
-                st.markdown(f"### {instrument}")
+                st.markdown(f"### {display_name(instrument)}")
                 with st.expander("Bull", expanded=False):
                     st.markdown(co.bull or "_no output_")
                 with st.expander("Bear", expanded=False):
