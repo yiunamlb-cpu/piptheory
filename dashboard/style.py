@@ -92,8 +92,15 @@ p, li, .stMarkdown {
 .caption { font-size: var(--text-caption); color: var(--color-faded-stone); }
 .body-sm { font-size: var(--text-body-sm); }
 
-a { color: var(--color-inkwell); text-decoration: underline; text-underline-offset: 2px; }
-a:hover { text-decoration-thickness: 2px; }
+/* Streamlit's default link color is bright blue. Force monochrome. */
+a, a:visited,
+.stMarkdown a, .stMarkdown a:visited,
+[data-testid="stMarkdownContainer"] a {
+  color: var(--color-inkwell) !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px !important;
+}
+a:hover { text-decoration-thickness: 2px !important; }
 
 code, pre, .stCode {
   font-family: var(--font-mono) !important;
@@ -132,10 +139,28 @@ button, .stButton > button {
   border: 1px solid var(--color-divider) !important;
 }
 
-[data-testid="stSelectbox"] > div > div {
+[data-testid="stSelectbox"] > div > div,
+[data-testid="stSelectbox"] [data-baseweb="select"] > div {
   border-radius: var(--radius-input) !important;
   background: var(--color-parchment) !important;
   border: 1px solid var(--color-divider) !important;
+}
+
+[data-testid="stSelectbox"] [data-baseweb="select"]:focus-within > div,
+[data-testid="stSelectbox"] [aria-expanded="true"] {
+  border-color: var(--color-inkwell) !important;
+  box-shadow: none !important;
+}
+
+[data-baseweb="popover"] [role="option"][aria-selected="true"] {
+  background: var(--color-parchment) !important;
+  color: var(--color-inkwell) !important;
+}
+
+/* Focus rings: Streamlit defaults to blue */
+*:focus-visible {
+  outline: 1px solid var(--color-inkwell) !important;
+  outline-offset: 2px !important;
 }
 
 [data-testid="stTextInput"] input,
@@ -146,30 +171,54 @@ button, .stButton > button {
   color: var(--color-inkwell) !important;
 }
 
-/* Tabs: pill-style */
+/* Tabs: pill-style. Streamlit's BaseWeb tabs render text in nested <p>/<span>
+   elements, so we have to drill down. */
 [data-baseweb="tab-list"] {
   gap: var(--space-4) !important;
   border-bottom: none !important;
+  background: transparent !important;
 }
 
 [data-baseweb="tab"] {
   border-radius: var(--radius-pill) !important;
   padding: 6px 16px !important;
   background: transparent !important;
-  color: var(--color-faded-stone) !important;
   font-size: var(--text-body-sm) !important;
   font-weight: 400 !important;
   border: none !important;
+  margin: 0 !important;
+}
+
+[data-baseweb="tab"]:hover {
+  background: var(--color-parchment) !important;
+}
+
+[data-baseweb="tab"], [data-baseweb="tab"] *,
+[data-baseweb="tab"] p, [data-baseweb="tab"] span {
+  color: var(--color-faded-stone) !important;
+  text-decoration: none !important;
 }
 
 [data-baseweb="tab"][aria-selected="true"] {
   background: var(--color-graphite) !important;
+}
+
+[data-baseweb="tab"][aria-selected="true"],
+[data-baseweb="tab"][aria-selected="true"] *,
+[data-baseweb="tab"][aria-selected="true"] p,
+[data-baseweb="tab"][aria-selected="true"] span {
   color: var(--color-paper-white) !important;
 }
 
 [data-baseweb="tab-highlight"] {
   background: transparent !important;
   height: 0 !important;
+  display: none !important;
+}
+
+[data-baseweb="tab-border"] {
+  background: transparent !important;
+  display: none !important;
 }
 
 [data-testid="stTabsContent"] {
