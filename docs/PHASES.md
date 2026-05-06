@@ -93,9 +93,17 @@ If yes to all three: proceed to Phase B. If not: simplify, re-prompt, or kill.
 ## What's Deferred Past Phase C (Maybe Forever)
 
 - **Engine backtesting** — replaying the full agent stack on historical data. Real, valuable, expensive. Most solo macro traders never do this and trade fine without it.
-- **Auto-execution** — the agents *recommend*, the human *decides*. Removing the human is its own multi-month project with significant risk; the upside is marginal for a solo operator.
 - **Multi-strategy diversification** — if trend-pullback proves out, considered later. Don't fragment focus during the build.
 - **Equities or crypto extension** — different analytical toolkit; treat as separate project if ever pursued.
+
+## Out of scope (permanent)
+
+These are not deferred. They are not in this project's design space.
+
+- **Autonomous order placement.** The system never places, modifies, or cancels orders. The MT5 layer (when built) displays signals on charts and optionally posts alerts; it does not transmit orders.
+- **Automatic position sizing.** The PM brief discusses risk character (e.g., "high-quality setup, normal-size candidate") but never recommends specific contract counts, lot sizes, or dollar risk. Sizing is the human's decision.
+- **Self-managed position handling.** The system does not move stops, take profits, or scale into/out of positions. Trade management is the human's.
+- **Auto-execution behind any feature flag.** Not "deferred behind a flag." Not present. The architecture is decision-support; building execution would be a different project with a different risk profile.
 
 ## Anti-goals
 

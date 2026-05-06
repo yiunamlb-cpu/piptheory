@@ -1,31 +1,44 @@
 # mt5/
 
-MetaTrader 5 components — the execution side. FTMO-compatible (MT5 is one of FTMO's supported platforms).
+MetaTrader 5 components — **chart visualization only**. FTMO-compatible (MT5 is one of FTMO's supported platforms).
 
-## Planned components
+## Decision-support boundary
 
-- **`SignalConsumer/`** — MT5 EA written in MQL5 that connects to the Python signal server (via ZeroMQ or local file watcher), reads structured bias/setup signals, and either auto-executes (if user enables) or posts on-chart alerts for manual review. Manual is the default for FTMO accounts.
-- **`IndicatorPack/`** — visual aids on charts: structural pullback markers, regime overlay (current quadrant from Layer 1 specialists), emergency-stop guides, agent-conviction labels overlaid on watchlist symbols.
-- **`RiskOverlay/`** — FTMO rule enforcement at the EA level (daily loss limit, max drawdown, news-window trading restrictions, weekend close, consistency rule). The Risk Manager agent (Layer 5) enforces these in software; this overlay enforces them at the platform.
+This folder does not place, modify, or cancel orders. Ever.
 
-## Bridge architecture
+The system is a research desk that produces markdown bias briefs and structured filter outputs. Trade decisions, sizing, entry, and trade management are the human's responsibility, executed manually in MT5.
 
-Two-way communication between Python (research) and MT5 (execution):
+The MT5 layer's only role is making the agent's reasoning visible on charts where the human is already trading — so context comes to the trader, the trader doesn't context-switch to a separate dashboard while a setup is unfolding.
 
-- **Python → MT5 (commands, signals)**: ZeroMQ PUB from Python; SUB in MT5 EA. Or simpler: Python writes JSON files, MT5 EA polls. ZMQ for low-latency, files for robustness.
-- **MT5 → Python (price ticks, account state, fills)**: Either the `MetaTrader5` Python package (direct API to local terminal) or ZeroMQ PUB from MT5 EA, SUB in Python.
+## Planned components (all read-only with respect to orders)
 
-Reference projects:
-- `MetaTrader5` (official Python package by MetaQuotes) — the de facto standard
-- `DWX_ZeroMQ_Connector` (Darwinex Labs) — robust ZMQ bridge
+- **`ChartOverlay/`** — MT5 indicator (MQL5) that reads JSON written by the Python pipeline and renders structural markers on charts: trend-pullback zones, agent-supplied invalidation levels, regime quadrant label, conviction tier, freshness state of underlying data. Visual aid only.
+- **`AlertPoster/`** — MT5 EA that watches the bias-card directory and posts platform alerts ("EURUSD setup_filter: tradable_now") to MT5's alert system. The alert prompts the human to review the brief; it does not place orders.
+- **`RiskHud/`** — Heads-up display showing live FTMO state (daily loss vs limit, max DD vs trailing limit, news-window status, consistency rule status) so the human is aware of constraints before clicking. No automatic enforcement of orders.
+
+What you will NOT find here:
+- ❌ Order placement code
+- ❌ Position sizing logic
+- ❌ Stop-management automation
+- ❌ "Auto-trade if conviction > N" gates of any kind, behind any flag
+
+## Data flow
+
+One direction only: **Python → MT5 (read-only signals for display)**.
+
+- Python pipeline writes structured JSON to `bias_cards/{date}/` after each run
+- MT5 indicator/EA polls the directory (or reads via local file watcher) and renders annotations
+- Optional: ZeroMQ pub/sub if file polling latency becomes a problem (it won't, given the daily run cadence)
+
+MT5 → Python is **not** wired in this design. We don't need MT5's order/account state because the system never reasons about live positions. If price/tick data is needed for the Tradability Filter, it comes from a separate market-data source (yfinance, OANDA, etc.), not from the FTMO terminal.
 
 ## FTMO-specific notes
 
-- MT5 terminal must be the FTMO-provided build (or compatible)
-- EA running in algo trading mode; EA must respect FTMO trading hours and news restrictions
+- The MT5 terminal must be the FTMO-provided build (or compatible)
+- EAs and indicators here are for visual aid; they don't trip FTMO's automation rules because they don't transact
 - Compiled `.ex5` artifacts are gitignored; only `.mq5` source is committed
-- Test all logic in FTMO demo before any challenge attempt
+- Test all visualizations in FTMO demo before live use
 
 ## Phase relevance
 
-This folder is **Phase C work** — we don't build the bridge until the agent stack is producing value via markdown bias cards. Phase A and B output is human-read.
+This folder is **Phase C work**, optional. Phase A and B output is consumed via the Streamlit dashboard and markdown files. The MT5 layer is a convenience for putting the brief next to the chart — useful, not essential.

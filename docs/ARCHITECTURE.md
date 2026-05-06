@@ -4,6 +4,30 @@ A solo discretionary macro research desk built as a multi-layer agent stack. Mod
 
 **Core principle:** OSS handles plumbing, we build the edge. The edge lives in three places — the playbook (curated frameworks), the personas (prompt engineering), and the calibration (feedback loop) — none of which any framework provides for free.
 
+## Decision-support boundary (immutable)
+
+This system is a **decision-support and trade briefing tool**. It is not, and will not become, an execution engine. This is an architectural invariant — every layer below operates within this boundary.
+
+The system optimizes for:
+
+- Better daily macro framing
+- More selective and actionable watchlists
+- Clear distinctions between *tradable now*, *watch only*, and *pass*
+- Stronger human interpretability (every reasoning step auditable)
+- Awareness of invalidation levels and event risk
+- Honest identification of no-trade conditions
+
+The system explicitly does not provide:
+
+- Order placement, modification, or cancellation
+- Automatic position sizing
+- Self-managed stops, take-profits, or scaling
+- Auto-execution behind any feature flag
+
+The human reads the brief, decides whether to trade, sizes the position, places the order in MT5, and manages the trade. The system's role ends at *handing the human a sharper picture*.
+
+When evaluating future architectural changes, the question to ask is: *does this make the brief more selective, more interpretable, more honest about uncertainty?* If yes, in scope. *Does this move the system closer to deciding or executing for the human?* If yes, out of scope.
+
 ## The Seven Layers
 
 ### Layer 0 — Data Plane
