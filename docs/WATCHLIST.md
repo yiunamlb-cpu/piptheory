@@ -4,6 +4,17 @@ Ten instruments. Cover every macro theme; minimize redundancy; all FTMO-tradeabl
 
 Composition: ~50% FX, 20% indices, 20% commodities, 10% rates. FX-weighted because FX is the most analytically tractable asset class for a solo operator with LLM agents — cleaner driver set, two-sided macro plays, COT data is rich, central bank communication is the master variable.
 
+## Active universe (Commits B onward)
+
+The pipeline now distinguishes **active universe** from **context watchlist**:
+
+| Tier | Instruments | Treatment |
+|---|---|---|
+| **Active** | **ES (US500), NQ (NAS100), GC (XAUUSD)** | Full pipeline: Layer 1 → 2 → 3 → 4 council → 4b Tradability Filter → 5 PM brief. These are the instruments whose setups can show up on the PM brief as `tradable_now`. |
+| **Context** | DXY, EURUSD, USDJPY, GBPUSD, AUDUSD, CL, ZN | Layer 1 → 2 only. Strategist produces bias cards for these so the human sees the wider macro picture, but they do not pass through the filter or appear on the PM brief as actionable. |
+
+This narrowing is a deliberate consequence of the architectural review (priority #4): keep the active universe small while we refine output quality. If the system is consistently producing useful, selective briefs on these three for a few months, the active universe can expand (likely starting with EURUSD).
+
 ## FX (5)
 
 ### DXY — US Dollar Index

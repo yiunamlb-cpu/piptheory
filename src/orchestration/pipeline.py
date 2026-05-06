@@ -19,9 +19,11 @@ from pathlib import Path
 
 import structlog
 
+import json
+
 from src.agents import run_agent
 from src.config import BIAS_CARDS_DIR
-from src.data import CotClient, FredClient
+from src.data import CotClient, FredClient, PriceClient
 from src.llm import OpenRouterClient
 from src.orchestration.context import (
     bear_advocate_input,
@@ -33,18 +35,26 @@ from src.orchestration.context import (
     load_themes,
     pm_brief_input,
     positioning_analyst_input,
+    setup_filter_input,
     strategist_input,
 )
 
 log = structlog.get_logger(__name__)
 
-# Watchlist for Layer 2 strategist coverage.
+# Watchlist for Layer 2 strategist coverage (still produces context bias cards
+# for all of these so the human can see the wider macro picture).
 FULL_WATCHLIST = ["DXY", "EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "ES", "NQ", "GC", "CL", "ZN"]
+
+# Active universe: only these go through Layer 4 council + Layer 4b filter.
+# Per architectural review: keep tight while we refine output quality.
+# ES = US500, NQ = NAS100, GC = XAUUSD on FTMO/MT5.
+ACTIVE_UNIVERSE = ["ES", "NQ", "GC"]
 
 # Subset with COT positioning data.
 COT_INSTRUMENTS = ["EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "GC", "CL", "ZN"]
 
-# Layer 4 council runs only for instruments where Layer 2 conviction >= this threshold.
+# Layer 4 council runs only for ACTIVE_UNIVERSE instruments where Layer 2
+# conviction >= this threshold.
 COUNCIL_CONVICTION_THRESHOLD = 5
 
 
@@ -69,6 +79,7 @@ class BiasEngine:
         self.client = client or OpenRouterClient()
         self.fred = FredClient()
         self.cot = CotClient(lookback_years=3)
+        self.prices = PriceClient()
 
     # --- Layer 1 ---
 
@@ -193,11 +204,64 @@ class BiasEngine:
             "judge": judge_result.content,
         }
 
+    # --- Layer 4b — Tradability Filter ---
+
+    def run_setup_filter(
+        self,
+        instrument: str,
+        judge_card: str,
+        themes: str,
+    ) -> dict:
+        """Run the Tradability Filter for a single instrument.
+
+        Returns a dict including the agent's full output and a parsed verdict
+        (best-effort). Falls back to verdict='unparseable' if extraction fails.
+        """
+        log.info("layer4b_filter_start", instrument=instrument)
+        try:
+            ctx = self.prices.get_setup_context(instrument).to_dict()
+        except Exception as e:
+            log.warning("price_context_unavailable", instrument=instrument, error=str(e))
+            return {
+                "instrument": instrument,
+                "verdict": "skip_no_data",
+                "verdict_reason": f"Price/setup context unavailable: {e}",
+                "agent_output": "",
+            }
+
+        user_msg = setup_filter_input(instrument, judge_card, ctx, themes)
+        result = run_agent(
+            "layer4b_tradability/setup_filter", user_msg, client=self.client
+        )
+
+        verdict = self._extract_verdict(result.content)
+        return {
+            "instrument": instrument,
+            "verdict": verdict,
+            "agent_output": result.content,
+            "setup_context": ctx,
+        }
+
+    @staticmethod
+    def _extract_verdict(filter_output: str) -> str:
+        """Best-effort extraction of the verdict from the filter agent's output."""
+        m = re.search(
+            r"verdict\s*:\s*[\"']?(tradable_now|watch|pass_despite_bias|skip_no_data)",
+            filter_output,
+            re.IGNORECASE,
+        )
+        return m.group(1).lower() if m else "unparseable"
+
     # --- Layer 5 ---
 
-    def run_pm_brief(self, judge_outputs: dict[str, str], themes: str) -> str:
+    def run_pm_brief(
+        self,
+        judge_outputs: dict[str, str],
+        themes: str,
+        filter_results: dict[str, dict] | None = None,
+    ) -> str:
         log.info("layer5_pm_start")
-        user_msg = pm_brief_input(judge_outputs, themes)
+        user_msg = pm_brief_input(judge_outputs, themes, filter_results=filter_results)
         result = run_agent("layer5_pm/pm_druckenmiller", user_msg, client=self.client)
         return result.content
 
@@ -234,10 +298,12 @@ class BiasEngine:
         result.layer3_contrarian = self.run_contrarian(result.layer2_strategist, themes)
         (out_dir / "03_contrarian.md").write_text(result.layer3_contrarian, encoding="utf-8")
 
-        # Layer 4 — selective by conviction threshold
+        # Layer 4 — selective by conviction threshold AND active universe
         if council_instruments is None:
             council_instruments = []
             for inst in FULL_WATCHLIST:
+                if inst not in ACTIVE_UNIVERSE:
+                    continue
                 section = self._extract_per_instrument_section(result.layer2_strategist, inst)
                 conviction = self._extract_conviction(section)
                 if conviction >= COUNCIL_CONVICTION_THRESHOLD:
@@ -245,8 +311,12 @@ class BiasEngine:
             log.info(
                 "council_filter",
                 threshold=COUNCIL_CONVICTION_THRESHOLD,
+                active_universe=ACTIVE_UNIVERSE,
                 selected=council_instruments,
             )
+        else:
+            # Explicit override: still respect active universe to avoid drift
+            council_instruments = [i for i in council_instruments if i in ACTIVE_UNIVERSE]
 
         council_dir = out_dir / "04_council"
         council_dir.mkdir(exist_ok=True)
@@ -259,13 +329,39 @@ class BiasEngine:
             (council_dir / f"{instrument}_bear.md").write_text(outputs["bear"], encoding="utf-8")
             (council_dir / f"{instrument}_judge.md").write_text(outputs["judge"], encoding="utf-8")
 
-        # Layer 5
+        # Layer 4b — Tradability Filter (per instrument that cleared council)
+        filter_dir = out_dir / "04b_tradability_filter"
+        filter_dir.mkdir(exist_ok=True)
+        filter_results: dict[str, dict] = {}
+        for instrument in council_instruments:
+            judge_card = result.layer4_council[instrument]["judge"]
+            filter_card = self.run_setup_filter(instrument, judge_card, themes)
+            filter_results[instrument] = filter_card
+            (filter_dir / f"{instrument}.md").write_text(
+                filter_card.get("agent_output") or "_no output_", encoding="utf-8"
+            )
+        if filter_results:
+            (filter_dir / "_summary.json").write_text(
+                json.dumps(
+                    {i: {"verdict": v.get("verdict")} for i, v in filter_results.items()},
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+        # Layer 5 — only feed PM the judge cards for instruments that have a
+        # verdict (any category); PM organises by tradable_now / watch / pass.
         judge_outputs = {inst: outputs["judge"] for inst, outputs in result.layer4_council.items()}
         if judge_outputs:
-            result.layer5_pm_brief = self.run_pm_brief(judge_outputs, themes)
+            result.layer5_pm_brief = self.run_pm_brief(
+                judge_outputs, themes, filter_results=filter_results
+            )
             (out_dir / "05_pm_brief.md").write_text(result.layer5_pm_brief, encoding="utf-8")
         else:
-            result.layer5_pm_brief = "No instruments met council threshold; no PM brief produced."
+            result.layer5_pm_brief = (
+                "No active-universe instruments met council threshold; no PM brief produced. "
+                "This is the expected output on most days — the system is selective by design."
+            )
 
         # Cost summary
         result.total_cost_usd = self.client.budget.spent_today()

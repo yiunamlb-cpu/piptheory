@@ -191,22 +191,92 @@ def judge_input(
     )
 
 
-def pm_brief_input(judge_outputs: dict[str, str], themes: str) -> str:
+def setup_filter_input(
+    instrument: str,
+    judge_card: str,
+    setup_context: dict,
+    themes: str,
+) -> str:
+    """Build the user message for the Tradability Filter (Layer 4b)."""
+    return (
+        f"# Tradability Filter — {instrument}\n\n"
+        f"The Judge has produced a final bias for this instrument. Apply your "
+        f"structural checks (trend alignment, location quality, ATR suitability, "
+        f"invalidation clarity, crowding, blocking events) and produce a "
+        f"verdict per your output schema.\n\n"
+        f"You are filtering what reaches the human reviewer. Default to a more "
+        f"restrictive verdict when checks conflict.\n\n"
+        f"## Active themes (condensed)\n\n{themes}\n\n"
+        f"## Judge bias card\n\n{judge_card}\n\n"
+        f"## Setup context (live, daily OHLC + derived levels)\n\n"
+        f"```json\n{json.dumps(setup_context, indent=2, default=str)}\n```\n"
+    )
+
+
+def pm_brief_input(
+    judge_outputs: dict[str, str],
+    themes: str,
+    *,
+    filter_results: dict[str, dict] | None = None,
+) -> str:
+    """Build the user message for the PM brief (Layer 5).
+
+    If filter_results is provided, the PM is instructed to organize the brief
+    by tradability category (tradable_now / watch / pass) so the human reviewer
+    sees actionable setups separated from watchlist items.
+    """
     today = datetime.now().date().isoformat()
+    filter_results = filter_results or {}
+
     parts = [
         f"# PM Brief — {today}",
         "",
         "Synthesize the Judge final bias cards into a daily PM brief per your "
-        "output schema. Rank the watchlist, identify 1-3 highest-priority "
-        "setups, recommend action or no-action. Druckenmiller principles.",
-        "",
-        "## THEMES.md",
-        "",
-        themes,
-        "",
-        "## Judge final bias cards",
+        "output schema. Your role is to brief the human, not to act for them. "
+        "Use review language ('setup at 20d SMA on pullback'), not execution "
+        "language ('enter here').",
         "",
     ]
+
+    if filter_results:
+        # Categorize instruments
+        tradable_now = [i for i, f in filter_results.items() if f.get("verdict") == "tradable_now"]
+        watch = [i for i, f in filter_results.items() if f.get("verdict") == "watch"]
+        passed = [i for i, f in filter_results.items() if f.get("verdict") == "pass_despite_bias"]
+
+        parts.extend([
+            "**Tradability Filter has run.** Organize your brief into three sections, "
+            "in this order:",
+            "",
+            "1. **Setups for review (`tradable_now`)** — these have cleared structural "
+            "checks. Present clearly: bias direction, key level to act around, "
+            "invalidation level, primary themes. The human decides whether to trade. "
+            "Do not state position sizes, dollar risk, or execution actions.",
+            "2. **Watch list (`watch`)** — bias is supported but location is not yet "
+            "tradable. State explicitly what would change the verdict.",
+            "3. **Passed despite bias (`pass_despite_bias`)** — macro-aligned but "
+            "structurally unfavorable. Note briefly why the filter passed each.",
+            "",
+            f"Tradable now: {tradable_now or 'none'}",
+            f"Watch: {watch or 'none'}",
+            f"Passed: {passed or 'none'}",
+            "",
+            "If tradable_now is empty, the brief should be honest: today has no "
+            "setups passing structural review. That is a valid output and most days "
+            "should look like this.",
+            "",
+        ])
+
+    parts.extend(["## THEMES.md", "", themes, ""])
+
+    if filter_results:
+        parts.extend(["## Filter results (per instrument)", ""])
+        for instrument, fr in filter_results.items():
+            parts.extend([f"### {instrument}", "",
+                          f"```json\n{json.dumps(fr, indent=2, default=str)}\n```", ""])
+
+    parts.extend(["## Judge final bias cards", ""])
     for instrument, output in judge_outputs.items():
         parts.extend([f"### {instrument}", "", output, ""])
+
     return "\n".join(parts)
