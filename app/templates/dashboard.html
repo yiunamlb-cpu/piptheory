@@ -60,12 +60,44 @@
     </div>
   </section>
 
+  <!-- METHODOLOGY DISCLOSURE -->
+  <details class="methodology">
+    <summary>How to read this page</summary>
+    <div class="methodology-body">
+      <p><strong>Conviction</strong> is a 1-10 score. When the council debate
+      ran (filter status: Watch / Tradable / Skip), conviction is the Judge's
+      <em>final</em> number after weighing bull and bear cases. Otherwise it's
+      the Strategist's initial macro read. Same number wherever it appears on
+      this page.</p>
+
+      <p><strong>Run-to-run variance.</strong> Two consecutive pipeline runs
+      can produce convictions that differ by 1 point even with the same data —
+      this is normal LLM noise. A 6 vs 7 doesn't mean anything actionable
+      changed. Look for movement of <em>2+ points</em> or category changes
+      (Watch ↔ Skip).</p>
+
+      <p><strong>What's shown vs hidden.</strong> Visible above:</p>
+      <ul>
+        <li><span class="pill pill-tradable">Tradable now</span> — chart and macro both green-lit</li>
+        <li><span class="pill pill-watch">Watch</span> — bias supported, location not yet ready</li>
+        <li><span class="pill pill-neutral">Context</span> with conviction ≥ 6 — strong macro view, no structural check (outside active universe)</li>
+      </ul>
+      <p>Collapsed below:</p>
+      <ul>
+        <li><span class="pill pill-passed">Skip</span> — chart says no even though macro says yes</li>
+        <li><span class="pill pill-neutral">Active · no filter run</span> with low conviction</li>
+        <li><span class="pill pill-neutral">Context</span> with conviction &lt; 6</li>
+      </ul>
+    </div>
+  </details>
+
   <!-- SETUPS FOR REVIEW -->
   {% if setups %}
   <section class="section">
     <h2 class="section-title">Setups for review</h2>
     <p class="section-help">
-      These passed structural review. Your call on whether to take them.
+      Filter said <strong>Tradable now</strong>. Chart and macro both support
+      taking the trade. Your call on whether to act.
     </p>
     <div class="grid grid-2">
       {% for r in setups %}
@@ -78,10 +110,10 @@
   <!-- WATCH AND CONTEXT -->
   {% if watch_and_context %}
   <section class="section">
-    <h2 class="section-title">{% if setups %}Also worth a look{% else %}Watch & context{% endif %}</h2>
+    <h2 class="section-title">{% if setups %}Also worth a look{% else %}Worth your attention{% endif %}</h2>
     <p class="section-help">
-      Bias supported but either not at a tradable location, or outside the
-      active universe (no chart filter applied).
+      Either on the watch list (bias supported, location not ready) or
+      conviction ≥ 6 outside the active universe.
     </p>
     <div class="grid grid-2">
       {% for r in watch_and_context %}
@@ -96,11 +128,12 @@
   <section class="section">
     <details class="collapse">
       <summary>
-        Other instruments ({{ other|length }} hidden):
+        Other instruments ({{ other|length }}):
         <span class="muted">{{ other_summary }}</span>
       </summary>
       <p class="section-help">
-        Skipped despite macro bias (chart's against it), or simply low conviction.
+        Either skipped despite macro bias (chart against it), or low conviction
+        across the board.
       </p>
       <div class="grid grid-2" style="margin-top: 12px;">
         {% for r in other %}

@@ -220,12 +220,16 @@ def _build_unified_watchlist(run: Run) -> list[dict]:
         filter_card = run.tradability.get(b.instrument)
         verdict = filter_card.verdict if filter_card else None
 
-        # Actionability tier
+        # Actionability tier.
+        # Visibility cutoff: tiers 0-2 are 'worth your attention' (visible);
+        # 3-5 collapsed as 'other'. Threshold for tier 2 is conviction >= 6
+        # to include the borderline-strong context items; lower than that
+        # is treated as low conviction noise.
         if verdict == "tradable_now":
             tier, tier_label = 0, "tradable_now"
         elif verdict == "watch":
             tier, tier_label = 1, "watch"
-        elif final_conv >= 7:
+        elif final_conv >= 6:
             tier, tier_label = 2, "context_high"
         elif verdict == "pass_despite_bias":
             tier, tier_label = 3, "passed"
