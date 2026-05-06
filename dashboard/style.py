@@ -1,16 +1,13 @@
-"""CSS injection for the dashboard. Implements the design tokens from
-design MDS/ — Perplexity-style monochromatic light theme.
+"""Dashboard CSS injection.
 
-Key tokens (from design MDS/DESIGN.md):
-  - Inkwell #000000 — primary text, active states
-  - Paper White #FFFFFF — page background
-  - Parchment #FAF8F5 — interactive surfaces (search, active nav)
-  - Graphite #27251E — secondary text, borders (note: source had #27251 typo)
-  - Faded Stone #92918B — placeholder text, low contrast
-  - Dusk Gray #72706B — tertiary text, dividers
-  - Font: pplxSans (Inter as substitute), 400/500, 12/14/16px
-  - Radii: cards 16px, inputs 8px, buttons 9999px (pill), nav 8px
-  - Spacing: 4px base, compact density
+Aesthetic: light, friendly, decision-support oriented. Uses purposeful color
+for verdict status (green/amber/gray) so categorisation is glanceable. Card-
+heavy layout with soft shadows. Inter for type. Aimed at being readable and
+fast to scan, not clinical or playful.
+
+Color philosophy: most surfaces are neutral warm-gray. Accent color appears
+only where status matters: tradable_now (emerald), watch (amber), pass
+(stone). Conviction and priority stay neutral.
 """
 from __future__ import annotations
 
@@ -20,378 +17,475 @@ import streamlit as st
 CSS = """
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
 :root {
-  --color-inkwell: #000000;
-  --color-paper-white: #FFFFFF;
-  --color-parchment: #FAF8F5;
-  --color-graphite: #27251E;
-  --color-faded-stone: #92918B;
-  --color-dusk-gray: #72706B;
-  --color-divider: #EDEAE5;
+  /* === Surfaces === */
+  --bg: #FAFAF9;
+  --surface: #FFFFFF;
+  --surface-muted: #F5F5F4;
+  --border: #E7E5E4;
+  --border-strong: #D6D3D1;
 
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  /* === Text === */
+  --text-primary: #0C0A09;
+  --text-secondary: #57534E;
+  --text-tertiary: #A8A29E;
 
-  --text-caption: 12px;
-  --text-body-sm: 14px;
-  --text-body: 16px;
-  --leading: 1.5;
+  /* === Status accents (verdict-coded; used sparingly) === */
+  --status-tradable: #059669;          /* emerald 600 */
+  --status-tradable-tint: #ECFDF5;     /* emerald 50 */
+  --status-tradable-border: #A7F3D0;   /* emerald 200 */
 
-  --radius-card: 16px;
+  --status-watch: #D97706;             /* amber 600 */
+  --status-watch-tint: #FFFBEB;        /* amber 50 */
+  --status-watch-border: #FCD34D;      /* amber 300 */
+
+  --status-pass: #78716C;              /* stone 500 */
+  --status-pass-tint: #F5F5F4;         /* stone 100 */
+  --status-pass-border: #D6D3D1;       /* stone 300 */
+
+  /* === Type === */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* === Sizing === */
+  --radius-card: 12px;
   --radius-input: 8px;
   --radius-pill: 9999px;
-  --radius-nav: 8px;
+  --radius-sm: 6px;
 
-  --space-4: 4px;
-  --space-8: 8px;
-  --space-12: 12px;
-  --space-16: 16px;
-  --space-32: 32px;
+  --shadow-sm: 0 1px 2px rgba(12, 10, 9, 0.04);
+  --shadow-md: 0 1px 3px rgba(12, 10, 9, 0.04), 0 4px 12px rgba(12, 10, 9, 0.04);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
 }
 
-html, body, [class*="css"] {
+/* === Base === */
+
+html, body, [class*="css"], [data-testid="stAppViewContainer"], .main {
   font-family: var(--font-sans) !important;
-  color: var(--color-inkwell);
-  background: var(--color-paper-white);
+  color: var(--text-primary);
+  background: var(--bg) !important;
+  -webkit-font-smoothing: antialiased;
 }
 
-.main, .block-container, [data-testid="stAppViewContainer"] {
-  background: var(--color-paper-white);
+.block-container {
+  padding-top: var(--space-6) !important;
+  padding-bottom: var(--space-12) !important;
+  max-width: 1200px !important;
 }
 
 [data-testid="stSidebar"] {
-  background: var(--color-paper-white);
-  border-right: 1px solid var(--color-divider);
+  background: var(--surface) !important;
+  border-right: 1px solid var(--border);
 }
 
 [data-testid="stSidebar"] .block-container {
-  padding-top: var(--space-32);
+  padding-top: var(--space-6);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3, h4, h5 {
   font-family: var(--font-sans) !important;
-  color: var(--color-inkwell) !important;
-  font-weight: 500 !important;
-  letter-spacing: -0.01em;
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.015em;
+  margin: 0;
 }
 
-h1 { font-size: 24px !important; line-height: 1.3 !important; margin: 0 0 var(--space-16) 0 !important; }
-h2 { font-size: 18px !important; line-height: 1.4 !important; margin: var(--space-32) 0 var(--space-16) 0 !important; }
-h3 { font-size: 16px !important; line-height: 1.5 !important; margin: var(--space-16) 0 var(--space-8) 0 !important; }
-h4 { font-size: 14px !important; line-height: 1.5 !important; }
+h1 { font-size: 28px !important; line-height: 1.25 !important; }
+h2 { font-size: 20px !important; line-height: 1.35 !important; margin-top: var(--space-8) !important; margin-bottom: var(--space-3) !important; }
+h3 { font-size: 16px !important; line-height: 1.4 !important; font-weight: 600 !important; margin-top: var(--space-4) !important; margin-bottom: var(--space-2) !important; }
+h4 { font-size: 14px !important; line-height: 1.4 !important; font-weight: 500 !important; }
 
 p, li, .stMarkdown {
-  font-size: var(--text-body) !important;
-  line-height: var(--leading) !important;
-  color: var(--color-inkwell);
+  font-size: 15px !important;
+  line-height: 1.6 !important;
+  color: var(--text-primary);
 }
 
-.caption { font-size: var(--text-caption); color: var(--color-faded-stone); }
-.body-sm { font-size: var(--text-body-sm); }
-
-/* Streamlit's default link color is bright blue. Force monochrome. */
-a, a:visited,
-.stMarkdown a, .stMarkdown a:visited,
-[data-testid="stMarkdownContainer"] a {
-  color: var(--color-inkwell) !important;
+a, a:visited, .stMarkdown a, [data-testid="stMarkdownContainer"] a {
+  color: var(--text-primary) !important;
   text-decoration: underline !important;
-  text-underline-offset: 2px !important;
+  text-underline-offset: 3px !important;
+  text-decoration-color: var(--border-strong) !important;
 }
-a:hover { text-decoration-thickness: 2px !important; }
+a:hover { text-decoration-color: var(--text-primary) !important; }
 
-code, pre, .stCode {
+code, pre {
   font-family: var(--font-mono) !important;
-  font-size: var(--text-body-sm) !important;
-  background: var(--color-parchment) !important;
-  border-radius: var(--radius-input) !important;
+  font-size: 13px !important;
+  background: var(--surface-muted) !important;
+  border-radius: var(--radius-sm) !important;
 }
 
 pre {
-  padding: var(--space-12) !important;
-  border: 1px solid var(--color-divider);
+  padding: var(--space-3) !important;
+  border: 1px solid var(--border) !important;
 }
 
-/* === Streamlit overrides === */
+/* === Streamlit chrome === */
 
-button, .stButton > button {
-  border-radius: var(--radius-pill) !important;
-  background: var(--color-graphite) !important;
-  color: var(--color-paper-white) !important;
-  border: none !important;
-  font-family: var(--font-sans) !important;
-  font-size: var(--text-body-sm) !important;
-  font-weight: 400 !important;
-  padding: 6px 16px !important;
-  transition: opacity 0.15s ease;
-}
-
-.stButton > button:hover {
-  background: var(--color-inkwell) !important;
-  opacity: 0.95;
-}
-
-.stButton > button[kind="secondary"] {
-  background: transparent !important;
-  color: var(--color-faded-stone) !important;
-  border: 1px solid var(--color-divider) !important;
-}
-
-[data-testid="stSelectbox"] > div > div,
-[data-testid="stSelectbox"] [data-baseweb="select"] > div {
-  border-radius: var(--radius-input) !important;
-  background: var(--color-parchment) !important;
-  border: 1px solid var(--color-divider) !important;
-}
-
-[data-testid="stSelectbox"] [data-baseweb="select"]:focus-within > div,
-[data-testid="stSelectbox"] [aria-expanded="true"] {
-  border-color: var(--color-inkwell) !important;
-  box-shadow: none !important;
-}
-
-[data-baseweb="popover"] [role="option"][aria-selected="true"] {
-  background: var(--color-parchment) !important;
-  color: var(--color-inkwell) !important;
-}
-
-/* Focus rings: Streamlit defaults to blue */
-*:focus-visible {
-  outline: 1px solid var(--color-inkwell) !important;
-  outline-offset: 2px !important;
-}
-
-[data-testid="stTextInput"] input,
-[data-testid="stTextArea"] textarea {
-  border-radius: var(--radius-input) !important;
-  background: var(--color-parchment) !important;
-  border: 1px solid var(--color-divider) !important;
-  color: var(--color-inkwell) !important;
-}
-
-/* Tabs: pill-style. Streamlit's BaseWeb tabs render text in nested <p>/<span>
-   elements, so we have to drill down. */
-[data-baseweb="tab-list"] {
-  gap: var(--space-4) !important;
-  border-bottom: none !important;
-  background: transparent !important;
-}
-
-[data-baseweb="tab"] {
-  border-radius: var(--radius-pill) !important;
-  padding: 6px 16px !important;
-  background: transparent !important;
-  font-size: var(--text-body-sm) !important;
-  font-weight: 400 !important;
-  border: none !important;
-  margin: 0 !important;
-}
-
-[data-baseweb="tab"]:hover {
-  background: var(--color-parchment) !important;
-}
-
-[data-baseweb="tab"], [data-baseweb="tab"] *,
-[data-baseweb="tab"] p, [data-baseweb="tab"] span {
-  color: var(--color-faded-stone) !important;
-  text-decoration: none !important;
-}
-
-[data-baseweb="tab"][aria-selected="true"] {
-  background: var(--color-graphite) !important;
-}
-
-[data-baseweb="tab"][aria-selected="true"],
-[data-baseweb="tab"][aria-selected="true"] *,
-[data-baseweb="tab"][aria-selected="true"] p,
-[data-baseweb="tab"][aria-selected="true"] span {
-  color: var(--color-paper-white) !important;
-}
-
-[data-baseweb="tab-highlight"] {
-  background: transparent !important;
-  height: 0 !important;
-  display: none !important;
-}
-
-[data-baseweb="tab-border"] {
-  background: transparent !important;
-  display: none !important;
-}
-
-[data-testid="stTabsContent"] {
-  padding-top: var(--space-16) !important;
-}
-
-/* Tables */
-[data-testid="stTable"] table, .stDataFrame table {
-  font-family: var(--font-sans) !important;
-  font-size: var(--text-body-sm) !important;
-}
-
-[data-testid="stTable"] th, .stDataFrame th {
-  background: var(--color-parchment) !important;
-  color: var(--color-graphite) !important;
-  font-weight: 500 !important;
-  text-align: left !important;
-  border-bottom: 1px solid var(--color-divider) !important;
-}
-
-[data-testid="stTable"] td, .stDataFrame td {
-  border-bottom: 1px solid var(--color-divider) !important;
-  color: var(--color-inkwell) !important;
-}
-
-/* Expander */
-[data-testid="stExpander"] {
-  border: 1px solid var(--color-divider) !important;
-  border-radius: var(--radius-card) !important;
-  background: var(--color-paper-white) !important;
-  margin-bottom: var(--space-8) !important;
-}
-
-[data-testid="stExpander"] summary {
-  padding: var(--space-12) !important;
-  font-weight: 500 !important;
-}
-
-/* Streamlit chrome — hide the deploy/share/menu items, but KEEP the sidebar
-   collapse control so the user can re-open the sidebar after hiding it. */
 #MainMenu, footer { visibility: hidden !important; }
-[data-testid="stDeployButton"], .stDeployButton { display: none !important; }
-[data-testid="stStatusWidget"] { display: none !important; }
+[data-testid="stDeployButton"], .stDeployButton, [data-testid="stStatusWidget"] {
+  display: none !important;
+}
 header[data-testid="stHeader"] {
   background: transparent !important;
   height: auto !important;
 }
 
-/* Sidebar collapse / expand chevron — must remain visible.
-   Style it to fit the monochrome design. */
+/* Sidebar collapse button — keep visible, style monochrome */
 [data-testid="collapsedControl"],
 [data-testid="stSidebarCollapseButton"],
 [data-testid="stSidebarCollapsedControl"] {
   visibility: visible !important;
   display: flex !important;
-  color: var(--color-inkwell) !important;
-  background: var(--color-paper-white) !important;
-  border: 1px solid var(--color-divider) !important;
-  border-radius: var(--radius-input) !important;
+  color: var(--text-primary) !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-sm) !important;
   padding: 4px !important;
-  z-index: 999 !important;
+  box-shadow: var(--shadow-sm);
 }
-
 [data-testid="collapsedControl"] svg,
-[data-testid="stSidebarCollapseButton"] svg,
-[data-testid="stSidebarCollapsedControl"] svg {
-  fill: var(--color-inkwell) !important;
-  color: var(--color-inkwell) !important;
+[data-testid="stSidebarCollapseButton"] svg {
+  fill: var(--text-primary) !important;
 }
 
-[data-testid="collapsedControl"]:hover,
-[data-testid="stSidebarCollapseButton"]:hover,
-[data-testid="stSidebarCollapsedControl"]:hover {
-  background: var(--color-parchment) !important;
+/* === Buttons === */
+
+.stButton > button {
+  border-radius: var(--radius-input) !important;
+  background: var(--text-primary) !important;
+  color: var(--surface) !important;
+  border: none !important;
+  font-family: var(--font-sans) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  padding: 8px 14px !important;
+  box-shadow: var(--shadow-sm);
+  transition: opacity 0.15s ease;
+}
+.stButton > button:hover { opacity: 0.92; }
+
+.stButton > button[kind="secondary"] {
+  background: var(--surface) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-strong) !important;
 }
 
-/* === Custom components === */
+/* === Inputs === */
+
+[data-testid="stSelectbox"] > div > div,
+[data-testid="stSelectbox"] [data-baseweb="select"] > div,
+[data-testid="stTextInput"] input {
+  border-radius: var(--radius-input) !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-primary) !important;
+  font-size: 14px !important;
+}
+
+[data-testid="stSelectbox"] [data-baseweb="select"]:focus-within > div {
+  border-color: var(--text-primary) !important;
+  box-shadow: 0 0 0 3px rgba(12, 10, 9, 0.06) !important;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--text-primary) !important;
+  outline-offset: 2px !important;
+}
+
+/* === Tabs === */
+
+[data-baseweb="tab-list"] {
+  gap: var(--space-1) !important;
+  border-bottom: 1px solid var(--border) !important;
+  padding-bottom: 0 !important;
+  background: transparent !important;
+}
+[data-baseweb="tab"] {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 2px solid transparent !important;
+  border-radius: 0 !important;
+  padding: 10px 16px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+[data-baseweb="tab"], [data-baseweb="tab"] *,
+[data-baseweb="tab"] p, [data-baseweb="tab"] span {
+  color: var(--text-secondary) !important;
+}
+[data-baseweb="tab"]:hover {
+  background: var(--surface-muted) !important;
+}
+[data-baseweb="tab"][aria-selected="true"] {
+  border-bottom-color: var(--text-primary) !important;
+}
+[data-baseweb="tab"][aria-selected="true"], [data-baseweb="tab"][aria-selected="true"] *,
+[data-baseweb="tab"][aria-selected="true"] p, [data-baseweb="tab"][aria-selected="true"] span {
+  color: var(--text-primary) !important;
+}
+[data-baseweb="tab-highlight"], [data-baseweb="tab-border"] {
+  display: none !important;
+}
+
+/* === Tables === */
+
+[data-testid="stTable"] table, .stDataFrame table {
+  font-family: var(--font-sans) !important;
+  font-size: 14px !important;
+  border-radius: var(--radius-card) !important;
+  overflow: hidden;
+}
+[data-testid="stTable"] th, .stDataFrame th {
+  background: var(--surface-muted) !important;
+  color: var(--text-secondary) !important;
+  font-weight: 500 !important;
+  text-align: left !important;
+  border-bottom: 1px solid var(--border) !important;
+  font-size: 13px !important;
+}
+[data-testid="stTable"] td, .stDataFrame td {
+  border-bottom: 1px solid var(--border) !important;
+  color: var(--text-primary) !important;
+}
+
+/* === Expanders === */
+
+[data-testid="stExpander"] {
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-card) !important;
+  background: var(--surface) !important;
+  margin-bottom: var(--space-2) !important;
+  box-shadow: var(--shadow-sm);
+}
+[data-testid="stExpander"] summary {
+  padding: var(--space-3) var(--space-4) !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+}
+
+/* ============================================
+   CUSTOM COMPONENTS
+   ============================================ */
 
 .brand {
   font-family: var(--font-sans);
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   letter-spacing: -0.02em;
-  color: var(--color-inkwell);
-  padding-bottom: var(--space-32);
-  border-bottom: 1px solid var(--color-divider);
-  margin-bottom: var(--space-16);
+  color: var(--text-primary);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-4);
 }
-
 .brand .meta {
   display: block;
-  font-size: var(--text-caption);
-  color: var(--color-faded-stone);
+  font-size: 12px;
+  color: var(--text-tertiary);
   font-weight: 400;
   margin-top: 4px;
-}
-
-.bias-card {
-  background: var(--color-paper-white);
-  border: 1px solid var(--color-divider);
-  border-radius: var(--radius-card);
-  padding: var(--space-16);
-  margin-bottom: var(--space-12);
-}
-
-.bias-card.priority-aplus { border-left: 2px solid var(--color-inkwell); }
-.bias-card.priority-a { border-left: 2px solid var(--color-graphite); }
-.bias-card.priority-b { border-left: 2px solid var(--color-faded-stone); }
-.bias-card.priority-c { border-left: 2px solid var(--color-divider); }
-
-.instrument {
-  font-size: var(--text-body);
-  font-weight: 500;
-  color: var(--color-inkwell);
-  display: inline-block;
-}
-
-.bias-direction {
-  font-size: var(--text-body-sm);
-  color: var(--color-graphite);
-  margin-left: var(--space-12);
-}
-
-.chip {
-  display: inline-block;
-  background: var(--color-parchment);
-  color: var(--color-graphite);
-  border-radius: var(--radius-pill);
-  padding: 2px 12px;
-  font-size: var(--text-caption);
-  font-weight: 400;
-  margin-right: var(--space-4);
-}
-
-.chip-strong { background: var(--color-graphite); color: var(--color-paper-white); }
-.chip-muted  { background: var(--color-paper-white); color: var(--color-faded-stone); border: 1px solid var(--color-divider); }
-
-.run-meta {
-  font-size: var(--text-caption);
-  color: var(--color-faded-stone);
-  padding: var(--space-8) var(--space-12);
-  background: var(--color-parchment);
-  border-radius: var(--radius-input);
-  display: inline-block;
+  letter-spacing: 0;
 }
 
 .section-title {
-  font-size: var(--text-caption);
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--color-faded-stone);
-  font-weight: 500;
-  margin: var(--space-32) 0 var(--space-8) 0;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  margin: var(--space-6) 0 var(--space-3) 0;
 }
 
-.empty-state {
-  padding: var(--space-32);
-  text-align: center;
-  color: var(--color-faded-stone);
-  font-size: var(--text-body-sm);
-  border: 1px dashed var(--color-divider);
+/* === Hero status card === */
+.hero {
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-card);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--space-6);
+}
+.hero-eyebrow {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-2);
+}
+.hero-headline {
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+.hero-subline {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.hero.tradable {
+  border-left: 4px solid var(--status-tradable);
+  background: linear-gradient(to right, var(--status-tradable-tint), var(--surface) 60%);
+}
+.hero.standby {
+  border-left: 4px solid var(--status-pass);
+}
+
+/* === Status pill === */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  border: 1px solid;
+}
+.status-pill::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.status-pill.tradable {
+  color: var(--status-tradable);
+  background: var(--status-tradable-tint);
+  border-color: var(--status-tradable-border);
+}
+.status-pill.watch {
+  color: var(--status-watch);
+  background: var(--status-watch-tint);
+  border-color: var(--status-watch-border);
+}
+.status-pill.pass {
+  color: var(--status-pass);
+  background: var(--status-pass-tint);
+  border-color: var(--status-pass-border);
+}
+.status-pill.neutral {
+  color: var(--text-secondary);
+  background: var(--surface-muted);
+  border-color: var(--border);
+}
+
+/* === Instrument card === */
+.inst-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  height: 100%;
+  transition: box-shadow 0.15s ease;
+}
+.inst-card:hover {
+  box-shadow: var(--shadow-md);
+}
+.inst-card.tradable { border-color: var(--status-tradable-border); }
+.inst-card.watch { border-color: var(--status-watch-border); }
+.inst-card.pass { border-color: var(--status-pass-border); }
+
+.inst-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+.inst-card-symbol {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+.inst-card-direction {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-transform: capitalize;
+}
+.inst-card-conviction {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+.inst-card-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+}
+.inst-card-row .label {
+  color: var(--text-tertiary);
+}
+.inst-card-row .value {
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* === Generic surface card === */
+.surface-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-3);
+}
+
+/* === Empty state === */
+.empty-state {
+  padding: var(--space-8);
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 14px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+/* === Run meta strip === */
+.run-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 12px;
+  color: var(--text-tertiary);
+  padding: 6px 12px;
+  background: var(--surface-muted);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  margin-bottom: var(--space-4);
 }
 </style>
 """
 
 
 def inject_css() -> None:
-    """Call once at the top of the Streamlit app to apply the design system."""
     st.markdown(CSS, unsafe_allow_html=True)
 
 
-def chip(text: str, variant: str = "default") -> str:
-    """Return HTML for a pill chip. variant: default | strong | muted."""
-    cls = {"default": "chip", "strong": "chip chip-strong", "muted": "chip chip-muted"}[variant]
-    return f'<span class="{cls}">{text}</span>'
+def status_pill(text: str, status: str) -> str:
+    """Return HTML for a status pill. status: tradable | watch | pass | neutral."""
+    cls = status if status in ("tradable", "watch", "pass", "neutral") else "neutral"
+    return f'<span class="status-pill {cls}">{text}</span>'

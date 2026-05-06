@@ -196,7 +196,11 @@ class BiasEngine:
             instrument, strategist_section, contrarian_section,
             bull_result.content, bear_result.content, themes,
         )
-        judge_result = run_agent("layer4_council/judge", judge_msg, client=self.client)
+        # Judge runs at temperature 0 — synthesis quality benefits from less
+        # stochasticity. See consistency discussion in conversation logs.
+        judge_result = run_agent(
+            "layer4_council/judge", judge_msg, client=self.client, temperature=0.0,
+        )
 
         return {
             "bull": bull_result.content,
@@ -230,8 +234,11 @@ class BiasEngine:
             }
 
         user_msg = setup_filter_input(instrument, judge_card, ctx, themes)
+        # Filter runs at temperature 0 — categorical decisions (tradable/watch/pass)
+        # should not flip between runs given identical inputs.
         result = run_agent(
-            "layer4b_tradability/setup_filter", user_msg, client=self.client
+            "layer4b_tradability/setup_filter", user_msg, client=self.client,
+            temperature=0.0,
         )
 
         verdict = self._extract_verdict(result.content)
@@ -262,7 +269,12 @@ class BiasEngine:
     ) -> str:
         log.info("layer5_pm_start")
         user_msg = pm_brief_input(judge_outputs, themes, filter_results=filter_results)
-        result = run_agent("layer5_pm/pm_druckenmiller", user_msg, client=self.client)
+        # PM brief runs at temperature 0 — final synthesis. Some prose
+        # variation is fine but the rankings and recommendations themselves
+        # should be stable.
+        result = run_agent(
+            "layer5_pm/pm_druckenmiller", user_msg, client=self.client, temperature=0.0,
+        )
         return result.content
 
     # --- Orchestration ---
