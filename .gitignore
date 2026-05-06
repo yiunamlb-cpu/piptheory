@@ -90,6 +90,9 @@ traces/
 *.bak
 *.tmp
 
+# --- Streamlit cache ---
+.streamlit/secrets.toml
+
 # --- cot_reports library drops these in CWD; we don't need them ---
 FinFutYY.txt
 f_year.txt

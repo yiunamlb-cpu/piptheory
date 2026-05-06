@@ -1,0 +1,21 @@
+# Streamlit theme — aligns built-in widgets with the design system in
+# `design MDS/`. Custom CSS in `dashboard/style.py` does the heavy lifting;
+# this catches any defaults the CSS doesn't reach (e.g., color of slider
+# tracks, file uploader hover states).
+
+[theme]
+base = "light"
+primaryColor = "#000000"               # Inkwell — accents, focus rings
+backgroundColor = "#FFFFFF"            # Paper White
+secondaryBackgroundColor = "#FAF8F5"   # Parchment — surfaces, sidebar
+textColor = "#000000"                  # Inkwell
+font = "sans serif"
+
+[browser]
+gatherUsageStats = false
+
+[server]
+headless = true                        # don't auto-open browser; we'll launch manually
+
+[runner]
+magicEnabled = false                   # explicit st.* calls only
