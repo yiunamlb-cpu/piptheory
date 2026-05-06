@@ -139,7 +139,7 @@
   </section>
   {% endif %}
 
-  <!-- OTHER (collapsed) -->
+  <!-- OTHER (collapsed) — compact list, not full cards -->
   {% if other %}
   <section class="section">
     <details class="collapse">
@@ -148,14 +148,27 @@
         <span class="muted">{{ other_summary }}</span>
       </summary>
       <p class="section-help">
-        Either skipped despite macro bias (chart against it), or low conviction
-        across the board.
+        Either skipped despite macro bias (chart against it), or low conviction.
+        Listed compactly with a one-line reason.
       </p>
-      <div class="grid grid-2" style="margin-top: 12px;">
+      <ul class="other-list">
         {% for r in other %}
-        {% include "_card.html" %}
+        <li class="other-item other-item-{{ r.pill_class }}">
+          <div class="other-row">
+            <div class="other-id">
+              <span class="other-symbol">{{ r.symbol }}</span>
+              <span class="other-name">{{ r.name }}</span>
+            </div>
+            <div class="other-tags">
+              <span class="other-bias">{{ r.bias }}</span>
+              <span class="other-conv conviction-{{ r.conviction_class }}">{{ r.conviction }}/10</span>
+              <span class="pill pill-{{ r.pill_class }}">{{ r.pill_text }}</span>
+            </div>
+          </div>
+          <p class="other-reason">{{ r.simple_summary }}</p>
+        </li>
         {% endfor %}
-      </div>
+      </ul>
     </details>
   </section>
   {% endif %}

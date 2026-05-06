@@ -31,14 +31,16 @@ _CACHE_TTL = timedelta(hours=6)
 # Active universe → yfinance ticker. Continuous front-month futures.
 # ES, NQ, GC = US500, NAS100, XAUUSD on FTMO/MT5 in symbol terms.
 INSTRUMENT_TO_TICKER: dict[str, str] = {
-    "ES": "ES=F",   # E-mini S&P 500 continuous
-    "NQ": "NQ=F",   # E-mini Nasdaq 100 continuous
-    "GC": "GC=F",   # Gold continuous
-    # Optional secondary universe for context only
+    "ES": "ES=F",            # E-mini S&P 500 continuous
+    "NQ": "NQ=F",            # E-mini Nasdaq 100 continuous
+    "GC": "GC=F",            # Gold continuous
+    "CL": "CL=F",            # WTI Crude continuous
+    "ZN": "ZN=F",            # 10Y Treasury Note continuous
+    "DXY": "DX-Y.NYB",       # ICE Dollar Index
     "EURUSD": "EURUSD=X",
-    "DXY": "DX-Y.NYB",
-    "ZN": "ZN=F",   # 10Y Treasury Note continuous
-    "CL": "CL=F",   # WTI Crude continuous
+    "USDJPY": "JPY=X",       # yfinance uses JPY=X for USD/JPY
+    "GBPUSD": "GBPUSD=X",
+    "AUDUSD": "AUDUSD=X",
 }
 
 

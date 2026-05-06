@@ -45,10 +45,12 @@ log = structlog.get_logger(__name__)
 # for all of these so the human can see the wider macro picture).
 FULL_WATCHLIST = ["DXY", "EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "ES", "NQ", "GC", "CL", "ZN"]
 
-# Active universe: only these go through Layer 4 council + Layer 4b filter.
-# Per architectural review: keep tight while we refine output quality.
-# ES = US500, NQ = NAS100, GC = XAUUSD on FTMO/MT5.
-ACTIVE_UNIVERSE = ["ES", "NQ", "GC"]
+# Focus list: instruments that go through Layer 4 council + Layer 4b filter.
+# Expanded to the full watchlist per user direction. Council still requires
+# conviction >= COUNCIL_CONVICTION_THRESHOLD before it runs, so on quiet days
+# the council fires on a small subset; on high-conviction days it can run
+# on most of the universe. Cost scales accordingly.
+ACTIVE_UNIVERSE = list(FULL_WATCHLIST)
 
 # Subset with COT positioning data.
 COT_INSTRUMENTS = ["EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "GC", "CL", "ZN"]

@@ -42,12 +42,12 @@ from dashboard.loader import (  # noqa: E402
 )
 from src.config import ROOT  # noqa: E402
 from src.llm import OpenRouterClient  # noqa: E402
+from src.orchestration.pipeline import ACTIVE_UNIVERSE  # noqa: E402  single source of truth
 
 app = FastAPI(title="nam-hedgefund")
 templates = Jinja2Templates(directory=str(APP_ROOT / "templates"))
 app.mount("/static", StaticFiles(directory=str(APP_ROOT / "static")), name="static")
 
-ACTIVE_UNIVERSE = ["ES", "NQ", "GC"]
 CONTEXT_CONVICTION_THRESHOLD = 7
 
 
@@ -221,22 +221,20 @@ def _build_unified_watchlist(run: Run) -> list[dict]:
         verdict = filter_card.verdict if filter_card else None
 
         # Actionability tier.
-        # Visibility cutoff: tiers 0-2 are 'worth your attention' (visible);
-        # 3-5 collapsed as 'other'. Threshold for tier 2 is conviction >= 6
-        # to include the borderline-strong context items; lower than that
-        # is treated as low conviction noise.
+        # Filter verdict ALWAYS wins over conviction — if the structural
+        # review said skip, it's collapsed regardless of how high the
+        # macro conviction is. Visibility: tiers 0-2 visible (cards),
+        # 3-4 collapsed (compact list).
         if verdict == "tradable_now":
             tier, tier_label = 0, "tradable_now"
         elif verdict == "watch":
             tier, tier_label = 1, "watch"
-        elif final_conv >= 6:
-            tier, tier_label = 2, "context_high"
         elif verdict == "pass_despite_bias":
             tier, tier_label = 3, "passed"
-        elif in_active:
-            tier, tier_label = 4, "active_low"
+        elif final_conv >= 6:
+            tier, tier_label = 2, "high_conv_no_filter"  # high conv but no filter ran
         else:
-            tier, tier_label = 5, "context_low"
+            tier, tier_label = 4, "low_conv"
 
         # Single pill label (plain English)
         if verdict == "tradable_now":
@@ -246,14 +244,35 @@ def _build_unified_watchlist(run: Run) -> list[dict]:
             pill_text = "Watch"
             pill_class = "watch"
         elif verdict == "pass_despite_bias":
-            pill_text = "Skip — chart's against it"
+            pill_text = "Skip"
             pill_class = "passed"
-        elif in_active:
-            pill_text = "Focus · no filter run"
-            pill_class = "neutral"
+        elif final_conv >= 6:
+            pill_text = "Worth a look"
+            pill_class = "watch"
         else:
-            pill_text = "Context"
+            pill_text = "Low conviction"
             pill_class = "neutral"
+
+        # Short one-line explanation suitable for a compact row in the
+        # collapsed 'Other' section. Falls back through several sources.
+        simple_summary = ""
+        if verdict == "pass_despite_bias" and filter_card and filter_card.raw:
+            m = _VERDICT_REASON_RE.search(filter_card.raw)
+            if m:
+                simple_summary = m.group(1).strip().rstrip(".") + "."
+        if not simple_summary:
+            if final_conv < 5:
+                simple_summary = (
+                    f"Low conviction ({final_conv}/10). Macro signal isn't "
+                    f"strong enough to justify a structural review."
+                )
+            elif verdict == "pass_despite_bias":
+                simple_summary = (
+                    "Macro view supports this, but the chart is against it "
+                    "right now (counter-trend, fuzzy invalidation, or blocking event)."
+                )
+            else:
+                simple_summary = f"{final_bias.capitalize()}, but no clear setup yet."
 
         rows.append({
             "symbol": b.instrument,
@@ -264,6 +283,7 @@ def _build_unified_watchlist(run: Run) -> list[dict]:
             "conviction": final_conv,
             "conviction_class": _conviction_class(final_conv),
             "summary": _summarise_card(b, filter_card, in_active),
+            "simple_summary": simple_summary,
             "in_active": in_active,
             "has_council": co is not None,
             "has_filter": filter_card is not None,
@@ -304,7 +324,10 @@ async def run_page(request: Request, date: str):
 
     watchlist = _build_unified_watchlist(run)
 
-    # Three sections (no overlap). Hidden by default = section 3.
+    # Three sections (no overlap):
+    #   setups          — tier 0 (Tradable now)
+    #   worth a look    — tiers 1 (Watch) and 2 (high conv, no filter yet)
+    #   other           — tier 3 (Skip) and 4 (Low conviction); collapsed
     setups = [r for r in watchlist if r["tier"] == 0]
     watch_and_context = [r for r in watchlist if r["tier"] in (1, 2)]
     other = [r for r in watchlist if r["tier"] >= 3]
