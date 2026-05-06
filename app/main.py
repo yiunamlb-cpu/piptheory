@@ -598,19 +598,49 @@ def _read_log_tail(n: int = 50) -> list[str]:
 
 
 def _detect_current_stage(log_tail: list[str]) -> dict:
-    """Find the most recent stage start line in the log."""
+    """Find the most recent stage start line in the log.
+
+    Parallel-aware: if a parallel layer is in flight (start logged, complete
+    not yet logged), report it as a single coherent stage with an in-flight
+    count rather than the most recent individual agent (which jumps between
+    threads under parallel mode).
+    """
+    last_event_line = next((ln for ln in reversed(log_tail) if "[info" in ln), None)
+
+    # ---- Parallel-block detection ----
+    parallel_blocks = [
+        ("layer1_parallel_start", "layer1_parallel_complete",
+         "Layer 1 — Specialists (3 in parallel)"),
+        ("layer4_parallel_start", "layer4_parallel_complete",
+         "Layer 4 + 4b — Council & Filter (parallel)"),
+    ]
+    for start_marker, end_marker, label in parallel_blocks:
+        # Most recent occurrence of start, with no following complete
+        last_start_idx = -1
+        last_end_idx = -1
+        for i, ln in enumerate(log_tail):
+            if start_marker in ln:
+                last_start_idx = i
+            if end_marker in ln:
+                last_end_idx = i
+        if last_start_idx >= 0 and last_end_idx < last_start_idx:
+            # In flight. Count agent_start minus agent_complete since the
+            # parallel block started — gives the user a real progress feel.
+            since_start = log_tail[last_start_idx:]
+            starts = sum(1 for ln in since_start if "run_agent_start" in ln)
+            completes = sum(1 for ln in since_start if "run_agent_complete" in ln)
+            in_flight = max(0, starts - completes)
+            stage = f"{label} · {completes} done · {in_flight} in flight"
+            return {"stage": stage, "last_event_line": last_event_line}
+
+    # ---- Fallback: serial-stage detection ----
     stage_label = "Starting…"
     instrument: str | None = None
     agent: str | None = None
-    last_event_line: str | None = None
-    # walk backward through log; first matching event wins
     for ln in reversed(log_tail):
-        if not last_event_line and "[info" in ln:
-            last_event_line = ln
         for marker, label in _STAGES:
             if marker in ln:
                 stage_label = label
-                # try pull instrument= from same line
                 if "instrument=" in ln:
                     try:
                         instrument = ln.split("instrument=")[1].split()[0]

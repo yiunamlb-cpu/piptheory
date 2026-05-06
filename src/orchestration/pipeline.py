@@ -235,6 +235,28 @@ class BiasEngine:
             "judge": judge_result.content,
         }
 
+    def run_council_and_filter_for_instrument(
+        self,
+        instrument: str,
+        strategist_output: str,
+        contrarian_output: str,
+        themes: str,
+    ) -> dict:
+        """Per-instrument: run the full Council debate (Bull→Bear→Judge),
+        then immediately Layer 4b Filter on the Judge's output.
+
+        Bundling these per instrument means the Filter call can start as
+        soon as that instrument's Judge finishes, without waiting for
+        other instruments' councils to complete.
+
+        Returns: {"council": {bull, bear, judge}, "filter": {...filter card dict}}.
+        """
+        council = self.run_council_for_instrument(
+            instrument, strategist_output, contrarian_output, themes,
+        )
+        filter_card = self.run_setup_filter(instrument, council["judge"], themes)
+        return {"instrument": instrument, "council": council, "filter": filter_card}
+
     # --- Layer 4b — Tradability Filter ---
 
     def run_setup_filter(
@@ -365,26 +387,56 @@ class BiasEngine:
 
         council_dir = out_dir / "04_council"
         council_dir.mkdir(exist_ok=True)
-        for instrument in council_instruments:
-            outputs = self.run_council_for_instrument(
-                instrument, result.layer2_strategist, result.layer3_contrarian, themes,
-            )
-            result.layer4_council[instrument] = outputs
-            (council_dir / f"{instrument}_bull.md").write_text(outputs["bull"], encoding="utf-8")
-            (council_dir / f"{instrument}_bear.md").write_text(outputs["bear"], encoding="utf-8")
-            (council_dir / f"{instrument}_judge.md").write_text(outputs["judge"], encoding="utf-8")
-
-        # Layer 4b — Tradability Filter (per instrument that cleared council)
         filter_dir = out_dir / "04b_tradability_filter"
         filter_dir.mkdir(exist_ok=True)
         filter_results: dict[str, dict] = {}
-        for instrument in council_instruments:
-            judge_card = result.layer4_council[instrument]["judge"]
-            filter_card = self.run_setup_filter(instrument, judge_card, themes)
-            filter_results[instrument] = filter_card
-            (filter_dir / f"{instrument}.md").write_text(
-                filter_card.get("agent_output") or "_no output_", encoding="utf-8"
-            )
+
+        # Layer 4 + 4b — parallel across instruments. Each instrument's
+        # bull→bear→judge→filter chain stays sequential internally (the
+        # later agents depend on the earlier ones); but instruments don't
+        # depend on each other, so we run them concurrently. Big win:
+        # 7 instruments × ~3-4 min serial would be 20-28 min; parallel
+        # collapses to roughly the slowest single chain (~3-4 min).
+        log.info(
+            "layer4_parallel_start",
+            instruments=council_instruments,
+            workers=min(len(council_instruments), 8),
+        )
+        # Cap workers at 8 to stay below typical OpenRouter concurrency
+        # ceilings; tracker lock serializes budget updates regardless.
+        with ThreadPoolExecutor(
+            max_workers=min(max(len(council_instruments), 1), 8),
+            thread_name_prefix="L4",
+        ) as ex:
+            futures = {
+                ex.submit(
+                    self.run_council_and_filter_for_instrument,
+                    inst, result.layer2_strategist, result.layer3_contrarian, themes,
+                ): inst
+                for inst in council_instruments
+            }
+            for fut in as_completed(futures):
+                inst = futures[fut]
+                try:
+                    bundle = fut.result()
+                except Exception as e:
+                    log.error("layer4_parallel_failed", instrument=inst, error=str(e))
+                    continue
+
+                council_outputs = bundle["council"]
+                result.layer4_council[inst] = council_outputs
+                (council_dir / f"{inst}_bull.md").write_text(council_outputs["bull"], encoding="utf-8")
+                (council_dir / f"{inst}_bear.md").write_text(council_outputs["bear"], encoding="utf-8")
+                (council_dir / f"{inst}_judge.md").write_text(council_outputs["judge"], encoding="utf-8")
+
+                filter_card = bundle["filter"]
+                filter_results[inst] = filter_card
+                (filter_dir / f"{inst}.md").write_text(
+                    filter_card.get("agent_output") or "_no output_", encoding="utf-8"
+                )
+
+        log.info("layer4_parallel_complete", completed=len(filter_results))
+
         if filter_results:
             (filter_dir / "_summary.json").write_text(
                 json.dumps(
