@@ -163,44 +163,84 @@ _HUMAN_NOTES_RE = re.compile(
 _STRATEGIST_NOTES_RE = re.compile(
     r"NOTES?:?\**\s*([^\n*]+(?:\n(?!#|\*\*)[^\n]+)*)", re.IGNORECASE,
 )
+_JUDGE_PRIMARY_THEME_RE = re.compile(
+    r"PRIMARY\s*THEME[^:]*:\s*([^\n]+)", re.IGNORECASE,
+)
+_STRATEGIST_PRIMARY_RE = re.compile(
+    r"Primary[\s:\-]+([^\n]+)", re.IGNORECASE,
+)
+_DRIVING_THEMES_RE = re.compile(
+    r"DRIVING\s*THEMES?[^\n]*\n((?:[^\n]*\n){1,4})", re.IGNORECASE,
+)
 
 
-def _summarise_card(b: InstrumentBias, filter_card, in_active: bool) -> str:
-    """Produce a 1-2 sentence plain-English summary for a card.
+def _extract_macro_summary(b: InstrumentBias, co) -> str:
+    """One-sentence macro driver summary: why is the bias what it is?
 
-    Sources, in priority order:
-      1. Filter agent's verdict_reason (when filter ran — most actionable)
-      2. Filter agent's human_review_notes first sentence
-      3. Strategist's bias text (when no filter)
-      4. Composed fallback
+    Priority:
+      1. Judge's PRIMARY THEME line (most authoritative when council ran)
+      2. Strategist's first 'Primary:' theme line
+      3. Strategist DRIVING THEMES block (first line)
+      4. Bias direction + conviction (composed fallback)
+    """
+    if co and co.judge:
+        m = _JUDGE_PRIMARY_THEME_RE.search(co.judge)
+        if m:
+            theme = m.group(1).strip().strip("[]").rstrip(".")
+            if 5 <= len(theme) <= 200:
+                return f"Macro: {theme}."
+
+    if b.raw_section:
+        m = _STRATEGIST_PRIMARY_RE.search(b.raw_section)
+        if m:
+            theme = m.group(1).strip().strip("*").rstrip(".")
+            # Strip "(bullish USD)" parens or directional hints — often noisy
+            if 5 <= len(theme) <= 200:
+                return f"Macro: {theme}."
+        m = _DRIVING_THEMES_RE.search(b.raw_section)
+        if m:
+            first = m.group(1).strip().split("\n")[0].strip()
+            first = re.sub(r"^[-*•\s]+", "", first).rstrip(".")
+            if 5 <= len(first) <= 200:
+                return f"Macro: {first}."
+
+    return f"Macro: {b.bias.capitalize()} bias at {b.conviction}/10."
+
+
+def _extract_chart_summary(filter_card, has_council: bool) -> str:
+    """One-sentence chart status: what did structural review say?
+
+    Priority:
+      1. Filter's verdict_reason (when filter ran)
+      2. Filter's human_review_notes first sentence
+      3. 'Council ran but no filter' (transitional state)
+      4. 'Below council threshold' (no review at all)
     """
     if filter_card and filter_card.raw:
         m = _VERDICT_REASON_RE.search(filter_card.raw)
         if m:
-            text = m.group(1).strip().rstrip(".") + "."
-            return text
+            text = m.group(1).strip().rstrip(".")
+            if text:
+                return f"Chart: {text}."
         m = _HUMAN_NOTES_RE.search(filter_card.raw)
         if m:
             block = m.group(1).strip()
-            # Take first sentence (or first ~200 chars)
             first = block.split(". ")[0].strip().rstrip(".")
-            if first:
-                return first + "."
+            if first and len(first) < 240:
+                return f"Chart: {first}."
+        return "Chart: filter output unparseable."
 
-    # No filter — use the strategist's bias card if available
-    if b.raw_section:
-        m = _STRATEGIST_NOTES_RE.search(b.raw_section)
-        if m:
-            text = m.group(1).strip().split(". ")[0].rstrip(".)").strip()
-            # Require something substantive — short fragments are usually
-            # the regex catching closing punctuation, not real content.
-            if text and len(text) >= 30 and len(text) < 250:
-                return text + "."
+    if has_council:
+        return "Chart: structural review pending for this run."
+    return "Chart: not reviewed (conviction below council threshold)."
 
-    # Composed fallback
-    if not in_active:
-        return "Macro view supports this. Outside active universe — no chart filter applied today."
-    return f"{b.bias.capitalize()} bias at conviction {b.conviction}/10. No structural review for this run."
+
+def _summarise_card(b: InstrumentBias, filter_card, in_active: bool, council_output=None) -> str:
+    """Two-part 'macro + chart' summary. Macro always comes first because
+    it's the primary signal source (chart only gates timing)."""
+    macro = _extract_macro_summary(b, council_output)
+    chart = _extract_chart_summary(filter_card, has_council=council_output is not None)
+    return f"{macro} {chart}"
 
 
 def _build_unified_watchlist(run: Run) -> list[dict]:
@@ -282,7 +322,7 @@ def _build_unified_watchlist(run: Run) -> list[dict]:
             "bias": final_bias,
             "conviction": final_conv,
             "conviction_class": _conviction_class(final_conv),
-            "summary": _summarise_card(b, filter_card, in_active),
+            "summary": _summarise_card(b, filter_card, in_active, council_output=co),
             "simple_summary": simple_summary,
             "in_active": in_active,
             "has_council": co is not None,
