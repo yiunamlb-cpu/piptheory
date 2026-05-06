@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark"></span>
+    <span class="brand-text">nam-hedgefund</span>
+  </div>
+</header>
+<main class="container">
+  <div class="empty-state">
+    <h2>{{ message }}</h2>
+    <p>Execute <code>scripts/run_bias_engine.py</code> or click <strong>Run analysis</strong> below to populate.</p>
+  </div>
+</main>
+{% endblock %}

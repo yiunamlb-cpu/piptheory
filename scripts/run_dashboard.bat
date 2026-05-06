@@ -2,14 +2,8 @@
 rem nam-hedgefund dashboard auto-start.
 rem Registered with Windows Task Scheduler — see scripts/install_dashboard_task.ps1.
 rem
-rem This script:
-rem   1. Sets working directory to the project root
-rem   2. Activates Python via the project's venv (no shell activation needed)
-rem   3. Starts Streamlit in headless mode bound to all interfaces (Tailscale-reachable)
-rem   4. Logs to logs/dashboard.log
-rem
-rem Streamlit Serve is also re-applied so the https://desktop.tail*.ts.net/
-rem URL re-attaches after a reboot.
+rem Replaces the Streamlit launcher with FastAPI (uvicorn). Same port (8501),
+rem same Tailscale Serve mapping, custom HTML/CSS, no framework UI surprises.
 
 setlocal
 
@@ -26,11 +20,10 @@ echo ================================================================ >> "logs\d
 echo Dashboard started %DATE% %TIME% >> "logs\dashboard.log"
 echo ================================================================ >> "logs\dashboard.log"
 
-rem Re-apply Tailscale Serve mapping in case it didn't persist across reboot.
+rem Re-apply Tailscale Serve mapping (idempotent; safe to call repeatedly).
 "C:\Program Files\Tailscale\tailscale.exe" serve --bg http://localhost:8501 1>> "logs\dashboard.log" 2>&1
 
-rem Start Streamlit in the background. The cmd /c start technique detaches
-rem so the scheduled task doesn't sit around as a parent process.
-start "" /B ".venv\Scripts\python.exe" -m streamlit run "dashboard\app.py" 1>> "logs\dashboard.log" 2>&1
+rem Start uvicorn in the background, bound to all interfaces on 8501.
+start "" /B ".venv\Scripts\python.exe" -m uvicorn app.main:app --host 0.0.0.0 --port 8501 --log-level info 1>> "logs\dashboard.log" 2>&1
 
 endlocal

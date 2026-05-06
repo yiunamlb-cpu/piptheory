@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+{% block title %}{{ run_date }} — nam-hedgefund{% endblock %}
+
+{% block content %}
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <span class="brand-text">nam-hedgefund</span>
+    <span class="brand-meta" aria-hidden="true">decision support</span>
+  </div>
+
+  <div class="topbar-actions">
+    <select id="run-picker" class="select" aria-label="Run date">
+      {% for r in runs %}
+        <option value="{{ r }}" {% if r == run_date %}selected{% endif %}>{{ r }}</option>
+      {% endfor %}
+    </select>
+
+    <button id="run-now-btn" class="btn btn-primary">
+      <span class="btn-icon" aria-hidden="true">▶</span>
+      <span>Run analysis</span>
+    </button>
+  </div>
+</header>
+
+<div id="run-status-banner" class="run-banner" hidden></div>
+
+<main class="container">
+
+  <!-- HERO -->
+  <section class="hero hero-{{ hero.status }}">
+    <div class="hero-eyebrow"><span class="dot" aria-hidden="true"></span>{{ hero.eyebrow }}</div>
+    <h1 class="hero-headline">{{ hero.headline }}</h1>
+    <p class="hero-subline">{{ hero.subline }}</p>
+
+    {% if run.run_summary.get('total_cost_usd') is not none %}
+    <div class="hero-meta">
+      <span>{{ run_date }}</span>
+      <span class="dot-sep" aria-hidden="true">·</span>
+      <span>${{ "%.4f"|format(run.run_summary['total_cost_usd']) }} run cost</span>
+      {% if run.tradability %}
+      <span class="dot-sep" aria-hidden="true">·</span>
+      <span>{{ run.tradability|length }} filter cards</span>
+      {% endif %}
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- ACTIVE UNIVERSE -->
+  <section class="section">
+    <h2 class="section-title">Active universe</h2>
+    <div class="grid grid-3">
+      {% for c in active_cards %}
+      <article class="inst-card inst-card-{{ c.verdict_class }}">
+        <header class="inst-card-head">
+          <div>
+            <div class="inst-card-symbol">{{ c.symbol }}
+              <span class="inst-card-name">{{ c.name }}</span>
+            </div>
+            <div class="inst-card-sub">
+              {% if c.platform_differs %}MT5: {{ c.platform }} · {% endif %}{{ c.bias }}
+            </div>
+          </div>
+          <span class="pill pill-{{ c.verdict_class }}">{{ c.verdict_label }}</span>
+        </header>
+        <dl class="inst-card-rows">
+          {% if c.conviction %}
+          <div class="inst-card-row">
+            <dt>Conviction</dt>
+            <dd><span class="conviction conviction-{{ c.conviction_class }}">{{ c.conviction }}/10</span></dd>
+          </div>
+          {% endif %}
+          {% if c.timeframe %}
+          <div class="inst-card-row">
+            <dt>Timeframe</dt><dd>{{ c.timeframe }}</dd>
+          </div>
+          {% endif %}
+          {% if c.priority %}
+          <div class="inst-card-row">
+            <dt>Priority</dt>
+            <dd><span class="badge badge-{{ c.priority_class }}">{{ c.priority }}</span></dd>
+          </div>
+          {% endif %}
+        </dl>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- WIDER WATCHLIST -->
+  {% if context_high or context_low %}
+  <section class="section">
+    {% if context_high %}
+    <h2 class="section-title">Wider watchlist · worth a look</h2>
+    <p class="section-help">
+      Outside the active universe, conviction ≥ 7/10. No structural filter is run — context only.
+    </p>
+    <div class="grid grid-2">
+      {% for b in context_high %}
+      <article class="surface-card">
+        <div class="ctx-row">
+          <div class="ctx-meta">
+            <div class="ctx-symbol">{{ b.symbol }}
+              <span class="ctx-name">{{ b.name }}{% if b.platform_differs %} · MT5: {{ b.platform }}{% endif %}</span>
+            </div>
+            <div class="ctx-bias">{{ b.bias }}</div>
+          </div>
+          <span class="conviction conviction-{{ b.conviction_class }}">{{ b.conviction }}/10</span>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if context_low %}
+    <details class="collapse">
+      <summary>
+        Lower-conviction items ({{ context_low|length }} hidden):
+        <span class="muted">{{ context_low_summary }}</span>
+      </summary>
+      <p class="section-help">Weak macro alignment today. Hidden to reduce noise.</p>
+      <div class="grid grid-2">
+        {% for b in context_low %}
+        <article class="surface-card">
+          <div class="ctx-row">
+            <div class="ctx-meta">
+              <div class="ctx-symbol">{{ b.symbol }}
+                <span class="ctx-name">{{ b.name }}{% if b.platform_differs %} · MT5: {{ b.platform }}{% endif %}</span>
+              </div>
+              <div class="ctx-bias">{{ b.bias }}</div>
+            </div>
+            <span class="conviction conviction-{{ b.conviction_class }}">{{ b.conviction }}/10</span>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </details>
+    {% endif %}
+  </section>
+  {% endif %}
+
+  <!-- TABS -->
+  <nav class="tabs" role="tablist">
+    <button class="tab is-active" data-tab="brief" role="tab">PM Brief</button>
+    <button class="tab" data-tab="filter" role="tab">Tradability</button>
+    <button class="tab" data-tab="ask" role="tab">Ask</button>
+    <button class="tab" data-tab="inspect" role="tab">Inspect</button>
+  </nav>
+
+  <!-- BRIEF -->
+  <section id="tab-brief" class="tab-panel is-active" role="tabpanel">
+    <article class="surface-card prose">
+      {% if run.layer5_pm_brief %}
+        {{ run.layer5_pm_brief | markdown | safe }}
+      {% else %}
+        <div class="empty-state">
+          <h3>No PM brief generated for this run</h3>
+          <p class="muted">Layer 5 only runs when at least one active-universe instrument passes the council threshold.</p>
+        </div>
+      {% endif %}
+    </article>
+  </section>
+
+  <!-- TRADABILITY -->
+  <section id="tab-filter" class="tab-panel" role="tabpanel" hidden>
+    {% if not run.tradability %}
+      <div class="empty-state">
+        <h3>No Tradability Filter outputs</h3>
+        <p class="muted">No active-universe instrument passed the conviction threshold.</p>
+      </div>
+    {% else %}
+      {% if by_verdict.tradable %}
+        <h3 class="section-title">Tradable now</h3>
+        {% for c in by_verdict.tradable %}
+        <details class="collapse" open>
+          <summary>{{ c.symbol }} — {{ c.name }} · <span class="pill pill-tradable">Tradable now</span></summary>
+          <article class="prose">{{ c.raw | markdown | safe }}</article>
+        </details>
+        {% endfor %}
+      {% endif %}
+
+      {% if by_verdict.watch %}
+        <h3 class="section-title">Watch — bias supported, location not yet tradable</h3>
+        {% for c in by_verdict.watch %}
+        <details class="collapse">
+          <summary>{{ c.symbol }} — {{ c.name }} · <span class="pill pill-watch">Watch</span></summary>
+          <article class="prose">{{ c.raw | markdown | safe }}</article>
+        </details>
+        {% endfor %}
+      {% endif %}
+
+      {% if by_verdict.passed %}
+        <details class="collapse">
+          <summary>
+            Passed despite bias ({{ by_verdict.passed|length }} item{% if by_verdict.passed|length != 1 %}s{% endif %})
+            <span class="muted">·
+              {% for c in by_verdict.passed %}{{ c.symbol }}{% if not loop.last %} · {% endif %}{% endfor %}
+            </span>
+          </summary>
+          <p class="section-help">Macro-aligned but structurally unfavourable.</p>
+          {% for c in by_verdict.passed %}
+          <details class="collapse">
+            <summary>{{ c.symbol }} — {{ c.name }} · <span class="pill pill-passed">Passed</span></summary>
+            <article class="prose">{{ c.raw | markdown | safe }}</article>
+          </details>
+          {% endfor %}
+        </details>
+      {% endif %}
+    {% endif %}
+  </section>
+
+  <!-- ASK -->
+  <section id="tab-ask" class="tab-panel" role="tabpanel" hidden>
+    <div class="surface-card">
+      <div class="ask-controls">
+        <label for="persona-select">Voice</label>
+        <select id="persona-select" class="select">
+          {% for p in personas %}
+          <option value="{{ p.key }}">{{ p.label }}</option>
+          {% endfor %}
+        </select>
+        <button id="ask-clear" class="btn btn-secondary btn-sm">Clear chat</button>
+      </div>
+      <p id="ask-help" class="section-help"></p>
+
+      <div id="chat-history" class="chat-history" aria-live="polite"></div>
+
+      <form id="chat-form" class="chat-form">
+        <textarea id="chat-input" placeholder="Ask about the brief…" rows="2" required></textarea>
+        <button type="submit" class="btn btn-primary" id="chat-send">Send</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- INSPECT -->
+  <section id="tab-inspect" class="tab-panel" role="tabpanel" hidden>
+    <h3 class="section-title">Full watchlist</h3>
+    <div class="grid grid-1">
+      {% for b in instrument_biases %}
+      <article class="surface-card inspect-row">
+        <div>
+          <div class="ctx-symbol">{{ b.instrument }}
+            <span class="ctx-name">{{ _display_helpers.display_label(b.instrument) }}{% if _display_helpers.platform_symbol(b.instrument) != b.instrument %} · MT5: {{ _display_helpers.platform_symbol(b.instrument) }}{% endif %}</span>
+          </div>
+          <div class="ctx-bias">{{ b.bias }}</div>
+        </div>
+        <div class="inspect-meta">
+          <span class="conviction conviction-{{ 'high' if b.conviction >= 7 else 'med' if b.conviction >= 4 else 'low' }}">{{ b.conviction }}/10</span>
+          {% if b.priority %}
+            <span class="badge badge-{{ {'A+': 'aplus', 'A': 'a', 'B': 'b', 'C': 'c'}.get(b.priority, '') }}">{{ b.priority }}</span>
+          {% endif %}
+          {% if b.instrument in active_universe %}
+            <span class="badge badge-active">Active</span>
+          {% endif %}
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+
+    <h3 class="section-title">Layer 1 specialists</h3>
+    <details class="collapse"><summary>Inflation Tracker</summary>
+      <article class="prose">{{ run.layer1_inflation | markdown | safe }}</article>
+    </details>
+    <details class="collapse"><summary>Positioning Analyst</summary>
+      <article class="prose">{{ run.layer1_positioning | markdown | safe }}</article>
+    </details>
+    <details class="collapse"><summary>Fed-Watcher</summary>
+      <article class="prose">{{ run.layer1_fed | markdown | safe }}</article>
+    </details>
+
+    <h3 class="section-title">Strategist (Layer 2)</h3>
+    <details class="collapse"><summary>Open</summary>
+      <article class="prose">{{ run.layer2_strategist | markdown | safe }}</article>
+    </details>
+
+    <h3 class="section-title">Contrarian (Layer 3)</h3>
+    <details class="collapse"><summary>Open</summary>
+      <article class="prose">{{ run.layer3_contrarian | markdown | safe }}</article>
+    </details>
+
+    {% if run.council %}
+    <h3 class="section-title">Council debates (Layer 4)</h3>
+    {% for inst, co in run.council.items() %}
+    <details class="collapse">
+      <summary>{{ inst }} — {{ _display_helpers.display_label(inst) }}</summary>
+      <details class="collapse"><summary>Bull Advocate</summary>
+        <article class="prose">{{ co.bull | markdown | safe }}</article>
+      </details>
+      <details class="collapse"><summary>Bear Advocate</summary>
+        <article class="prose">{{ co.bear | markdown | safe }}</article>
+      </details>
+      <details class="collapse" open><summary>Judge — final bias</summary>
+        <article class="prose">{{ co.judge | markdown | safe }}</article>
+      </details>
+    </details>
+    {% endfor %}
+    {% endif %}
+  </section>
+
+  <footer class="footer">
+    Rendered {{ render_time }} · private research · not investment advice
+  </footer>
+
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.__APP_CONFIG__ = {
+    runDate: "{{ run_date }}",
+    runs: {{ runs | tojson }}
+  };
+</script>
+<script src="/static/app.js"></script>
+{% endblock %}
