@@ -7,18 +7,40 @@ Returns structured responses with usage and cost so the budget tracker can enfor
 """
 from __future__ import annotations
 
+import json
 from enum import Enum
 from typing import Any, Literal
 
+import httpx
 import structlog
-from openai import OpenAI
+from openai import APIConnectionError, APIError, APITimeoutError, OpenAI
 from openai.types.chat import ChatCompletion
 from pydantic import BaseModel
+from tenacity import (
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from src.config import settings
 from src.llm.budget import BudgetTracker
 
 log = structlog.get_logger(__name__)
+
+# Long-tail completions on DeepSeek V4 Pro can take 90-120s. Default httpx
+# timeout would interrupt them; we extend.
+_HTTP_TIMEOUT_SECONDS = 240.0
+
+# Retryable: transient transport errors and malformed/truncated server responses.
+_RETRY_EXCEPTIONS = (
+    APIConnectionError,
+    APITimeoutError,
+    httpx.ReadTimeout,
+    httpx.ConnectTimeout,
+    httpx.RemoteProtocolError,
+    json.JSONDecodeError,
+)
 
 
 class ModelTier(str, Enum):
@@ -51,6 +73,8 @@ class OpenRouterClient:
         self._client = OpenAI(
             base_url=self.BASE_URL,
             api_key=settings.openrouter_api_key,
+            timeout=_HTTP_TIMEOUT_SECONDS,
+            max_retries=0,  # we manage retries ourselves via tenacity
             default_headers={
                 # OpenRouter uses these for ranking; harmless for our private use.
                 "HTTP-Referer": "https://github.com/yiunamlb-cpu/nam-hedgefund",
@@ -102,7 +126,25 @@ class OpenRouterClient:
         if response_format is not None:
             kwargs["response_format"] = response_format
 
-        response: ChatCompletion = self._client.chat.completions.create(**kwargs)
+        @retry(
+            stop=stop_after_attempt(3),
+            wait=wait_exponential(multiplier=2, min=2, max=30),
+            retry=retry_if_exception_type(_RETRY_EXCEPTIONS),
+            reraise=True,
+        )
+        def _do_call() -> ChatCompletion:
+            try:
+                return self._client.chat.completions.create(**kwargs)
+            except APIError as e:
+                # Some 5xx and rate-limit responses come back as APIError.
+                # Retry on 408/425/429/500/502/503/504; raise others.
+                status = getattr(e, "status_code", None)
+                if status in (408, 425, 429, 500, 502, 503, 504):
+                    log.warning("openrouter_retryable_api_error", status=status, msg=str(e)[:200])
+                    raise
+                raise
+
+        response: ChatCompletion = _do_call()
 
         content = response.choices[0].message.content or ""
         usage = response.usage

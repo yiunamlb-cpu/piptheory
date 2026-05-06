@@ -38,7 +38,7 @@ MACRO_SERIES: dict[str, dict[str, str]] = {
         "sticky_cpi": "CORESTICKM158SFRBATL",  # Atlanta Fed sticky CPI YoY
         "breakeven_5y5y": "T5YIFR",
         "breakeven_10y": "T10YIE",
-        "ahe_yoy": "CES0500000008",          # Avg Hourly Earnings, all employees, total private (level — convert to YoY)
+        "ahe_level": "CES0500000003",         # Avg Hourly Earnings, all employees, total private (level — use yoy() to compute YoY)
     },
     "growth": {
         "real_gdp": "GDPC1",

@@ -1,0 +1,306 @@
+"""The bias engine pipeline. Runs Layer 1 → 2 → 3 → 4 → 5 against live data.
+
+Phase A scope:
+  Layer 1: Inflation Tracker + Positioning Analyst + Fed-Watcher (rates-only)
+  Layer 2: FX + Cross-Asset Strategist (combined for Phase A)
+  Layer 3: Contrarian
+  Layer 4: Bull, Bear, Judge per instrument (only for instruments with conviction >= 5/10)
+  Layer 5: PM Brief
+
+Outputs written to bias_cards/YYYY-MM-DD/.
+"""
+from __future__ import annotations
+
+import json
+import re
+from dataclasses import dataclass, field
+from datetime import datetime
+from pathlib import Path
+
+import structlog
+
+from src.agents import run_agent
+from src.config import BIAS_CARDS_DIR
+from src.data import CotClient, FredClient
+from src.llm import OpenRouterClient
+from src.orchestration.context import (
+    bear_advocate_input,
+    bull_advocate_input,
+    contrarian_input,
+    fed_watcher_input,
+    inflation_tracker_input,
+    judge_input,
+    load_themes,
+    pm_brief_input,
+    positioning_analyst_input,
+    strategist_input,
+)
+
+log = structlog.get_logger(__name__)
+
+# Watchlist for Layer 2 strategist coverage.
+FULL_WATCHLIST = ["DXY", "EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "ES", "NQ", "GC", "CL", "ZN"]
+
+# Subset with COT positioning data.
+COT_INSTRUMENTS = ["EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "GC", "CL", "ZN"]
+
+# Layer 4 council runs only for instruments where Layer 2 conviction >= this threshold.
+COUNCIL_CONVICTION_THRESHOLD = 5
+
+
+@dataclass
+class PipelineResult:
+    """Aggregate result of one pipeline run."""
+    run_date: str
+    layer1: dict[str, str] = field(default_factory=dict)
+    layer2_strategist: str = ""
+    layer3_contrarian: str = ""
+    layer4_council: dict[str, dict[str, str]] = field(default_factory=dict)
+    layer5_pm_brief: str = ""
+    total_cost_usd: float = 0.0
+    total_input_tokens: int = 0
+    total_output_tokens: int = 0
+
+
+class BiasEngine:
+    """Runs the full bias pipeline. Single entry: `run()`."""
+
+    def __init__(self, client: OpenRouterClient | None = None):
+        self.client = client or OpenRouterClient()
+        self.fred = FredClient()
+        self.cot = CotClient(lookback_years=3)
+
+    # --- Layer 1 ---
+
+    def run_inflation_tracker(self) -> str:
+        log.info("layer1_inflation_start")
+        snapshot = self.fred.snapshot([
+            "cpi_headline", "cpi_core", "pce_core",
+            "sticky_cpi", "breakeven_5y5y", "breakeven_10y", "ahe_level",
+        ])
+        # Compute YoY for the level series
+        yoy = {}
+        for name in ["cpi_headline", "cpi_core", "pce_core"]:
+            try:
+                series = self.fred.yoy(name, periods=12).dropna()
+                if not series.empty:
+                    yoy[f"{name}_yoy"] = float(series.iloc[-1])
+            except Exception as e:
+                log.warning("yoy_calc_failed", name=name, error=str(e))
+        user_msg = inflation_tracker_input(snapshot, yoy)
+        result = run_agent("layer1_specialists/inflation_tracker", user_msg, client=self.client)
+        return result.content
+
+    def run_positioning_analyst(self) -> str:
+        log.info("layer1_positioning_start")
+        summaries = []
+        for instrument in COT_INSTRUMENTS:
+            try:
+                s = self.cot.summary(instrument)
+                if s.get("status") == "ok":
+                    summaries.append(s)
+            except Exception as e:
+                log.warning("cot_summary_failed", instrument=instrument, error=str(e))
+        user_msg = positioning_analyst_input(summaries)
+        result = run_agent("layer1_specialists/positioning_analyst", user_msg, client=self.client)
+        return result.content
+
+    def run_fed_watcher(self) -> str:
+        log.info("layer1_fed_start")
+        snapshot = self.fred.snapshot([
+            "ffr_effective", "ffr_target_upper",
+            "ust_2y", "ust_10y", "ust_30y", "real_10y",
+            "breakeven_5y5y", "breakeven_10y",
+        ])
+        user_msg = fed_watcher_input(snapshot)
+        result = run_agent("layer1_specialists/fed_watcher", user_msg, client=self.client)
+        return result.content
+
+    # --- Layer 2 ---
+
+    def run_strategist(self, layer1_outputs: dict[str, str], themes: str) -> str:
+        log.info("layer2_strategist_start")
+        user_msg = strategist_input(layer1_outputs, themes)
+        result = run_agent("layer2_strategists/fx_cross_asset", user_msg, client=self.client)
+        return result.content
+
+    # --- Layer 3 ---
+
+    def run_contrarian(self, strategist_output: str, themes: str) -> str:
+        log.info("layer3_contrarian_start")
+        user_msg = contrarian_input(strategist_output, themes)
+        result = run_agent("layer3_redteam/contrarian", user_msg, client=self.client)
+        return result.content
+
+    # --- Layer 4 ---
+
+    def _extract_per_instrument_section(self, output: str, instrument: str) -> str:
+        """Crude extraction of an instrument's section from a multi-instrument output.
+
+        Strategist and Contrarian produce concatenated outputs across many
+        instruments; for Layer 4 advocates we only need the relevant section.
+        Falls back to the full output if extraction is uncertain.
+        """
+        # Try to find INSTRUMENT: <name> markers
+        pattern = re.compile(
+            rf"INSTRUMENT:\s*{re.escape(instrument)}\b(.*?)(?=INSTRUMENT:\s*\w+|$)",
+            re.DOTALL | re.IGNORECASE,
+        )
+        match = pattern.search(output)
+        if match:
+            return f"INSTRUMENT: {instrument}{match.group(1).rstrip()}"
+        return output  # fallback — agent gets the full strategist/contrarian doc
+
+    def _extract_conviction(self, instrument_section: str) -> int:
+        """Extract conviction score from a strategist bias card. Returns 0 if unparseable.
+
+        Tolerates markdown-formatted lines like ``**CONVICTION:** 8/10``.
+        """
+        # Permissive: any non-digit chars between "CONVICTION" and the digit
+        # (covers `:`, `**`, whitespace, smart quotes, etc.). Cap to 30 chars
+        # of slack so we don't eat past the line.
+        m = re.search(r"CONVICTION[^\d]{0,30}(\d+)\s*/\s*10", instrument_section, re.IGNORECASE)
+        return int(m.group(1)) if m else 0
+
+    def run_council_for_instrument(
+        self,
+        instrument: str,
+        strategist_output: str,
+        contrarian_output: str,
+        themes: str,
+    ) -> dict[str, str]:
+        log.info("layer4_council_start", instrument=instrument)
+        strategist_section = self._extract_per_instrument_section(strategist_output, instrument)
+        contrarian_section = self._extract_per_instrument_section(contrarian_output, instrument)
+
+        bull_msg = bull_advocate_input(instrument, strategist_section, contrarian_section, themes)
+        bull_result = run_agent("layer4_council/bull_advocate", bull_msg, client=self.client)
+
+        bear_msg = bear_advocate_input(
+            instrument, strategist_section, contrarian_section, bull_result.content, themes
+        )
+        bear_result = run_agent("layer4_council/bear_advocate", bear_msg, client=self.client)
+
+        judge_msg = judge_input(
+            instrument, strategist_section, contrarian_section,
+            bull_result.content, bear_result.content, themes,
+        )
+        judge_result = run_agent("layer4_council/judge", judge_msg, client=self.client)
+
+        return {
+            "bull": bull_result.content,
+            "bear": bear_result.content,
+            "judge": judge_result.content,
+        }
+
+    # --- Layer 5 ---
+
+    def run_pm_brief(self, judge_outputs: dict[str, str], themes: str) -> str:
+        log.info("layer5_pm_start")
+        user_msg = pm_brief_input(judge_outputs, themes)
+        result = run_agent("layer5_pm/pm_druckenmiller", user_msg, client=self.client)
+        return result.content
+
+    # --- Orchestration ---
+
+    def run(self, council_instruments: list[str] | None = None) -> PipelineResult:
+        """Run the full pipeline.
+
+        Args:
+            council_instruments: Override which instruments go through Layer 4.
+                If None, runs Layer 4 for instruments with strategist conviction
+                >= COUNCIL_CONVICTION_THRESHOLD.
+        """
+        run_date = datetime.now().date().isoformat()
+        out_dir = BIAS_CARDS_DIR / run_date
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        result = PipelineResult(run_date=run_date)
+        themes = load_themes()
+
+        # Layer 1
+        result.layer1["inflation"] = self.run_inflation_tracker()
+        (out_dir / "01_layer1_inflation.md").write_text(result.layer1["inflation"], encoding="utf-8")
+        result.layer1["positioning"] = self.run_positioning_analyst()
+        (out_dir / "01_layer1_positioning.md").write_text(result.layer1["positioning"], encoding="utf-8")
+        result.layer1["fed"] = self.run_fed_watcher()
+        (out_dir / "01_layer1_fed.md").write_text(result.layer1["fed"], encoding="utf-8")
+
+        # Layer 2
+        result.layer2_strategist = self.run_strategist(result.layer1, themes)
+        (out_dir / "02_strategist.md").write_text(result.layer2_strategist, encoding="utf-8")
+
+        # Layer 3
+        result.layer3_contrarian = self.run_contrarian(result.layer2_strategist, themes)
+        (out_dir / "03_contrarian.md").write_text(result.layer3_contrarian, encoding="utf-8")
+
+        # Layer 4 — selective by conviction threshold
+        if council_instruments is None:
+            council_instruments = []
+            for inst in FULL_WATCHLIST:
+                section = self._extract_per_instrument_section(result.layer2_strategist, inst)
+                conviction = self._extract_conviction(section)
+                if conviction >= COUNCIL_CONVICTION_THRESHOLD:
+                    council_instruments.append(inst)
+            log.info(
+                "council_filter",
+                threshold=COUNCIL_CONVICTION_THRESHOLD,
+                selected=council_instruments,
+            )
+
+        council_dir = out_dir / "04_council"
+        council_dir.mkdir(exist_ok=True)
+        for instrument in council_instruments:
+            outputs = self.run_council_for_instrument(
+                instrument, result.layer2_strategist, result.layer3_contrarian, themes,
+            )
+            result.layer4_council[instrument] = outputs
+            (council_dir / f"{instrument}_bull.md").write_text(outputs["bull"], encoding="utf-8")
+            (council_dir / f"{instrument}_bear.md").write_text(outputs["bear"], encoding="utf-8")
+            (council_dir / f"{instrument}_judge.md").write_text(outputs["judge"], encoding="utf-8")
+
+        # Layer 5
+        judge_outputs = {inst: outputs["judge"] for inst, outputs in result.layer4_council.items()}
+        if judge_outputs:
+            result.layer5_pm_brief = self.run_pm_brief(judge_outputs, themes)
+            (out_dir / "05_pm_brief.md").write_text(result.layer5_pm_brief, encoding="utf-8")
+        else:
+            result.layer5_pm_brief = "No instruments met council threshold; no PM brief produced."
+
+        # Cost summary
+        result.total_cost_usd = self.client.budget.spent_today()
+
+        # Write summary index
+        index_md = (
+            f"# Bias Engine Run — {run_date}\n\n"
+            f"## Files\n\n"
+            f"- `01_layer1_inflation.md` — Inflation Tracker\n"
+            f"- `01_layer1_positioning.md` — Positioning Analyst\n"
+            f"- `01_layer1_fed.md` — Fed-Watcher (rates-only mode)\n"
+            f"- `02_strategist.md` — Cross-Asset Strategist (per-instrument bias cards)\n"
+            f"- `03_contrarian.md` — Contrarian challenge\n"
+            f"- `04_council/{{inst}}_{{bull,bear,judge}}.md` — per-instrument debate\n"
+            f"- `05_pm_brief.md` — PM Brief\n\n"
+            f"## Council instruments\n\n"
+            f"{', '.join(council_instruments) if council_instruments else 'none above threshold'}\n\n"
+            f"## Cost\n\n"
+            f"Total spend today: ${result.total_cost_usd:.4f}\n"
+        )
+        (out_dir / "00_index.md").write_text(index_md, encoding="utf-8")
+
+        # Persist as JSON too for programmatic access
+        run_summary = {
+            "run_date": run_date,
+            "council_instruments": council_instruments,
+            "total_cost_usd": result.total_cost_usd,
+            "spent_today": self.client.budget.spent_today(),
+        }
+        (out_dir / "run_summary.json").write_text(
+            json.dumps(run_summary, indent=2), encoding="utf-8"
+        )
+
+        return result
+
+    def output_dir(self, run_date: str | None = None) -> Path:
+        run_date = run_date or datetime.now().date().isoformat()
+        return BIAS_CARDS_DIR / run_date
