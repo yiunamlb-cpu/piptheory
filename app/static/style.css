@@ -770,9 +770,17 @@ textarea:focus, input:focus {
   padding: 12px;
   font-family: var(--mono);
   font-size: 13px;
-  overflow-x: auto;
-  word-wrap: normal;
-  white-space: pre;
+  /* Wrap long content rather than scrolling — the agent briefs aren't
+     code, so wrapping is friendlier on mobile than horizontal scroll. */
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+.prose {
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 .prose pre code { background: transparent; padding: 0; }
 .prose hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }

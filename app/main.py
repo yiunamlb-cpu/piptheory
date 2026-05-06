@@ -598,8 +598,17 @@ _md = md_lib.Markdown(extensions=["fenced_code", "tables", "nl2br", "sane_lists"
 def _render_markdown(text: str) -> str:
     if not text:
         return ""
+    stripped = text.strip()
+    # Defensive: if the whole content is wrapped in a single code fence
+    # (LLMs sometimes do this even when not asked), peel it. Otherwise
+    # markdown renders the entire brief as one <pre> block that doesn't
+    # wrap on mobile.
+    if stripped.startswith("```") and stripped.rstrip().endswith("```"):
+        lines = stripped.split("\n")
+        if len(lines) >= 2 and lines[0].startswith("```") and lines[-1].strip() == "```":
+            stripped = "\n".join(lines[1:-1])
     _md.reset()
-    return _md.convert(text)
+    return _md.convert(stripped)
 
 
 templates.env.filters["markdown"] = _render_markdown

@@ -60,19 +60,21 @@ For each daily run:
 
 ## Output structure
 
-Use exactly this section ordering. Markdown.
+Output is plain Markdown — **do NOT wrap your output in a triple-backtick
+code fence**. Start directly with the heading line as shown below.
 
-```
-PM BRIEF — YYYY-MM-DD
-========================
+Use exactly this section ordering:
 
-## Executive summary
-
-[2-3 sentences. State the macro regime in one phrase. State whether
-today is action-day or stand-aside. State the binary catalyst, if any,
-that the day's picture depends on.]
-
----
+> PM BRIEF — YYYY-MM-DD
+> =====================
+>
+> ## Executive summary
+>
+> [2-3 sentences. State the macro regime in one phrase. State whether
+> today is action-day or stand-aside. State the binary catalyst, if any,
+> that the day's picture depends on.]
+>
+> ---
 
 ## 1. Setups for review (tradable_now)
 
@@ -134,7 +136,6 @@ and structural review. Cash is the right position." Stop section here.]
 
 [1-2 sentence rationale: where the structural assessment is clean,
 where it's tentative.]
-```
 
 ## Output rules
 
@@ -144,6 +145,7 @@ where it's tentative.]
 4. **No-action default.** Section 1 ("Setups for review") is empty most days. That is the expected outcome of a selective filter. Do not invent a setup to fill the section.
 5. **Continuity acknowledgement.** If yesterday's brief had a setup that's still relevant today, note it in the appropriate section with "Continuation from {YYYY-MM-DD}". Don't re-derive from scratch.
 6. **Cite invalidation levels.** Every setup or watch item must have a specific price level that invalidates the thesis. No level → no entry on that section.
+7. **No surrounding code fences.** Output must be plain Markdown that starts with the heading "PM BRIEF — YYYY-MM-DD" line. Do **not** wrap your entire response in triple-backticks (```...```). Code fences make the brief render as a non-wrapping preformatted block, which breaks mobile readability.
 
 ## Failure modes to avoid
 
