@@ -514,6 +514,114 @@ header[data-testid="stHeader"] {
   background: var(--surface);
 }
 
+/* ============================================
+   MOBILE / SMALL-SCREEN OPTIMIZATIONS
+   ============================================ */
+@media (max-width: 768px) {
+  .block-container {
+    padding-left: var(--space-3) !important;
+    padding-right: var(--space-3) !important;
+    padding-top: var(--space-3) !important;
+  }
+
+  h1 { font-size: 22px !important; line-height: 1.2 !important; }
+  h2 { font-size: 17px !important; margin-top: var(--space-5) !important; }
+  h3 { font-size: 15px !important; }
+  p, li, .stMarkdown { font-size: 14px !important; }
+
+  /* Hero card — slimmer */
+  .hero {
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+  .hero-headline { font-size: 20px; line-height: 1.25; }
+  .hero-subline { font-size: 14px; }
+  .hero-eyebrow { font-size: 10px; letter-spacing: 0.1em; }
+
+  /* Section titles — keep short trail */
+  .section-title { font-size: 10px; }
+  .section-title::after { width: 24px; }
+
+  /* Active universe cards — stacked by Streamlit default; tighten spacing */
+  .inst-card {
+    padding: var(--space-3);
+    margin-bottom: var(--space-2);
+  }
+  .inst-card-symbol { font-size: 16px; }
+  .inst-card-direction { font-size: 12px; }
+  .inst-card-header {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .inst-card-row { font-size: 12px; padding: 5px 0; }
+
+  /* Tabs — bigger tap targets, smaller font */
+  [data-baseweb="tab"] {
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+  }
+  [data-baseweb="tab-list"] {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Status pills — slightly larger to be tappable */
+  .status-pill {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  .priority-badge {
+    font-size: 10px;
+    padding: 3px 7px;
+  }
+
+  /* Surface card padding */
+  .surface-card { padding: var(--space-4); }
+
+  /* Run meta strip — compact */
+  .run-meta {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  /* Sidebar — keep narrow when expanded on phone */
+  [data-testid="stSidebar"] {
+    min-width: 240px !important;
+  }
+
+  /* Brand mark — slightly smaller */
+  .brand { font-size: 15px; }
+
+  /* Empty states should stay readable */
+  .empty-state {
+    padding: var(--space-5);
+    font-size: 13px;
+  }
+
+  /* Tables get hard to read on phones; ensure they wrap */
+  [data-testid="stTable"], .stDataFrame {
+    font-size: 12px !important;
+  }
+
+  /* Make pre/code blocks scroll horizontally rather than overflow */
+  pre {
+    overflow-x: auto !important;
+    font-size: 11px !important;
+  }
+}
+
+/* Very small phones (<= 400px wide) — hero takes more breathing room */
+@media (max-width: 400px) {
+  .hero-headline { font-size: 18px; }
+  h1 { font-size: 20px !important; }
+  .inst-card-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+}
+
 /* === Run meta strip === */
 .run-meta {
   display: inline-flex;
