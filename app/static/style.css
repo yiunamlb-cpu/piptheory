@@ -485,118 +485,84 @@ textarea:focus, input:focus {
 .ctx-bias { color: var(--text-2); font-size: 13px; margin-top: 2px; word-break: break-word; }
 
 /* ============================================
-   UNIFIED WATCHLIST CARDS (replaces active-vs-context split)
+   UNIFIED CARD (one card style, four variants by verdict)
    ============================================ */
-.wl-card {
+.card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 14px;
+  padding: 14px 16px;
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  gap: 10px;
+  transition: box-shadow 0.15s ease;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
-.wl-card:hover { box-shadow: var(--shadow); }
+.card:hover { box-shadow: var(--shadow); }
 
-.wl-card-tradable { border-left: 3px solid var(--tradable); }
-.wl-card-watch    { border-left: 3px solid var(--watch); }
-.wl-card-passed   { border-left: 3px solid var(--passed); opacity: 0.85; }
-.wl-card-neutral  { border-left: 3px solid var(--border-strong); }
+.card-tradable { border-left: 3px solid var(--tradable); }
+.card-watch    { border-left: 3px solid var(--watch); }
+.card-passed   { border-left: 3px solid var(--passed); opacity: 0.88; }
+.card-neutral  { border-left: 3px solid var(--border-strong); }
 
-.wl-card-head {
+.card-head {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 8px;
   flex-wrap: wrap;
 }
-.wl-card-id { flex: 1; min-width: 0; }
-.wl-card-tags {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
-  flex-wrap: wrap;
-}
-
-.wl-symbol {
+.card-id { flex: 1; min-width: 0; }
+.card-symbol {
   font-size: 16px;
   font-weight: 600;
   letter-spacing: -0.01em;
-  word-break: break-word;
 }
-.wl-name {
+.card-name {
   font-weight: 400;
   color: var(--text-2);
   font-size: 13px;
   margin-left: 4px;
 }
-.wl-bias {
-  color: var(--text-2);
-  font-size: 13px;
-  margin-top: 4px;
-  word-break: break-word;
-}
 
-.wl-card-foot {
+.card-body {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-top: 10px;
-  border-top: 1px solid var(--border);
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 6px;
+}
+.card-bias {
+  font-size: 13px;
+  color: var(--text-2);
+}
+.card-bias .conviction {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 14px;
+}
+.card-summary {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
 }
 
-.wl-conviction {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
-  font-family: var(--mono);
+.section-help {
+  font-size: 13px;
+  color: var(--text-2);
+  margin: 0 0 12px 0;
 }
-.wl-conviction .num { font-size: 15px; font-weight: 600; }
-.wl-conviction .lbl {
-  font-size: 10px;
-  font-weight: 500;
+
+/* Reasoning tab: tighter h4 spacing inside collapses */
+.collapse h4 {
+  font-size: 13px;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-3);
-  font-family: var(--font);
+  margin: 16px 0 6px 0;
 }
-.wl-conviction.conviction-high .num { color: var(--brand-strong); }
-.wl-conviction.conviction-med .num  { color: var(--text-2); }
-.wl-conviction.conviction-low .num  { color: var(--text-3); }
-
-.wl-meta {
-  font-size: 12px;
-  color: var(--text-2);
-}
-
-.wl-delta {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 11px;
-  font-weight: 500;
-  font-family: var(--mono);
-  padding: 2px 8px;
-  border-radius: var(--radius-pill);
-  border: 1px solid;
-}
-.wl-delta.up {
-  color: var(--tradable);
-  background: var(--tradable-tint);
-  border-color: var(--tradable-border);
-}
-.wl-delta.down {
-  color: var(--watch);
-  background: var(--watch-tint);
-  border-color: var(--watch-border);
-}
-
-.section-header { margin-bottom: 12px; }
 
 /* ============================================
    PILLS, BADGES, CONVICTION

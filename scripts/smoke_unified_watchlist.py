@@ -15,8 +15,8 @@ for inst, co in r.council.items():
 
 print()
 print("Unified watchlist (sorted by tier, then conviction desc):")
-print(f"  {'tier':4s} {'sym':7s} {'bias':35s} {'conv':5s} {'src':10s} {'verdict':18s}")
+print(f"  {'tier':4s} {'sym':7s} {'bias':25s} {'conv':5s} {'pill':28s} summary")
 for row in _build_unified_watchlist(r):
-    print(f"  {row['tier']:<4} {row['symbol']:<7} {row['bias'][:35]:<35} "
-          f"{row['conviction']:>2}/10 {row['conviction_source']:<10} "
-          f"{row['verdict'] or '-':<18}")
+    print(f"  {row['tier']:<4} {row['symbol']:<7} {row['bias'][:25]:<25} "
+          f"{row['conviction']:>2}/10 {row['pill_text']:<28} "
+          f"{row['summary'][:80]}")

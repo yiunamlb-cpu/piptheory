@@ -11,6 +11,7 @@ Routes:
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 from datetime import datetime
@@ -153,59 +154,102 @@ def _verdict_label(verdict: str) -> str:
     }.get(verdict, verdict)
 
 
+_VERDICT_REASON_RE = re.compile(
+    r"verdict_reason:\s*[\"']?([^\"'\n]+)", re.IGNORECASE,
+)
+_HUMAN_NOTES_RE = re.compile(
+    r"human_review_notes:\s*\|?\s*\n((?:[ \t]+[^\n]*\n?)+)", re.IGNORECASE,
+)
+_STRATEGIST_NOTES_RE = re.compile(
+    r"NOTES?:?\**\s*([^\n*]+(?:\n(?!#|\*\*)[^\n]+)*)", re.IGNORECASE,
+)
+
+
+def _summarise_card(b: InstrumentBias, filter_card, in_active: bool) -> str:
+    """Produce a 1-2 sentence plain-English summary for a card.
+
+    Sources, in priority order:
+      1. Filter agent's verdict_reason (when filter ran — most actionable)
+      2. Filter agent's human_review_notes first sentence
+      3. Strategist's bias text (when no filter)
+      4. Composed fallback
+    """
+    if filter_card and filter_card.raw:
+        m = _VERDICT_REASON_RE.search(filter_card.raw)
+        if m:
+            text = m.group(1).strip().rstrip(".") + "."
+            return text
+        m = _HUMAN_NOTES_RE.search(filter_card.raw)
+        if m:
+            block = m.group(1).strip()
+            # Take first sentence (or first ~200 chars)
+            first = block.split(". ")[0].strip().rstrip(".")
+            if first:
+                return first + "."
+
+    # No filter — use the strategist's bias card if available
+    if b.raw_section:
+        m = _STRATEGIST_NOTES_RE.search(b.raw_section)
+        if m:
+            text = m.group(1).strip().split(". ")[0].rstrip(".)").strip()
+            # Require something substantive — short fragments are usually
+            # the regex catching closing punctuation, not real content.
+            if text and len(text) >= 30 and len(text) < 250:
+                return text + "."
+
+    # Composed fallback
+    if not in_active:
+        return "Macro view supports this. Outside active universe — no chart filter applied today."
+    return f"{b.bias.capitalize()} bias at conviction {b.conviction}/10. No structural review for this run."
+
+
 def _build_unified_watchlist(run: Run) -> list[dict]:
     """One ranked list of all instruments. Authoritative conviction = Judge if
-    available, else Strategist. Each row carries: actionability tier, status pill,
-    and active-universe membership."""
+    available, else Strategist. Each row carries a single answer per field."""
     rows: list[dict] = []
     for b in run.instrument_biases:
-        # Resolve final conviction + bias (Judge wins over Strategist)
         co = run.council.get(b.instrument)
         if co and co.judge_conviction:
             final_conv = co.judge_conviction
-            conv_source = "judge"
             final_bias = (co.judge_bias or b.bias).lower() or "no view"
         else:
             final_conv = b.conviction
-            conv_source = "strategist"
             final_bias = b.bias.lower() or "no view"
-
-        # Conviction delta: surface when Judge meaningfully revised the Strategist
-        conv_delta = None
-        if co and co.judge_conviction and b.conviction:
-            diff = co.judge_conviction - b.conviction
-            if abs(diff) >= 2:  # only show material revisions
-                conv_delta = diff
 
         in_active = b.instrument in ACTIVE_UNIVERSE
         filter_card = run.tradability.get(b.instrument)
         verdict = filter_card.verdict if filter_card else None
 
-        # Actionability tier (sorts within the unified list)
-        # 0 = tradable_now (top)
-        # 1 = watch
-        # 2 = high-conviction context (≥7) without filter
-        # 3 = passed_despite_bias  (still informative — show with low priority)
-        # 4 = active universe with low conviction (no filter ran)
-        # 5 = low-conviction context
+        # Actionability tier
         if verdict == "tradable_now":
-            tier = 0
-            tier_label = "tradable_now"
+            tier, tier_label = 0, "tradable_now"
         elif verdict == "watch":
-            tier = 1
-            tier_label = "watch"
-        elif verdict == "pass_despite_bias":
-            tier = 3
-            tier_label = "passed"
+            tier, tier_label = 1, "watch"
         elif final_conv >= 7:
-            tier = 2
-            tier_label = "context"
+            tier, tier_label = 2, "context_high"
+        elif verdict == "pass_despite_bias":
+            tier, tier_label = 3, "passed"
         elif in_active:
-            tier = 4
-            tier_label = "active_low"
+            tier, tier_label = 4, "active_low"
         else:
-            tier = 5
-            tier_label = "context_low"
+            tier, tier_label = 5, "context_low"
+
+        # Single pill label (plain English)
+        if verdict == "tradable_now":
+            pill_text = "Tradable now"
+            pill_class = "tradable"
+        elif verdict == "watch":
+            pill_text = "Watch"
+            pill_class = "watch"
+        elif verdict == "pass_despite_bias":
+            pill_text = "Skip — chart's against it"
+            pill_class = "passed"
+        elif in_active:
+            pill_text = "Active · no filter run"
+            pill_class = "neutral"
+        else:
+            pill_text = "Context"
+            pill_class = "neutral"
 
         rows.append({
             "symbol": b.instrument,
@@ -215,23 +259,17 @@ def _build_unified_watchlist(run: Run) -> list[dict]:
             "bias": final_bias,
             "conviction": final_conv,
             "conviction_class": _conviction_class(final_conv),
-            "conviction_source": conv_source,  # 'judge' or 'strategist'
-            "conviction_delta": conv_delta,    # signed int, only when Judge revised by >= 2
-            "strategist_conviction": b.conviction,
+            "summary": _summarise_card(b, filter_card, in_active),
             "in_active": in_active,
+            "has_council": co is not None,
+            "has_filter": filter_card is not None,
             "verdict": verdict or "",
-            "verdict_class": {
-                "tradable_now": "tradable",
-                "watch": "watch",
-                "pass_despite_bias": "passed",
-            }.get(verdict, "neutral"),
-            "verdict_label": _verdict_label(verdict) if verdict else "",
+            "pill_text": pill_text,
+            "pill_class": pill_class,
             "tier": tier,
             "tier_label": tier_label,
-            "timeframe": b.timeframe,
         })
 
-    # Sort: tier ascending, then conviction descending, then symbol
     rows.sort(key=lambda r: (r["tier"], -r["conviction"], r["symbol"]))
     return rows
 
@@ -260,13 +298,29 @@ async def run_page(request: Request, date: str):
     by_verdict = _categorise_filter(run)
     hero = _hero_state(run, by_verdict)
 
-    # Unified watchlist: one ranked list, authoritative conviction (Judge > Strategist)
     watchlist = _build_unified_watchlist(run)
 
-    # Split into top-of-page (actionable + high conviction) and collapsed (rest)
-    # Tier 0-2 are visible; 3-5 collapsed by default
-    visible = [r for r in watchlist if r["tier"] <= 2]
-    collapsed = [r for r in watchlist if r["tier"] > 2]
+    # Three sections (no overlap). Hidden by default = section 3.
+    setups = [r for r in watchlist if r["tier"] == 0]
+    watch_and_context = [r for r in watchlist if r["tier"] in (1, 2)]
+    other = [r for r in watchlist if r["tier"] >= 3]
+
+    # Per-instrument data for the Reasoning tab
+    reasoning_per_instrument = []
+    for b in sorted(run.instrument_biases,
+                    key=lambda x: (-x.conviction, x.instrument)):
+        co = run.council.get(b.instrument)
+        fc = run.tradability.get(b.instrument)
+        reasoning_per_instrument.append({
+            "symbol": b.instrument,
+            "name": display_label(b.instrument),
+            "strategist_md": b.raw_section,
+            "strategist_conviction": b.conviction,
+            "council": co,
+            "judge_conviction": co.judge_conviction if co else 0,
+            "filter_card": fc,
+            "verdict": fc.verdict if fc else "",
+        })
 
     return templates.TemplateResponse(
         request,
@@ -276,43 +330,13 @@ async def run_page(request: Request, date: str):
             "runs": runs,
             "run": run,
             "hero": hero,
-            "watchlist_visible": visible,
-            "watchlist_collapsed": collapsed,
-            "watchlist_collapsed_summary": " · ".join(
-                f"{r['symbol']} {r['conviction']}/10" for r in collapsed
+            "setups": setups,
+            "watch_and_context": watch_and_context,
+            "other": other,
+            "other_summary": " · ".join(
+                f"{r['symbol']} {r['conviction']}/10" for r in other
             ),
-            "by_verdict": {
-                "tradable": [
-                    {
-                        "symbol": c.instrument,
-                        "name": display_label(c.instrument),
-                        "raw": c.raw,
-                    }
-                    for c in by_verdict["tradable"]
-                ],
-                "watch": [
-                    {
-                        "symbol": c.instrument,
-                        "name": display_label(c.instrument),
-                        "raw": c.raw,
-                    }
-                    for c in by_verdict["watch"]
-                ],
-                "passed": [
-                    {
-                        "symbol": c.instrument,
-                        "name": display_label(c.instrument),
-                        "raw": c.raw,
-                    }
-                    for c in by_verdict["passed"]
-                ],
-            },
-            "council_instruments": sorted(run.council.keys()),
-            "instrument_biases": sorted(
-                run.instrument_biases,
-                key=lambda b: ({"A+": 0, "A": 1, "B": 2, "C": 3}.get(b.priority, 4),
-                               -b.conviction),
-            ),
+            "reasoning_per_instrument": reasoning_per_instrument,
             "personas": [
                 {"key": "default", "label": "Default analyst"},
                 {"key": "druckenmiller", "label": "Stanley Druckenmiller"},

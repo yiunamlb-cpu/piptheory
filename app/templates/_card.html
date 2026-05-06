@@ -1,0 +1,20 @@
+{# Single instrument card — used in all three watchlist sections.
+   Renders ONE bias direction, ONE conviction number, ONE verdict pill,
+   ONE plain-English summary. No internal-pipeline labels exposed. #}
+<article class="card card-{{ r.pill_class }}">
+  <header class="card-head">
+    <div class="card-id">
+      <div class="card-symbol">{{ r.symbol }}
+        <span class="card-name">{{ r.name }}{% if r.platform_differs %} · MT5: {{ r.platform }}{% endif %}</span>
+      </div>
+    </div>
+    <span class="pill pill-{{ r.pill_class }}">{{ r.pill_text }}</span>
+  </header>
+
+  <div class="card-body">
+    <div class="card-bias">
+      {{ r.bias|capitalize }} · <span class="conviction conviction-{{ r.conviction_class }}">{{ r.conviction }}/10</span>
+    </div>
+    <p class="card-summary">{{ r.summary }}</p>
+  </div>
+</article>

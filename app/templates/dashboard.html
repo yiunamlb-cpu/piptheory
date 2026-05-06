@@ -6,7 +6,6 @@
   <div class="brand">
     <span class="brand-mark" aria-hidden="true"></span>
     <span class="brand-text">nam-hedgefund</span>
-    <span class="brand-meta" aria-hidden="true">decision support</span>
   </div>
 
   <div class="topbar-actions">
@@ -18,7 +17,7 @@
 
     <button id="run-now-btn" class="btn btn-primary">
       <span class="btn-icon" aria-hidden="true">▶</span>
-      <span>Run analysis</span>
+      <span>Run again</span>
     </button>
   </div>
 </header>
@@ -56,119 +55,67 @@
       <span class="dot-sep" aria-hidden="true">·</span>
       <span>${{ "%.4f"|format(run.run_summary['total_cost_usd']) }} run cost</span>
       {% endif %}
-      {% if run.tradability %}
-      <span class="dot-sep" aria-hidden="true">·</span>
-      <span>{{ run.tradability|length }} filter cards</span>
-      {% endif %}
       <span class="dot-sep" aria-hidden="true">·</span>
       <span>last updated <span id="last-updated">…</span></span>
     </div>
   </section>
 
-  <!-- UNIFIED WATCHLIST (single ranked list) -->
+  <!-- SETUPS FOR REVIEW -->
+  {% if setups %}
   <section class="section">
-    <div class="section-header">
-      <h2 class="section-title">Watchlist</h2>
-      <p class="section-help">
-        All instruments, ranked by what's actionable today. Conviction is the
-        Judge's final number when the council debate ran (active universe);
-        Strategist's otherwise. <strong>Same number everywhere.</strong>
-      </p>
-    </div>
-
-    {% if not watchlist_visible and not watchlist_collapsed %}
-    <div class="empty-state"><h3>No instruments parsed</h3></div>
-    {% else %}
-
+    <h2 class="section-title">Setups for review</h2>
+    <p class="section-help">
+      These passed structural review. Your call on whether to take them.
+    </p>
     <div class="grid grid-2">
-      {% for r in watchlist_visible %}
-      <article class="wl-card wl-card-{{ r.verdict_class if r.verdict else 'neutral' }}">
-        <div class="wl-card-head">
-          <div class="wl-card-id">
-            <div class="wl-symbol">{{ r.symbol }}
-              <span class="wl-name">{{ r.name }}{% if r.platform_differs %} · MT5: {{ r.platform }}{% endif %}</span>
-            </div>
-            <div class="wl-bias">{{ r.bias }}</div>
-          </div>
-          <div class="wl-card-tags">
-            {% if r.verdict %}
-              <span class="pill pill-{{ r.verdict_class }}">{{ r.verdict_label }}</span>
-            {% elif r.in_active %}
-              <span class="pill pill-neutral">Active · no filter</span>
-            {% else %}
-              <span class="pill pill-neutral">Context</span>
-            {% endif %}
-          </div>
-        </div>
-        <div class="wl-card-foot">
-          <span class="wl-conviction conviction-{{ r.conviction_class }}">
-            <span class="num">{{ r.conviction }}/10</span>
-            <span class="lbl">{{ 'Judge' if r.conviction_source == 'judge' else 'Strategist' }}</span>
-          </span>
-          {% if r.conviction_delta %}
-            <span class="wl-delta {{ 'down' if r.conviction_delta < 0 else 'up' }}"
-                  title="Council debate revised the Strategist's initial {{ r.strategist_conviction }}/10">
-              {% if r.conviction_delta > 0 %}↑{% else %}↓{% endif %}{{ r.conviction_delta|abs }} from Strategist
-            </span>
-          {% endif %}
-          {% if r.timeframe %}<span class="wl-meta">{{ r.timeframe }}</span>{% endif %}
-        </div>
-      </article>
+      {% for r in setups %}
+      {% include "_card.html" %}
       {% endfor %}
     </div>
+  </section>
+  {% endif %}
 
-    {% if watchlist_collapsed %}
-    <details class="collapse" style="margin-top: 12px;">
+  <!-- WATCH AND CONTEXT -->
+  {% if watch_and_context %}
+  <section class="section">
+    <h2 class="section-title">{% if setups %}Also worth a look{% else %}Watch & context{% endif %}</h2>
+    <p class="section-help">
+      Bias supported but either not at a tradable location, or outside the
+      active universe (no chart filter applied).
+    </p>
+    <div class="grid grid-2">
+      {% for r in watch_and_context %}
+      {% include "_card.html" %}
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- OTHER (collapsed) -->
+  {% if other %}
+  <section class="section">
+    <details class="collapse">
       <summary>
-        Lower-priority items ({{ watchlist_collapsed|length }}):
-        <span class="muted">{{ watchlist_collapsed_summary }}</span>
+        Other instruments ({{ other|length }} hidden):
+        <span class="muted">{{ other_summary }}</span>
       </summary>
       <p class="section-help">
-        Either <strong>passed despite bias</strong> (macro-aligned but structurally
-        unfavourable) or simply low macro conviction. Listed here for completeness.
+        Skipped despite macro bias (chart's against it), or simply low conviction.
       </p>
-      <div class="grid grid-2">
-        {% for r in watchlist_collapsed %}
-        <article class="wl-card wl-card-{{ r.verdict_class if r.verdict else 'neutral' }}">
-          <div class="wl-card-head">
-            <div class="wl-card-id">
-              <div class="wl-symbol">{{ r.symbol }}
-                <span class="wl-name">{{ r.name }}{% if r.platform_differs %} · MT5: {{ r.platform }}{% endif %}</span>
-              </div>
-              <div class="wl-bias">{{ r.bias }}</div>
-            </div>
-            <div class="wl-card-tags">
-              {% if r.verdict %}
-                <span class="pill pill-{{ r.verdict_class }}">{{ r.verdict_label }}</span>
-              {% elif r.in_active %}
-                <span class="pill pill-neutral">Active · low conviction</span>
-              {% else %}
-                <span class="pill pill-neutral">Context</span>
-              {% endif %}
-            </div>
-          </div>
-          <div class="wl-card-foot">
-            <span class="wl-conviction conviction-{{ r.conviction_class }}">
-              <span class="num">{{ r.conviction }}/10</span>
-              <span class="lbl">{{ 'Judge' if r.conviction_source == 'judge' else 'Strategist' }}</span>
-            </span>
-            {% if r.priority %}<span class="badge badge-{{ r.priority_class }}">{{ r.priority }}</span>{% endif %}
-          </div>
-        </article>
+      <div class="grid grid-2" style="margin-top: 12px;">
+        {% for r in other %}
+        {% include "_card.html" %}
         {% endfor %}
       </div>
     </details>
-    {% endif %}
-
-    {% endif %}
   </section>
+  {% endif %}
 
   <!-- TABS -->
   <nav class="tabs" role="tablist">
-    <button class="tab is-active" data-tab="brief" role="tab">PM Brief</button>
-    <button class="tab" data-tab="filter" role="tab">Tradability</button>
+    <button class="tab is-active" data-tab="brief" role="tab">Brief</button>
     <button class="tab" data-tab="ask" role="tab">Ask</button>
-    <button class="tab" data-tab="inspect" role="tab">Inspect</button>
+    <button class="tab" data-tab="reasoning" role="tab">Reasoning</button>
   </nav>
 
   <!-- BRIEF -->
@@ -183,54 +130,6 @@
         </div>
       {% endif %}
     </article>
-  </section>
-
-  <!-- TRADABILITY -->
-  <section id="tab-filter" class="tab-panel" role="tabpanel" hidden>
-    {% if not run.tradability %}
-      <div class="empty-state">
-        <h3>No Tradability Filter outputs</h3>
-        <p class="muted">No active-universe instrument passed the conviction threshold.</p>
-      </div>
-    {% else %}
-      {% if by_verdict.tradable %}
-        <h3 class="section-title">Tradable now</h3>
-        {% for c in by_verdict.tradable %}
-        <details class="collapse" open>
-          <summary>{{ c.symbol }} — {{ c.name }} · <span class="pill pill-tradable">Tradable now</span></summary>
-          <article class="prose">{{ c.raw | markdown | safe }}</article>
-        </details>
-        {% endfor %}
-      {% endif %}
-
-      {% if by_verdict.watch %}
-        <h3 class="section-title">Watch — bias supported, location not yet tradable</h3>
-        {% for c in by_verdict.watch %}
-        <details class="collapse">
-          <summary>{{ c.symbol }} — {{ c.name }} · <span class="pill pill-watch">Watch</span></summary>
-          <article class="prose">{{ c.raw | markdown | safe }}</article>
-        </details>
-        {% endfor %}
-      {% endif %}
-
-      {% if by_verdict.passed %}
-        <details class="collapse">
-          <summary>
-            Passed despite bias ({{ by_verdict.passed|length }} item{% if by_verdict.passed|length != 1 %}s{% endif %})
-            <span class="muted">·
-              {% for c in by_verdict.passed %}{{ c.symbol }}{% if not loop.last %} · {% endif %}{% endfor %}
-            </span>
-          </summary>
-          <p class="section-help">Macro-aligned but structurally unfavourable.</p>
-          {% for c in by_verdict.passed %}
-          <details class="collapse">
-            <summary>{{ c.symbol }} — {{ c.name }} · <span class="pill pill-passed">Passed</span></summary>
-            <article class="prose">{{ c.raw | markdown | safe }}</article>
-          </details>
-          {% endfor %}
-        </details>
-      {% endif %}
-    {% endif %}
   </section>
 
   <!-- ASK -->
@@ -256,32 +155,49 @@
     </div>
   </section>
 
-  <!-- INSPECT -->
-  <section id="tab-inspect" class="tab-panel" role="tabpanel" hidden>
-    <h3 class="section-title">Full watchlist</h3>
-    <div class="grid grid-1">
-      {% for b in instrument_biases %}
-      <article class="surface-card inspect-row">
-        <div>
-          <div class="ctx-symbol">{{ b.instrument }}
-            <span class="ctx-name">{{ _display_helpers.display_label(b.instrument) }}{% if _display_helpers.platform_symbol(b.instrument) != b.instrument %} · MT5: {{ _display_helpers.platform_symbol(b.instrument) }}{% endif %}</span>
-          </div>
-          <div class="ctx-bias">{{ b.bias }}</div>
-        </div>
-        <div class="inspect-meta">
-          <span class="conviction conviction-{{ 'high' if b.conviction >= 7 else 'med' if b.conviction >= 4 else 'low' }}">{{ b.conviction }}/10</span>
-          {% if b.priority %}
-            <span class="badge badge-{{ {'A+': 'aplus', 'A': 'a', 'B': 'b', 'C': 'c'}.get(b.priority, '') }}">{{ b.priority }}</span>
-          {% endif %}
-          {% if b.instrument in active_universe %}
-            <span class="badge badge-active">Active</span>
-          {% endif %}
-        </div>
-      </article>
-      {% endfor %}
-    </div>
+  <!-- REASONING (audit trail, per-instrument) -->
+  <section id="tab-reasoning" class="tab-panel" role="tabpanel" hidden>
+    <p class="section-help">
+      Why the system says what it says. Pick an instrument to see all the agent
+      outputs that produced the card on the front page. Layer 1 specialists
+      (macro context, not per-instrument) are below.
+    </p>
 
-    <h3 class="section-title">Layer 1 specialists</h3>
+    {% for inst in reasoning_per_instrument %}
+    <details class="collapse">
+      <summary>
+        <strong>{{ inst.symbol }}</strong> · {{ inst.name }}
+        <span class="muted" style="margin-left:6px; font-size:12px;">
+          Strategist {{ inst.strategist_conviction }}/10
+          {% if inst.judge_conviction %} · Judge {{ inst.judge_conviction }}/10{% endif %}
+          {% if inst.verdict %} · {{ inst.verdict }}{% endif %}
+        </span>
+      </summary>
+
+      <h4>Strategist (Layer 2) — initial bias card</h4>
+      <article class="prose">{{ inst.strategist_md | markdown | safe }}</article>
+
+      {% if inst.council %}
+      <h4>Council debate (Layer 4)</h4>
+      <details class="collapse"><summary>Bull Advocate</summary>
+        <article class="prose">{{ inst.council.bull | markdown | safe }}</article>
+      </details>
+      <details class="collapse"><summary>Bear Advocate</summary>
+        <article class="prose">{{ inst.council.bear | markdown | safe }}</article>
+      </details>
+      <details class="collapse" open><summary>Judge — final bias</summary>
+        <article class="prose">{{ inst.council.judge | markdown | safe }}</article>
+      </details>
+      {% endif %}
+
+      {% if inst.filter_card %}
+      <h4>Tradability Filter (Layer 4b) — structural review</h4>
+      <article class="prose">{{ inst.filter_card.raw | markdown | safe }}</article>
+      {% endif %}
+    </details>
+    {% endfor %}
+
+    <h3 class="section-title" style="margin-top: 32px;">Layer 1 — Specialists (macro context)</h3>
     <details class="collapse"><summary>Inflation Tracker</summary>
       <article class="prose">{{ run.layer1_inflation | markdown | safe }}</article>
     </details>
@@ -292,33 +208,15 @@
       <article class="prose">{{ run.layer1_fed | markdown | safe }}</article>
     </details>
 
-    <h3 class="section-title">Strategist (Layer 2)</h3>
+    <h3 class="section-title" style="margin-top: 32px;">Layer 2 — Strategist (full)</h3>
     <details class="collapse"><summary>Open</summary>
       <article class="prose">{{ run.layer2_strategist | markdown | safe }}</article>
     </details>
 
-    <h3 class="section-title">Contrarian (Layer 3)</h3>
+    <h3 class="section-title" style="margin-top: 32px;">Layer 3 — Contrarian (full)</h3>
     <details class="collapse"><summary>Open</summary>
       <article class="prose">{{ run.layer3_contrarian | markdown | safe }}</article>
     </details>
-
-    {% if run.council %}
-    <h3 class="section-title">Council debates (Layer 4)</h3>
-    {% for inst, co in run.council.items() %}
-    <details class="collapse">
-      <summary>{{ inst }} — {{ _display_helpers.display_label(inst) }}</summary>
-      <details class="collapse"><summary>Bull Advocate</summary>
-        <article class="prose">{{ co.bull | markdown | safe }}</article>
-      </details>
-      <details class="collapse"><summary>Bear Advocate</summary>
-        <article class="prose">{{ co.bear | markdown | safe }}</article>
-      </details>
-      <details class="collapse" open><summary>Judge — final bias</summary>
-        <article class="prose">{{ co.judge | markdown | safe }}</article>
-      </details>
-    </details>
-    {% endfor %}
-    {% endif %}
   </section>
 
   <footer class="footer">
