@@ -453,39 +453,103 @@ with tab_filter:
                     st.markdown(card.raw)
 
         if passed:
-            st.markdown('<div class="section-title">Passed — macro-aligned but structurally unfavorable</div>',
-                        unsafe_allow_html=True)
-            for card in passed:
-                with st.expander(f"{display_name(card.instrument)} — Passed", expanded=False):
-                    st.markdown(card.raw)
+            # Same noise-reduction pattern as the wider watchlist:
+            # the headline is a one-line summary; details collapsed.
+            passed_summary = " · ".join(display_name(c.instrument) for c in passed)
+            with st.expander(
+                f"Passed despite bias ({len(passed)} item{'s' if len(passed) > 1 else ''}): {passed_summary}",
+                expanded=False,
+            ):
+                st.markdown(
+                    '<p style="font-size:12px; color: var(--text-tertiary); margin: 0 0 12px 0;">'
+                    'These instruments have macro-aligned bias but failed the structural review '
+                    '(counter-trend, fuzzy invalidation, blocking event, etc.). Hidden from the front '
+                    'page to reduce noise. Open if curious; otherwise skip.'
+                    '</p>',
+                    unsafe_allow_html=True,
+                )
+                for card in passed:
+                    with st.expander(f"{display_name(card.instrument)} — Passed", expanded=False):
+                        st.markdown(card.raw)
 
 
-# ---- Ask (chat about the brief) ----
+# ---- Ask (chat about the brief, optionally as a named persona) ----
 with tab_ask:
-    st.markdown(
-        '<p style="color: var(--text-secondary); font-size:14px; margin-bottom: 16px;">'
-        'Ask questions about today\'s brief, the macro picture, individual instruments, '
-        'or how the system works. The assistant has the full run loaded as context.'
-        '</p>',
-        unsafe_allow_html=True,
-    )
+    PERSONAS = {
+        "Default analyst": None,
+        "Stanley Druckenmiller": "druckenmiller",
+        "Ray Dalio": "dalio",
+        "George Soros": "soros",
+        "Howard Marks": "marks",
+        "Warren Buffett": "buffett",
+    }
 
-    # Build the system prompt once per run
+    cols_h = st.columns([2, 3])
+    with cols_h[0]:
+        persona_label = st.selectbox(
+            "Voice",
+            list(PERSONAS.keys()),
+            index=0,
+            key="persona_select",
+        )
+
+    persona_key = PERSONAS[persona_label]
+
+    if persona_key:
+        st.markdown(
+            f'<p style="color: var(--text-secondary); font-size:13px; margin: 0 0 16px 0;">'
+            f'Asking as <strong>{persona_label}</strong>. Same context as the default analyst, '
+            f'different reasoning lens. Switching voice resets chat history for this run.'
+            f'</p>',
+            unsafe_allow_html=True,
+        )
+    else:
+        st.markdown(
+            '<p style="color: var(--text-secondary); font-size:13px; margin: 0 0 16px 0;">'
+            'Ask questions about today\'s brief, individual instruments, or how the system works. '
+            'Switch the Voice above to ask the same question through a famous macro investor\'s lens.'
+            '</p>',
+            unsafe_allow_html=True,
+        )
+
+    # Build the system prompt once per (run, persona)
     @st.cache_data(show_spinner=False)
-    def _build_chat_context(run_date: str) -> str:
+    def _build_chat_context(run_date: str, persona_key: str | None) -> str:
         r = load_run(run_date)
         if r is None:
             return "No run loaded."
         themes_path = ROOT / "docs" / "THEMES.md"
         themes_text = themes_path.read_text(encoding="utf-8") if themes_path.exists() else ""
-        # Compact: each layer's content with size cap
-        parts = [
-            f"# Run context: {run_date}",
+
+        # Persona prompt is prepended (so persona voice frames everything)
+        persona_text = ""
+        if persona_key:
+            ppath = ROOT / "agents" / "personas" / f"{persona_key}.md"
+            if ppath.exists():
+                persona_text = ppath.read_text(encoding="utf-8")
+
+        parts = []
+        if persona_text:
+            parts.extend([
+                persona_text,
+                "",
+                "---",
+                "",
+                "When answering, stay in this persona but ground every answer in the run context below. "
+                "Do not invent data — only reason from what's provided.",
+                "",
+            ])
+        else:
+            parts.append(
+                "You are an analyst helping the user understand today's bias-engine brief. "
+                "Answer questions about the brief, individual instruments, the macro reasoning, "
+                "or how the system works. Stay grounded in the content provided — do not invent. "
+                "If asked something the brief doesn't address, say so directly."
+            )
+
+        parts.extend([
             "",
-            "You are an analyst helping the user understand today's bias-engine brief. "
-            "Answer questions about the brief, individual instruments, the macro reasoning, "
-            "or how the system works. Stay grounded in the content provided — do not invent. "
-            "If asked something the brief doesn't address, say so directly.",
+            f"# Run context: {run_date}",
             "",
             "## Active themes (THEMES.md)",
             themes_text[:8000],
@@ -494,7 +558,7 @@ with tab_ask:
             r.layer5_pm_brief or "(no PM brief)",
             "",
             "## Tradability Filter results",
-        ]
+        ])
         for inst, card in r.tradability.items():
             parts.append(f"### {inst} — {card.verdict}")
             parts.append(card.raw[:3000])
@@ -513,41 +577,43 @@ with tab_ask:
         ])
         return "\n".join(parts)
 
-    system_prompt = _build_chat_context(selected_date)
+    system_prompt = _build_chat_context(selected_date, persona_key)
 
-    # Chat history per-run (resets when user picks a different date)
-    chat_key = f"chat_history_{selected_date}"
+    # Chat history per-run AND per-persona (switching voice resets the convo)
+    chat_key = f"chat_history_{selected_date}_{persona_key or 'default'}"
     if chat_key not in st.session_state:
         st.session_state[chat_key] = []
 
     history = st.session_state[chat_key]
 
-    # Render history
     for msg in history:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    if prompt := st.chat_input("Ask about the brief, an instrument, or how the system works"):
-        # Append user message
+    placeholder = (
+        f"Ask {persona_label} about the brief…" if persona_key
+        else "Ask about the brief, an instrument, or how the system works"
+    )
+
+    if prompt := st.chat_input(placeholder):
         history.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
 
-        # Build conversation: system + recent history
         messages_user = []
-        for m in history[-12:]:  # cap context
+        for m in history[-12:]:
             messages_user.append(f"{m['role'].upper()}: {m['content']}")
         user_msg = "\n\n".join(messages_user)
 
         try:
             client = OpenRouterClient()
             with st.chat_message("assistant"):
-                with st.spinner("Thinking…"):
+                with st.spinner(f"{persona_label} thinking…" if persona_key else "Thinking…"):
                     result = client.complete(
                         system=system_prompt,
                         user=user_msg,
                         tier="cheap",
-                        temperature=0.3,
+                        temperature=0.4 if persona_key else 0.3,  # personas a touch warmer
                     )
                 st.markdown(result.content)
             history.append({"role": "assistant", "content": result.content})
