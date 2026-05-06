@@ -196,8 +196,19 @@ def setup_filter_input(
     judge_card: str,
     setup_context: dict,
     themes: str,
+    events_block: str = "",
 ) -> str:
     """Build the user message for the Tradability Filter (Layer 4b)."""
+    events_section = (
+        f"## Upcoming scheduled events (next 7 days)\n\n"
+        f"This is the ground-truth event calendar from data/events.yaml. "
+        f"Use this as the authoritative source for the `blocking_event_within_5d` "
+        f"check — do NOT rely on memory. If the list is empty, set "
+        f"`blocking_event_within_5d: false`.\n\n"
+        f"{events_block}\n\n"
+        if events_block
+        else ""
+    )
     return (
         f"# Tradability Filter — {instrument}\n\n"
         f"The Judge has produced a final bias for this instrument. Apply your "
@@ -207,6 +218,7 @@ def setup_filter_input(
         f"You are filtering what reaches the human reviewer. Default to a more "
         f"restrictive verdict when checks conflict.\n\n"
         f"## Active themes (condensed)\n\n{themes}\n\n"
+        f"{events_section}"
         f"## Judge bias card\n\n{judge_card}\n\n"
         f"## Setup context (live, daily OHLC + derived levels)\n\n"
         f"```json\n{json.dumps(setup_context, indent=2, default=str)}\n```\n"

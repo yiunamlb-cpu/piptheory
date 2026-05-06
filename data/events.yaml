@@ -1,0 +1,97 @@
+# Economic event calendar — manually maintained.
+#
+# Update this file weekly with events for the next 4-6 weeks. The Tradability
+# Filter (Layer 4b) reads it to flag setups blocked by major upcoming catalysts.
+#
+# Reference sources to update from:
+#   - https://www.bls.gov/schedule/news_release/cpi.htm  (CPI / inflation)
+#   - https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm (FOMC)
+#   - https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html (ECB)
+#   - https://www.boj.or.jp/en/mopo/mpmsche_minu/ (BoJ)
+#   - https://www.bankofengland.co.uk/monetary-policy-summary-and-minutes (BoE)
+#
+# Schema per event:
+#   date:     YYYY-MM-DD
+#   time:     "HH:MM TZ" (08:30 ET, 14:30 CET, etc.) — informational
+#   name:     Short description
+#   severity: high | medium | low
+#   category: inflation | employment | central_bank | growth | sentiment | other
+#   affects:  list of instrument symbols this typically moves
+#   notes:    Optional one-liner the agent will read
+
+events:
+  # === May 2026 ===
+  - date: 2026-05-12
+    time: "08:30 ET"
+    name: "US CPI April"
+    severity: high
+    category: inflation
+    affects: [USD, ES, NQ, GC, ZN, EURUSD, USDJPY, GBPUSD]
+    notes: "Master catalyst for current stagflation regime; binary risk for inflation trades."
+
+  - date: 2026-05-15
+    time: "23:30 AEST"
+    name: "RBA Governor Bullock testimony"
+    severity: medium
+    category: central_bank
+    affects: [AUDUSD]
+
+  - date: 2026-05-22
+    time: "TBD JST"
+    name: "BoJ monetary policy statement"
+    severity: medium
+    category: central_bank
+    affects: [USDJPY, JPY]
+    notes: "YCC band tweak risk; intervention also live above 160."
+
+  - date: 2026-05-30
+    time: "08:30 ET"
+    name: "US PCE April (Fed's preferred inflation gauge)"
+    severity: high
+    category: inflation
+    affects: [USD, ES, NQ, GC, ZN]
+
+  # === June 2026 ===
+  - date: 2026-06-05
+    time: "13:45 CET"
+    name: "ECB June rate decision"
+    severity: high
+    category: central_bank
+    affects: [EURUSD, EUR, ES, NQ]
+    notes: "Markets fully priced for hike; surprise hold would crush EURUSD."
+
+  - date: 2026-06-06
+    time: "08:30 ET"
+    name: "US NFP May"
+    severity: high
+    category: employment
+    affects: [USD, ES, NQ, ZN, EURUSD, USDJPY]
+
+  - date: 2026-06-11
+    time: "08:30 ET"
+    name: "US CPI May"
+    severity: high
+    category: inflation
+    affects: [USD, ES, NQ, GC, ZN, EURUSD]
+
+  - date: 2026-06-17
+    time: "14:00 ET"
+    name: "FOMC June statement + dot plot + Powell presser"
+    severity: high
+    category: central_bank
+    affects: [USD, ES, NQ, GC, ZN, EURUSD, USDJPY]
+    notes: "Quarterly dot plot release — single biggest scheduled event."
+
+  - date: 2026-06-19
+    time: "12:00 BST"
+    name: "BoE June rate decision"
+    severity: medium
+    category: central_bank
+    affects: [GBPUSD, GBP]
+
+  - date: 2026-06-30
+    time: "08:30 ET"
+    name: "US PCE May"
+    severity: high
+    category: inflation
+    affects: [USD, ES, NQ, GC, ZN]

@@ -23,7 +23,7 @@ import json
 
 from src.agents import run_agent
 from src.config import BIAS_CARDS_DIR
-from src.data import CotClient, FredClient, PriceClient
+from src.data import CotClient, FredClient, PriceClient, render_event_block, upcoming_events
 from src.llm import OpenRouterClient
 from src.orchestration.context import (
     bear_advocate_input,
@@ -233,7 +233,14 @@ class BiasEngine:
                 "agent_output": "",
             }
 
-        user_msg = setup_filter_input(instrument, judge_card, ctx, themes)
+        # Inject ground-truth event calendar so the Filter doesn't have to
+        # rely on the model's memory of release dates.
+        events = upcoming_events(days_ahead=7, affects_instrument=instrument,
+                                 min_severity="medium")
+        events_block = render_event_block(events)
+
+        user_msg = setup_filter_input(instrument, judge_card, ctx, themes,
+                                      events_block=events_block)
         # Filter runs at temperature 0 — categorical decisions (tradable/watch/pass)
         # should not flip between runs given identical inputs.
         result = run_agent(

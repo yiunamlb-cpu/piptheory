@@ -79,9 +79,17 @@ You must be able to point at a specific level whose violation invalidates the bi
 
 If `pct_change_20d` > 5% in the bias direction AND `distance_from_20d_high_pct` (or low) is near zero, this is likely a late chase. Even with macro support, the immediate location is unfavorable. `watch` for pullback rather than `tradable_now`.
 
-### Blocking events (Commit C will replace this rule with a real event calendar)
+### Blocking events
 
-For now, if the next 5 trading days contain a known major event you are aware of (FOMC, CPI release, NFP, ECB rate decision), flag `blocking_event_within_5d: true` and reduce verdict by one tier — `tradable_now` becomes `watch`. If unsure, default to `false` and note the uncertainty in `verdict_reason`. Do not invent events.
+The user message includes a section "Upcoming scheduled events (next 7 days)" sourced from the ground-truth calendar in `data/events.yaml`. This is authoritative — do **not** infer events from memory.
+
+Decision rule:
+- Calendar shows **any HIGH-severity event affecting this instrument within 5 trading days** → `blocking_event_within_5d: true`. Reduce verdict by one tier (`tradable_now` → `watch`). Cite the event in `blocking_event_detail`.
+- Calendar shows medium-severity events only → may downgrade verdict but not required to. Note in `verdict_reason`.
+- Calendar shows no relevant events → `blocking_event_within_5d: false`.
+- Calendar is empty (`No major scheduled events in the lookahead window.`) → `false`.
+
+Never set `true` for an event not in the calendar. Never set `false` if a HIGH-severity matching event is present.
 
 ## Verdict ladder (most → least restrictive)
 
