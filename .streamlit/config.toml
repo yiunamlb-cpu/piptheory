@@ -1,21 +1,30 @@
-# Streamlit theme — aligns built-in widgets with the design system in
-# `design MDS/`. Custom CSS in `dashboard/style.py` does the heavy lifting;
-# this catches any defaults the CSS doesn't reach (e.g., color of slider
-# tracks, file uploader hover states).
+# Streamlit configuration. Custom CSS in dashboard/style.py does the heavy
+# visual lifting; this file handles wiring (theme tokens for built-in
+# widgets, server-side behavior for tailnet access).
 
 [theme]
 base = "light"
-primaryColor = "#000000"               # Inkwell — accents, focus rings
-backgroundColor = "#FFFFFF"            # Paper White
-secondaryBackgroundColor = "#FAF8F5"   # Parchment — surfaces, sidebar
-textColor = "#000000"                  # Inkwell
+primaryColor = "#0D9488"               # Brand teal — accents, focus rings
+backgroundColor = "#FAFAF9"            # Page background (warm off-white)
+secondaryBackgroundColor = "#F5F5F4"   # Surfaces, sidebar
+textColor = "#0C0A09"                  # Primary text
 font = "sans serif"
 
 [browser]
 gatherUsageStats = false
 
 [server]
-headless = true                        # don't auto-open browser; we'll launch manually
+headless = true                        # don't auto-open a browser on start
+# Disable CORS / XSRF checks: this dashboard is served on a private tailnet
+# (Tailscale) only. Streamlit's defaults block WebSocket connections from
+# non-localhost origins, which prevents the dashboard from loading on phones
+# even when the firewall and routing are correctly configured. Disabling is
+# safe here because the dashboard is never exposed to the public internet.
+enableCORS = false
+enableXsrfProtection = false
+# Bind to all interfaces; the firewall + Tailscale handle access control.
+address = "0.0.0.0"
+port = 8501
 
 [runner]
 magicEnabled = false                   # explicit st.* calls only
