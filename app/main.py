@@ -249,7 +249,7 @@ def _build_unified_watchlist(run: Run) -> list[dict]:
             pill_text = "Skip — chart's against it"
             pill_class = "passed"
         elif in_active:
-            pill_text = "Active · no filter run"
+            pill_text = "Focus · no filter run"
             pill_class = "neutral"
         else:
             pill_text = "Context"
@@ -341,6 +341,7 @@ async def run_page(request: Request, date: str):
                 f"{r['symbol']} {r['conviction']}/10" for r in other
             ),
             "reasoning_per_instrument": reasoning_per_instrument,
+            "active_universe": ACTIVE_UNIVERSE,
             "personas": [
                 {"key": "default", "label": "Default analyst"},
                 {"key": "druckenmiller", "label": "Stanley Druckenmiller"},

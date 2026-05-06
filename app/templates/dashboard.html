@@ -64,10 +64,26 @@
   <details class="methodology">
     <summary>How to read this page</summary>
     <div class="methodology-body">
+      <p><strong>Focus list vs context.</strong> The system splits instruments
+      into two groups:</p>
+      <ul>
+        <li><strong>Focus list</strong> ({{ active_universe|join(', ') }}) —
+          the instruments you trade on FTMO. These get the <em>full analysis</em>:
+          macro view, council debate (Bull / Bear / Judge), and a structural
+          review of the chart that produces a Tradable / Watch / Skip verdict.</li>
+        <li><strong>Context</strong> (everything else) — macro analysis only.
+          No chart-level check. Used to keep the wider macro picture in view
+          but not as actionable setups.</li>
+      </ul>
+      <p>To change the focus list, edit
+      <code>ACTIVE_UNIVERSE</code> in <code>src/orchestration/pipeline.py</code>.
+      Currently kept small (3 instruments) while we calibrate output quality;
+      can be expanded later.</p>
+
       <p><strong>Conviction</strong> is a 1-10 score. When the council debate
-      ran (filter status: Watch / Tradable / Skip), conviction is the Judge's
-      <em>final</em> number after weighing bull and bear cases. Otherwise it's
-      the Strategist's initial macro read. Same number wherever it appears on
+      ran (focus-list instruments), conviction is the Judge's <em>final</em>
+      number after weighing bull and bear cases. Otherwise it's the
+      Strategist's initial macro read. Same number wherever it appears on
       this page.</p>
 
       <p><strong>Run-to-run variance.</strong> Two consecutive pipeline runs
@@ -78,14 +94,14 @@
 
       <p><strong>What's shown vs hidden.</strong> Visible above:</p>
       <ul>
-        <li><span class="pill pill-tradable">Tradable now</span> — chart and macro both green-lit</li>
-        <li><span class="pill pill-watch">Watch</span> — bias supported, location not yet ready</li>
-        <li><span class="pill pill-neutral">Context</span> with conviction ≥ 6 — strong macro view, no structural check (outside active universe)</li>
+        <li><span class="pill pill-tradable">Tradable now</span> — chart and macro both green-lit (focus list only)</li>
+        <li><span class="pill pill-watch">Watch</span> — bias supported, location not yet ready (focus list only)</li>
+        <li><span class="pill pill-neutral">Context</span> with conviction ≥ 6 — strong macro view, no structural check</li>
       </ul>
       <p>Collapsed below:</p>
       <ul>
-        <li><span class="pill pill-passed">Skip</span> — chart says no even though macro says yes</li>
-        <li><span class="pill pill-neutral">Active · no filter run</span> with low conviction</li>
+        <li><span class="pill pill-passed">Skip — chart's against it</span> — focus list, macro says yes but chart says no</li>
+        <li><span class="pill pill-neutral">Focus · no filter run</span> — focus list with low macro conviction (no structural review needed)</li>
         <li><span class="pill pill-neutral">Context</span> with conviction &lt; 6</li>
       </ul>
     </div>
