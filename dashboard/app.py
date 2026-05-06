@@ -104,8 +104,8 @@ st.markdown("# Daily bias")
 
 # ---------------------- Tabs ----------------------
 
-tab_brief, tab_watchlist, tab_detail, tab_layer1, tab_raw = st.tabs(
-    ["PM Brief", "Watchlist", "Per-instrument", "Specialists", "Raw outputs"]
+tab_brief, tab_filter, tab_watchlist, tab_detail, tab_layer1, tab_raw = st.tabs(
+    ["PM Brief", "Tradability", "Watchlist", "Per-instrument", "Specialists", "Raw outputs"]
 )
 
 
@@ -120,6 +120,65 @@ with tab_brief:
             'instrument passes the council threshold.</span></div>',
             unsafe_allow_html=True,
         )
+
+
+# ---- Tradability Filter ----
+with tab_filter:
+    if not run.tradability:
+        st.markdown(
+            '<div class="empty-state">No Tradability Filter outputs yet.<br>'
+            '<span class="caption">Layer 4b runs only on active-universe instruments '
+            '(ES / NQ / GC) that cleared the council threshold.</span></div>',
+            unsafe_allow_html=True,
+        )
+    else:
+        # Group by verdict
+        by_verdict = {"tradable_now": [], "watch": [], "pass_despite_bias": [], "other": []}
+        for inst, card in run.tradability.items():
+            v = card.verdict if card.verdict in by_verdict else "other"
+            by_verdict[v].append(card)
+
+        st.markdown('<div class="section-title">Setups for review</div>',
+                    unsafe_allow_html=True)
+        if by_verdict["tradable_now"]:
+            for card in by_verdict["tradable_now"]:
+                st.markdown(
+                    f'<div class="bias-card priority-aplus">'
+                    f'<span class="instrument">{card.instrument}</span>'
+                    f'<span class="bias-direction">tradable_now — cleared structural review</span>'
+                    f'</div>',
+                    unsafe_allow_html=True,
+                )
+                with st.expander(f"{card.instrument} — filter detail", expanded=False):
+                    st.markdown(card.raw)
+        else:
+            st.markdown(
+                '<p class="caption" style="color: var(--color-faded-stone);">'
+                'No setups are at a clean tradable location today. This is the '
+                'expected output most days.</p>',
+                unsafe_allow_html=True,
+            )
+
+        if by_verdict["watch"]:
+            st.markdown('<div class="section-title">Watch — bias supported, location not yet tradable</div>',
+                        unsafe_allow_html=True)
+            for card in by_verdict["watch"]:
+                with st.expander(f"{card.instrument} — watch", expanded=False):
+                    st.markdown(card.raw)
+
+        if by_verdict["pass_despite_bias"]:
+            st.markdown('<div class="section-title">Passed — macro-aligned but structurally unfavorable</div>',
+                        unsafe_allow_html=True)
+            for card in by_verdict["pass_despite_bias"]:
+                with st.expander(f"{card.instrument} — passed", expanded=False):
+                    st.markdown(card.raw)
+
+        if by_verdict["other"]:
+            st.markdown('<div class="section-title">Other / unparseable</div>',
+                        unsafe_allow_html=True)
+            for card in by_verdict["other"]:
+                with st.expander(f"{card.instrument} — {card.verdict}", expanded=False):
+                    st.markdown(card.raw)
 
 
 # ---- Watchlist ----

@@ -31,6 +31,14 @@ class CouncilOutput:
 
 
 @dataclass
+class TradabilityFilterCard:
+    """One instrument's Tradability Filter (Layer 4b) output."""
+    instrument: str
+    verdict: str = "unparseable"  # tradable_now | watch | pass_despite_bias | skip_no_data | unparseable
+    raw: str = ""
+
+
+@dataclass
 class Run:
     """All artifacts of one bias-engine run."""
     run_date: str
@@ -41,6 +49,8 @@ class Run:
     layer3_contrarian: str = ""
     layer5_pm_brief: str = ""
     council: dict[str, CouncilOutput] = field(default_factory=dict)
+    tradability: dict[str, TradabilityFilterCard] = field(default_factory=dict)
+    tradability_summary: dict = field(default_factory=dict)
     instrument_biases: list[InstrumentBias] = field(default_factory=list)
     run_summary: dict = field(default_factory=dict)
 
@@ -62,6 +72,17 @@ def list_runs() -> list[str]:
 
 def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8") if path.exists() else ""
+
+
+_FILTER_VERDICT_RE = re.compile(
+    r"verdict\s*:\s*[\"']?(tradable_now|watch|pass_despite_bias|skip_no_data)",
+    re.IGNORECASE,
+)
+
+
+def _extract_filter_verdict(filter_md: str) -> str:
+    m = _FILTER_VERDICT_RE.search(filter_md)
+    return m.group(1).lower() if m else "unparseable"
 
 
 # Match a per-instrument section in the strategist output. Tolerates markdown headings.
@@ -137,6 +158,25 @@ def load_run(run_date: str) -> Run | None:
             entry = council.setdefault(instrument, CouncilOutput(instrument=instrument))
             setattr(entry, role, _read(f))
         run.council = council
+
+    # Layer 4b — Tradability Filter outputs
+    filter_dir = base / "04b_tradability_filter"
+    if filter_dir.exists():
+        for f in filter_dir.iterdir():
+            if not f.is_file() or not f.name.endswith(".md"):
+                continue
+            instrument = f.stem
+            raw = _read(f)
+            verdict = _extract_filter_verdict(raw)
+            run.tradability[instrument] = TradabilityFilterCard(
+                instrument=instrument, verdict=verdict, raw=raw,
+            )
+        summary_file = filter_dir / "_summary.json"
+        if summary_file.exists():
+            try:
+                run.tradability_summary = json.loads(summary_file.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                run.tradability_summary = {}
 
     summary_path = base / "run_summary.json"
     if summary_path.exists():
