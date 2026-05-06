@@ -51,6 +51,12 @@ data/raw/
 *.feather
 *.h5
 
+# --- Runtime state (cost tracking, agent memory snapshots, etc.) ---
+state/
+
+# --- Bias cards (agent outputs revealing current positioning thinking) ---
+bias_cards/
+
 # --- Trade journal & positions (sensitive trading data) ---
 journal/
 trades/
