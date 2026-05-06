@@ -71,7 +71,7 @@ Discretionary, not automated by default. Human pulls the trigger.
 
 - Setup Scanner — given biased instruments, finds trend-pullback structure
 - Trade Journal — logs every decision with full agent reasoning trail
-- NT8 bridge — `CSharpNinja-Python` socket connector
+- MT5 bridge — `MetaTrader5` Python package for data + ZeroMQ EA for signal delivery (FTMO-compatible)
 
 ### Layer 7 — Meta / Learning
 
@@ -87,10 +87,12 @@ The part that's almost always missing and where long-term edge compounds.
 |---|---|
 | Orchestration substrate | `TradingAgents` (forked, customized for macro) on `LangGraph` |
 | Daily scheduler | `Prefect` (cron-style, retries, alerts) |
-| Model routing & cost tracking | `LiteLLM` (multi-provider, fallbacks, budget caps) |
+| Model gateway & cost tracking | **OpenRouter** (one API for Claude / DeepSeek / GPT / Llama; server-side routing; per-call cost in response) |
 | Observability | `Langfuse` (trace replay, prompt versioning, eval harness) |
 | Cross-run memory | `Letta` (persistent agent state across days/weeks) |
 | RAG | `PageIndex` (reasoning-based, no vector DB) |
+
+`LiteLLM` is **optional** with OpenRouter — only needed if we later want local-fallback to specific providers, or use models OpenRouter doesn't proxy.
 
 ## Tiered Model Strategy
 
@@ -106,7 +108,7 @@ Token volume runs through cheap models; decision-critical synthesis runs through
 | **PM synthesis (Layer 5)** | **Frontier** |
 | Weekly journal review | Cheap |
 
-Estimated cost: ~$15-30/month at MVP (Phase A), ~$50-100/month at full desk (Phase C). LiteLLM handles routing and per-call budget enforcement.
+Estimated cost: ~$15-30/month at MVP (Phase A), ~$50-100/month at full desk (Phase C). OpenRouter returns per-call cost in API responses for budget tracking; agent runner enforces caps.
 
 ## Honest Tradeoffs
 

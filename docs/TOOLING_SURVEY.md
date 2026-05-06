@@ -43,7 +43,8 @@ Open-source projects evaluated for the stack, organized by role. Compiled from t
 | `ai-hedge-fund` | Multi-agent fund sim with Druckenmiller PM agent | MIT | **Reference, not runtime dependency.** We steal prompt patterns and adapt into our PM agent inside TradingAgents. |
 | `DMAD` (Diverse Multi-Agent Debate) | Forces distinct reasoning perspectives across agents | MIT | ICLR 2025 paper. Implementation maturity unclear — may need to reimplement following paper. Use in Layer 3 to enforce reasoning diversity. |
 | `LangGraph` | State-machine orchestration for multi-step agent flows | MIT | What TradingAgents is built on. Genuinely well-suited to debate flows. |
-| `LiteLLM` | Provider abstraction across 100+ LLMs, with cost tracking | MIT | Essential for tiered model strategy. Built-in budget caps. |
+| **OpenRouter** (preferred) | Hosted gateway to Claude / DeepSeek / GPT / Llama with one API key | Commercial (pay-per-token) | **Replaces LiteLLM** as routing layer for solo-scale use. Server-side routing, per-call cost in API responses, simpler. |
+| `LiteLLM` | Provider abstraction across 100+ LLMs (alternative) | MIT | Optional — only needed if we want local-fallback or models OpenRouter doesn't proxy. |
 
 ## Memory
 
@@ -90,12 +91,15 @@ Open-source projects evaluated for the stack, organized by role. Compiled from t
 | `NautilusTrader` | Rust-native event-driven, deterministic | LGPL-3.0 | Overkill unless we go fully systematic. |
 | `vectorbt` | High-performance parameter sweeps | Apache 2.0 (Pro is paid) | For research, not live execution. |
 
-## Execution Bridge (NinjaTrader 8)
+## Execution Bridge (MetaTrader 5 — FTMO)
+
+FTMO supports MT4, MT5, cTrader, DXtrade. We target MT5 as the primary platform.
 
 | Project | Role | License | Notes |
 |---|---|---|---|
-| `CSharpNinja-Python-NinjaTrader8` | Drag-and-drop EA + socket bridge | Active | Saves writing socket plumbing. **Verify works in current NT8 version before depending.** |
-| `ninja-socket` | Lower-level WebSocket example for NT8 | Active | If we want to roll our own. |
+| `MetaTrader5` (Python package by MetaQuotes) | Direct API to local MT5 terminal | Official | The de-facto standard. Pulls data, places orders, reads account state. Windows-only (FTMO requirement is Windows anyway). |
+| `DWX_ZeroMQ_Connector` (Darwinex Labs) | ZMQ bridge between MT5 EA and Python | MIT | Robust pattern: MT5 EA publishes ticks/events via ZMQ, Python subscribes and sends commands back. |
+| `mql5-python-integration` patterns | Reference implementations | Various | Examples of Python ↔ MT5 patterns. Use for learning, not as a dependency. |
 
 ## Data / Brokers
 
@@ -115,9 +119,9 @@ These are NOT failures of the survey — they're failures of the OSS ecosystem t
 4. **Conviction calibration over time** wired into agents' priors. `properscoring` provides math; integration is custom.
 5. **Beyond-COT positioning data** (dealer gamma, FX intervention indicators, FRA-OIS, term premium decomposition). Confirmed no good OSS.
 6. **Engine-level backtesting** (replaying the full agent stack on historical data). Real research project; defer past Phase C.
-7. **NT8 trade journal feedback loop.** Pure glue code, ~300 LOC.
+7. **MT5 trade journal feedback loop.** Pure glue code, ~300 LOC. Reads closed trades from MT5, joins with agent reasoning trail, feeds calibration agent.
 8. **FTMO/prop-specific risk rules** in the Risk Manager agent. Small custom prompt, mandatory.
-9. **Cost throttling enforcement** beyond LiteLLM budgets. Few hours of work.
+9. **Cost throttling enforcement** beyond OpenRouter response cost data. Few hours of work — wrap each agent call with running-total budget check.
 
 ## Things to Avoid
 

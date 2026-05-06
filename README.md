@@ -13,8 +13,8 @@ Foundation phase. Architecture drafted, scaffold initialized. Agents and data pi
 - `docs/` — architecture, themes, watchlist, build phases, tooling survey
 - `playbook/` — macro frameworks distilled from primary sources (Dalio, Soros, Druckenmiller, central bank reading guides)
 - `agents/` — agent persona prompts and configs
-- `src/` — Python: data pipelines, agent runners, NT8 bridge
-- `nt8/` — NinjaTrader 8 C# strategies and indicators (signal consumers)
+- `src/` — Python: data pipelines, agent runners, MT5 bridge
+- `mt5/` — MetaTrader 5 EAs and indicators (signal consumers, FTMO execution)
 
 ## Universe
 

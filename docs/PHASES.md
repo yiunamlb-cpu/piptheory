@@ -18,7 +18,7 @@ Three phases over ~10-12 weeks. Each delivers something usable; commit to the ne
 6. **Layer 4:** simplified Bias Council — bull advocate + bear advocate + judge per instrument
 7. **Layer 5:** PM agent (Druckenmiller-style)
 8. **Manual journal** — markdown file, no automation
-9. **No NT8 bridge yet** — agent outputs read by human, traded manually
+9. **No MT5 bridge yet** — agent outputs read by human in markdown, FTMO trades placed manually in MetaTrader 5
 
 ### Phase A deliverables in this repo
 
@@ -78,10 +78,10 @@ If yes to all three: proceed to Phase B. If not: simplify, re-prompt, or kill.
 
 ### Adds
 
-- **Layer 6:** NT8 bridge via `CSharpNinja-Python` connector + custom signal server
+- **Layer 6:** MT5 bridge — `MetaTrader5` Python package for data; ZeroMQ EA for signal delivery to FTMO terminals
 - **Layer 7:** calibration agent (`properscoring` Brier scores), weekly review agent, theme maintenance agent
 - **Persona library expansion:** Soros (reflexivity), Marks (cycles), Tudor Jones (price action overlay)
-- **Cost throttling** and budget caps per agent run via LiteLLM
+- **Cost throttling** — per-call budget caps on OpenRouter calls, alerts on overruns
 - **Backup/disaster recovery** for memory and journal data
 
 ### Phase C success criteria

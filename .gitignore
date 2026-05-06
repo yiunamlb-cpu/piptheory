@@ -71,7 +71,11 @@ models/checkpoints/
 # --- Agent traces (Langfuse exports, debug dumps) ---
 traces/
 
-# --- NT8 compiled / build artifacts ---
+# --- MT5 compiled artifacts (commit .mq5 source, ignore compiled) ---
+*.ex5
+*.ex4
+
+# --- NT8 compiled artifacts (legacy — kept for any incidental NT8 projects) ---
 *.dll
 *.pdb
 *.user
