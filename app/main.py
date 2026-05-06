@@ -154,12 +154,66 @@ def _verdict_label(verdict: str) -> str:
     }.get(verdict, verdict)
 
 
-_VERDICT_REASON_RE = re.compile(
-    r"verdict_reason:\s*[\"']?([^\"'\n]+)", re.IGNORECASE,
+import yaml as _yaml
+
+_FILTER_YAML_BLOCK_RE = re.compile(
+    r"```ya?ml\s*\n(.*?)\n```", re.DOTALL | re.IGNORECASE,
+)
+
+# Fallback regexes if the agent didn't wrap output in a yaml fence.
+# The first form catches plain `verdict_reason: text` (single line, possibly
+# quoted). The folded `verdict_reason: >` and literal `|` block scalars are
+# handled by the YAML parser path; if that fails we still try a multi-line
+# regex fallback that tolerates indented continuation lines.
+_VERDICT_REASON_PLAIN_RE = re.compile(
+    r"verdict_reason:\s*[\"']([^\"'\n]+)[\"']", re.IGNORECASE,
+)
+_VERDICT_REASON_BLOCK_RE = re.compile(
+    r"verdict_reason:\s*[>|]?\s*\n((?:[ \t]+[^\n]+\n?)+)", re.IGNORECASE,
 )
 _HUMAN_NOTES_RE = re.compile(
     r"human_review_notes:\s*\|?\s*\n((?:[ \t]+[^\n]*\n?)+)", re.IGNORECASE,
 )
+
+
+def _parse_filter_yaml(filter_md: str) -> dict:
+    """Best-effort: extract the YAML block from a filter card and parse it.
+
+    The Filter agent's prompt asks for a fenced ```yaml block. Most outputs
+    follow that. Some don't, so we fall back gracefully — caller checks
+    for an empty dict.
+    """
+    if not filter_md:
+        return {}
+    m = _FILTER_YAML_BLOCK_RE.search(filter_md)
+    if not m:
+        return {}
+    try:
+        data = _yaml.safe_load(m.group(1))
+        return data if isinstance(data, dict) else {}
+    except _yaml.YAMLError:
+        return {}
+
+
+def _filter_field(filter_md: str, key: str) -> str:
+    """Extract a single field from a filter card. Tries YAML parse first,
+    then plain-text regex, then block-scalar regex. Returns trimmed string
+    or empty."""
+    parsed = _parse_filter_yaml(filter_md)
+    if parsed and isinstance(parsed.get(key), str):
+        return parsed[key].strip()
+    if key == "verdict_reason":
+        m = _VERDICT_REASON_PLAIN_RE.search(filter_md or "")
+        if m:
+            return m.group(1).strip()
+        m = _VERDICT_REASON_BLOCK_RE.search(filter_md or "")
+        if m:
+            return " ".join(ln.strip() for ln in m.group(1).strip().splitlines()).strip()
+    if key == "human_review_notes":
+        m = _HUMAN_NOTES_RE.search(filter_md or "")
+        if m:
+            return " ".join(ln.strip() for ln in m.group(1).strip().splitlines()).strip()
+    return ""
 _STRATEGIST_NOTES_RE = re.compile(
     r"NOTES?:?\**\s*([^\n*]+(?:\n(?!#|\*\*)[^\n]+)*)", re.IGNORECASE,
 )
@@ -211,21 +265,26 @@ def _extract_chart_summary(filter_card, has_council: bool) -> str:
     """One-sentence chart status: what did structural review say?
 
     Priority:
-      1. Filter's verdict_reason (when filter ran)
+      1. Filter's verdict_reason (when filter ran) — via YAML parser, with
+         regex fallbacks for unfenced or malformed output
       2. Filter's human_review_notes first sentence
       3. 'Council ran but no filter' (transitional state)
       4. 'Below council threshold' (no review at all)
     """
     if filter_card and filter_card.raw:
-        m = _VERDICT_REASON_RE.search(filter_card.raw)
-        if m:
-            text = m.group(1).strip().rstrip(".")
-            if text:
-                return f"Chart: {text}."
-        m = _HUMAN_NOTES_RE.search(filter_card.raw)
-        if m:
-            block = m.group(1).strip()
-            first = block.split(". ")[0].strip().rstrip(".")
+        reason = _filter_field(filter_card.raw, "verdict_reason")
+        if reason:
+            return f"Chart: {reason.rstrip('.')}."
+        notes = _filter_field(filter_card.raw, "human_review_notes")
+        if notes:
+            first = notes.split(". ")[0].strip().rstrip(".")
+            if first and len(first) < 240:
+                return f"Chart: {first}."
+        # Sub-threshold instruments produce a `note:` field instead of a
+        # verdict — surface that rather than "unparseable" if it's there.
+        note = _filter_field(filter_card.raw, "note")
+        if note:
+            first = note.split(". ")[0].strip().rstrip(".")
             if first and len(first) < 240:
                 return f"Chart: {first}."
         return "Chart: filter output unparseable."
@@ -297,9 +356,9 @@ def _build_unified_watchlist(run: Run) -> list[dict]:
         # collapsed 'Other' section. Falls back through several sources.
         simple_summary = ""
         if verdict == "pass_despite_bias" and filter_card and filter_card.raw:
-            m = _VERDICT_REASON_RE.search(filter_card.raw)
-            if m:
-                simple_summary = m.group(1).strip().rstrip(".") + "."
+            reason = _filter_field(filter_card.raw, "verdict_reason")
+            if reason:
+                simple_summary = reason.rstrip(".") + "."
         if not simple_summary:
             if final_conv < 5:
                 simple_summary = (
