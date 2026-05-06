@@ -333,45 +333,78 @@ for col, instrument in zip(cols, ACTIVE_UNIVERSE):
 CONTEXT_INSTRUMENTS = [b.instrument for b in run.instrument_biases
                       if b.instrument not in ACTIVE_UNIVERSE]
 
-if CONTEXT_INSTRUMENTS:
-    st.markdown('<div class="section-title">Wider watchlist (context only)</div>',
-                unsafe_allow_html=True)
-    st.markdown(
-        '<p style="font-size:13px; color: var(--text-secondary); margin: 0 0 12px 0;">'
-        'These instruments still get strategist-level analysis so you can see the '
-        'wider macro picture, but they don\'t pass through the structural filter or '
-        'appear as actionable setups. They are <strong>not</strong> "no-go" — '
-        'they are simply outside the active universe while we refine the system. '
-        'To promote one, edit <code>ACTIVE_UNIVERSE</code> in the pipeline config.'
-        '</p>',
-        unsafe_allow_html=True,
+# Threshold below which a context instrument doesn't earn front-page space.
+# Tweak this if too few or too many items show up most days.
+CONTEXT_CONVICTION_THRESHOLD = 7
+
+
+def _render_context_card(b: InstrumentBias) -> str:
+    full_name = display_label(b.instrument)
+    plat = platform_symbol(b.instrument)
+    plat_part = f' · MT5: {plat}' if plat != b.instrument else ''
+    return (
+        f'<div class="surface-card" style="margin-bottom: 8px;">'
+        f'<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">'
+        f'<div style="min-width: 0;">'
+        f'<div style="font-size:14px; font-weight:600;">{b.instrument} '
+        f'<span style="font-weight:400; color: var(--text-secondary); font-size:12px; margin-left:4px;">'
+        f'{full_name}{plat_part}</span></div>'
+        f'<div style="color: var(--text-secondary); font-size:13px; margin-top:2px; word-wrap: break-word;">{b.bias}</div>'
+        f'</div>'
+        f'<div style="display:flex; gap:6px; align-items:center; flex-shrink:0;">'
+        f'{_conviction_html(b.conviction)}'
+        f'</div>'
+        f'</div>'
+        f'</div>'
     )
 
-    # Compact two-column grid
-    cols = st.columns(2)
+
+if CONTEXT_INSTRUMENTS:
     sorted_context = sorted(
         [b for b in run.instrument_biases if b.instrument in CONTEXT_INSTRUMENTS],
         key=lambda b: -b.conviction,
     )
-    for i, b in enumerate(sorted_context):
-        with cols[i % 2]:
-            full_name = display_label(b.instrument)
-            plat = platform_symbol(b.instrument)
-            plat_part = f' · MT5: {plat}' if plat != b.instrument else ''
+    high_conv = [b for b in sorted_context if b.conviction >= CONTEXT_CONVICTION_THRESHOLD]
+    low_conv = [b for b in sorted_context if b.conviction < CONTEXT_CONVICTION_THRESHOLD]
+
+    if high_conv:
+        st.markdown('<div class="section-title">Wider watchlist · worth a look</div>',
+                    unsafe_allow_html=True)
+        st.markdown(
+            '<p style="font-size:13px; color: var(--text-secondary); margin: 0 0 12px 0;">'
+            f'Outside the active universe, but conviction ≥ {CONTEXT_CONVICTION_THRESHOLD}/10. '
+            'No structural filter is run on these — they are wider-context bias only.'
+            '</p>',
+            unsafe_allow_html=True,
+        )
+        cols = st.columns(2)
+        for i, b in enumerate(high_conv):
+            with cols[i % 2]:
+                st.markdown(_render_context_card(b), unsafe_allow_html=True)
+
+    if low_conv:
+        # Compact one-liner summary so the user sees what's hidden without expanding.
+        summary = " · ".join(
+            f"{b.instrument} {b.conviction}/10" for b in low_conv
+        )
+        with st.expander(
+            f"Lower-conviction items ({len(low_conv)} hidden): {summary}",
+            expanded=False,
+        ):
             st.markdown(
-                f'<div class="surface-card" style="margin-bottom: 8px;">'
-                f'<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">'
-                f'<div style="min-width: 0;">'
-                f'<div style="font-size:14px; font-weight:600;">{b.instrument} <span style="font-weight:400; color: var(--text-secondary); font-size:12px; margin-left:4px;">{full_name}{plat_part}</span></div>'
-                f'<div style="color: var(--text-secondary); font-size:13px; margin-top:2px; word-wrap: break-word;">{b.bias}</div>'
-                f'</div>'
-                f'<div style="display:flex; gap:6px; align-items:center; flex-shrink:0;">'
-                f'<span style="font-family: var(--font-mono); font-size:12px; color: var(--text-tertiary);">{b.conviction}/10</span>'
-                f'</div>'
-                f'</div>'
-                f'</div>',
+                '<p style="font-size:12px; color: var(--text-tertiary); margin: 0 0 12px 0;">'
+                'These have weak macro alignment today. Hidden from the front page to '
+                'reduce noise. Open if curious; otherwise skip.'
+                '</p>',
                 unsafe_allow_html=True,
             )
+            cols = st.columns(2)
+            for i, b in enumerate(low_conv):
+                with cols[i % 2]:
+                    st.markdown(_render_context_card(b), unsafe_allow_html=True)
+
+    if not high_conv and not low_conv:
+        pass  # nothing to render
 
 
 # ========================== Tabs ==========================
