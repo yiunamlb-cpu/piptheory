@@ -105,8 +105,13 @@
             <span class="num">{{ r.conviction }}/10</span>
             <span class="lbl">{{ 'Judge' if r.conviction_source == 'judge' else 'Strategist' }}</span>
           </span>
+          {% if r.conviction_delta %}
+            <span class="wl-delta {{ 'down' if r.conviction_delta < 0 else 'up' }}"
+                  title="Council debate revised the Strategist's initial {{ r.strategist_conviction }}/10">
+              {% if r.conviction_delta > 0 %}↑{% else %}↓{% endif %}{{ r.conviction_delta|abs }} from Strategist
+            </span>
+          {% endif %}
           {% if r.timeframe %}<span class="wl-meta">{{ r.timeframe }}</span>{% endif %}
-          {% if r.priority %}<span class="badge badge-{{ r.priority_class }}">{{ r.priority }}</span>{% endif %}
         </div>
       </article>
       {% endfor %}

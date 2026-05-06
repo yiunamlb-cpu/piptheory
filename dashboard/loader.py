@@ -65,6 +65,7 @@ class CouncilOutput:
     bear: str = ""
     judge: str = ""
     judge_conviction: int = 0  # parsed from the judge card; authoritative when present
+    judge_bias: str = ""       # parsed bias text from judge; authoritative when present
 
 
 @dataclass
@@ -194,12 +195,18 @@ def load_run(run_date: str) -> Run | None:
                 continue
             entry = council.setdefault(instrument, CouncilOutput(instrument=instrument))
             setattr(entry, role, _read(f))
-        # Parse judge conviction (authoritative final number per instrument)
+        # Parse judge conviction + bias (authoritative final values when present).
+        _JUDGE_BIAS_RE = re.compile(
+            r"FINAL\s*BIAS:?\**\s*([^\n*]+)", re.IGNORECASE,
+        )
         for instrument, co in council.items():
             if co.judge:
                 m = _CONVICTION_PATTERN.search(co.judge)
                 if m:
                     co.judge_conviction = int(m.group(1))
+                bm = _JUDGE_BIAS_RE.search(co.judge)
+                if bm:
+                    co.judge_bias = bm.group(1).strip().rstrip("*").strip()
         run.council = council
 
     # Layer 4b — Tradability Filter outputs

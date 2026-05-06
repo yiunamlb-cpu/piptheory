@@ -159,14 +159,23 @@ def _build_unified_watchlist(run: Run) -> list[dict]:
     and active-universe membership."""
     rows: list[dict] = []
     for b in run.instrument_biases:
-        # Resolve final conviction (Judge wins over Strategist)
+        # Resolve final conviction + bias (Judge wins over Strategist)
         co = run.council.get(b.instrument)
         if co and co.judge_conviction:
             final_conv = co.judge_conviction
             conv_source = "judge"
+            final_bias = (co.judge_bias or b.bias).lower() or "no view"
         else:
             final_conv = b.conviction
             conv_source = "strategist"
+            final_bias = b.bias.lower() or "no view"
+
+        # Conviction delta: surface when Judge meaningfully revised the Strategist
+        conv_delta = None
+        if co and co.judge_conviction and b.conviction:
+            diff = co.judge_conviction - b.conviction
+            if abs(diff) >= 2:  # only show material revisions
+                conv_delta = diff
 
         in_active = b.instrument in ACTIVE_UNIVERSE
         filter_card = run.tradability.get(b.instrument)
@@ -203,10 +212,11 @@ def _build_unified_watchlist(run: Run) -> list[dict]:
             "name": display_label(b.instrument),
             "platform": platform_symbol(b.instrument),
             "platform_differs": platform_symbol(b.instrument) != b.instrument,
-            "bias": b.bias.lower() or "no view",
+            "bias": final_bias,
             "conviction": final_conv,
             "conviction_class": _conviction_class(final_conv),
             "conviction_source": conv_source,  # 'judge' or 'strategist'
+            "conviction_delta": conv_delta,    # signed int, only when Judge revised by >= 2
             "strategist_conviction": b.conviction,
             "in_active": in_active,
             "verdict": verdict or "",
@@ -218,8 +228,6 @@ def _build_unified_watchlist(run: Run) -> list[dict]:
             "verdict_label": _verdict_label(verdict) if verdict else "",
             "tier": tier,
             "tier_label": tier_label,
-            "priority": b.priority,
-            "priority_class": _priority_class(b.priority),
             "timeframe": b.timeframe,
         })
 
