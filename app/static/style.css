@@ -1022,30 +1022,44 @@ textarea:focus, input:focus {
    =========================================================== */
 
 /* Help list inside the Positions tab "How to read this tab" disclosure.
-   Each <li> starts with a sample pill so you see colour + label together. */
+   Each <li> shows a sample pill above its explanation. Flex column so
+   the pill sits on its own line and the description (a single <div>)
+   wraps cleanly underneath without inline children leaking into grid
+   cells (early bug — the old layout used CSS grid which auto-placed
+   <strong> and <em> into their own cells, slicing up the prose). */
 .pills-help-list {
   list-style: none;
   margin: 12px 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
 }
 .pills-help-list > li {
-  display: grid;
-  grid-template-columns: 130px 1fr;
-  gap: 10px;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   font-size: 13px;
-  line-height: 1.45;
+  line-height: 1.5;
 }
 .pills-help-list > li .pill {
-  justify-self: start;
+  align-self: flex-start;
 }
-@media (max-width: 600px) {
+.pills-help-desc {
+  /* description block — keeps inline strong/em together, wraps as one
+     paragraph rather than fragmenting into grid cells */
+  color: var(--text);
+}
+
+/* On wider screens, lay out as two columns: pill on the left, prose
+   on the right. Inline children stay nested inside .pills-help-desc
+   so they don't leak into grid cells. */
+@media (min-width: 700px) {
   .pills-help-list > li {
-    grid-template-columns: 1fr;
-    gap: 4px;
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 14px;
+    align-items: start;
   }
 }
 
