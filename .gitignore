@@ -58,10 +58,14 @@ state/
 bias_cards/
 
 # --- Trade journal & positions (sensitive trading data) ---
+# These ignore the *runtime data*. The code lives at src/positions/ and
+# is re-included with the negation rule below.
 journal/
 trades/
 positions/
 fills/
+!src/positions/
+!src/positions/**
 
 # --- Backtest outputs ---
 backtest_results/

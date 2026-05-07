@@ -157,6 +157,24 @@ class PriceClient:
         self._save_cache(ticker, df)
         return df
 
+    def get_latest_close(self, instrument: str) -> float | None:
+        """Return the most recent daily close, or None if unavailable.
+
+        Used by the position page where we just need a current price for
+        P&L and don't want to compute the full SetupContext (which is the
+        Filter's heavy data structure).
+        """
+        try:
+            df = self.get_ohlc(instrument, period="30d")
+        except (KeyError, RuntimeError):
+            return None
+        if df.empty:
+            return None
+        try:
+            return float(df.iloc[-1]["Close"])
+        except (KeyError, ValueError):
+            return None
+
     @staticmethod
     def _atr(df: pd.DataFrame, period: int = 14) -> float:
         high_low = df["High"] - df["Low"]

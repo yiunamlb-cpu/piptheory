@@ -113,7 +113,8 @@ def _read(path: Path) -> str:
 
 
 _FILTER_VERDICT_RE = re.compile(
-    r"verdict\s*:\s*[\"']?(tradable_now|watch|pass_despite_bias|skip_no_data)",
+    r"verdict\s*:\s*[\"']?"
+    r"(tradable_now|watch|pass_despite_bias|skip_no_data|below_threshold)",
     re.IGNORECASE,
 )
 

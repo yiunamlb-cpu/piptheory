@@ -41,12 +41,19 @@ from dashboard.loader import (  # noqa: E402
     platform_symbol,
 )
 from src.config import ROOT  # noqa: E402
+from src.data.prices import INSTRUMENT_TO_TICKER, PriceClient  # noqa: E402
 from src.llm import OpenRouterClient  # noqa: E402
 from src.orchestration.pipeline import ACTIVE_UNIVERSE  # noqa: E402  single source of truth
+from src.positions import PositionStore, advise_position  # noqa: E402
 
 app = FastAPI(title="nam-hedgefund")
 templates = Jinja2Templates(directory=str(APP_ROOT / "templates"))
 app.mount("/static", StaticFiles(directory=str(APP_ROOT / "static")), name="static")
+
+# Module-level singletons. Each is cheap to keep around: PositionStore is a
+# file-backed CRUD shell, PriceClient holds nothing but a TTL config.
+_positions = PositionStore()
+_prices = PriceClient()
 
 CONTEXT_CONVICTION_THRESHOLD = 7
 
@@ -77,6 +84,38 @@ def _categorise_filter(run: Run) -> dict:
         "watch": [c for c in run.tradability.values() if c.verdict == "watch"],
         "passed": [c for c in run.tradability.values() if c.verdict == "pass_despite_bias"],
     }
+
+
+def _hero_position_alerts(run: Run) -> list[dict]:
+    """For each active position, run the advisor against the current run and
+    return any urgent / high-priority alerts (close, emergency_close, trim
+    when conviction has cratered, or trail_stop on a big winner).
+
+    Used to inject position-aware warnings into the hero subline. Returns
+    [] if there are no active positions or none have urgent advice.
+    """
+    try:
+        positions = _positions.list_active()
+    except Exception:
+        return []
+    if not positions:
+        return []
+    alerts = []
+    for pos in positions:
+        cur = _prices.get_latest_close(pos.instrument)
+        if cur is None:
+            continue
+        adv = advise_position(pos, cur, run)
+        if adv.urgency == "high" or adv.action in ("close", "emergency_close", "trim"):
+            alerts.append({
+                "instrument": pos.instrument,
+                "direction": pos.direction,
+                "action": adv.action,
+                "urgency": adv.urgency,
+                "reason": adv.reason,
+                "pnl_pct": adv.pnl_pct,
+            })
+    return alerts
 
 
 def _hero_state(run: Run, by_verdict: dict) -> dict:
@@ -498,6 +537,7 @@ async def run_page(request: Request, date: str):
 
     by_verdict = _categorise_filter(run)
     hero = _hero_state(run, by_verdict)
+    position_alerts = _hero_position_alerts(run)
 
     watchlist = _build_unified_watchlist(run)
 
@@ -534,6 +574,7 @@ async def run_page(request: Request, date: str):
             "runs": runs,
             "run": run,
             "hero": hero,
+            "position_alerts": position_alerts,
             "setups": setups,
             "watch_and_context": watch_and_context,
             "other": other,
@@ -602,8 +643,44 @@ async def api_chat(req: ChatRequest):
         themes_text[:8000],
         "\n## PM Brief\n",
         run.layer5_pm_brief or "(no PM brief)",
-        "\n## Tradability Filter results\n",
     ])
+
+    # Inject open positions so persona chats can answer "should I close GC?"
+    # questions with full state. Each position carries its open-time macro
+    # snapshot, current price, P&L, and the latest advisor verdict.
+    try:
+        active_positions = _positions.list_active()
+    except Exception:
+        active_positions = []
+    if active_positions:
+        parts.append("\n## Open positions (the user's current FTMO trades)\n")
+        parts.append(
+            "Each position shows the macro view at the time of opening, the "
+            "current price, the system's latest advisory verdict, and any user "
+            "notes. When the user asks about hold/close/trim, ground your answer "
+            "in this state. Do not invent prices or P&L numbers.\n\n"
+        )
+        for pos in active_positions:
+            cur = _prices.get_latest_close(pos.instrument)
+            adv = advise_position(pos, cur or pos.entry_price, run)
+            parts.append(
+                f"### {pos.instrument} {pos.direction.upper()} "
+                f"(opened {pos.entry_date} at {pos.entry_price})\n"
+                f"- Bias at open: {pos.bias_at_open} {pos.conviction_at_open}/10 "
+                f"({pos.timeframe_at_open or 'unspecified timeframe'})\n"
+                f"- Thesis at open: {pos.thesis_at_open}\n"
+                f"- Emergency stop: {pos.emergency_stop or 'not set'}\n"
+                f"- Current price: {cur}\n"
+                f"- P&L: {adv.pnl_pct}%\n"
+                f"- Macro now: bias {'aligned' if adv.macro_aligned else 'OPPOSED'}, "
+                f"conviction {adv.conviction_now}/10 "
+                f"(Δ {adv.conviction_delta:+d} since open)\n"
+                f"- Filter verdict now: {adv.filter_verdict_now or 'n/a'}\n"
+                f"- Advisor recommends: **{adv.action}** ({adv.urgency} urgency) — {adv.reason}\n"
+                f"- Notes: {pos.notes or '(none)'}\n\n"
+            )
+
+    parts.append("\n## Tradability Filter results\n")
     for inst, card in run.tradability.items():
         parts.append(f"\n### {inst} — {card.verdict}\n")
         parts.append(card.raw[:3000])
@@ -640,6 +717,216 @@ async def api_chat(req: ChatRequest):
         })
     except Exception as e:
         raise HTTPException(500, f"Chat failed: {e}")
+
+
+# ---------- API: positions ----------
+#
+# All positions endpoints are decision-support only: open/close marks state
+# changes the user has *already made* (or intends to make) on FTMO. The
+# system never executes; it only records and advises.
+
+class OpenPositionRequest(BaseModel):
+    instrument: str
+    direction: str                  # "long" | "short"
+    entry_price: float
+    entry_date: str | None = None    # ISO date; defaults to today server-side
+    size_units: float | None = None
+    emergency_stop: float | None = None
+    notes: str = ""
+    snapshot_run_date: str | None = None  # which run's macro snapshot to freeze
+
+
+class ClosePositionRequest(BaseModel):
+    close_price: float
+    close_reason: str = ""
+    close_date: str | None = None
+
+
+class NoteRequest(BaseModel):
+    note: str
+
+
+class StopRequest(BaseModel):
+    emergency_stop: float
+
+
+def _macro_snapshot(run, instrument: str) -> dict:
+    """Freeze the macro state for an instrument at the moment a position opens.
+
+    Used so the advisor can later detect "thesis weakened" by comparing
+    current conviction against what it was when the trade was put on.
+    """
+    if not run:
+        return {
+            "bias_at_open": "",
+            "conviction_at_open": 0,
+            "timeframe_at_open": "",
+            "thesis_at_open": "",
+        }
+    bias_obj = next((b for b in run.instrument_biases
+                     if b.instrument == instrument), None)
+    co = run.council.get(instrument)
+    # Authoritative conviction: Judge if available, else Strategist
+    if co and co.judge_conviction:
+        conv = co.judge_conviction
+        bias = co.judge_bias or (bias_obj.bias if bias_obj else "")
+    elif bias_obj:
+        conv = bias_obj.conviction
+        bias = bias_obj.bias
+    else:
+        conv = 0
+        bias = ""
+    # Direction snapshot — normalise to long/short/no_view
+    bl = (bias or "").lower()
+    if "long" in bl or "bull" in bl:
+        bias_norm = "long"
+    elif "short" in bl or "bear" in bl:
+        bias_norm = "short"
+    else:
+        bias_norm = "no_view"
+    # Timeframe (best-effort from strategist card text)
+    tf = ""
+    if bias_obj and bias_obj.timeframe:
+        tf_lower = bias_obj.timeframe.lower()
+        if "tactical" in tf_lower:
+            tf = "tactical"
+        elif "swing" in tf_lower:
+            tf = "swing"
+        elif "positional" in tf_lower or "month" in tf_lower:
+            tf = "positional"
+    # Thesis: try first sentence of Judge's reasoning, else strategist excerpt
+    thesis = ""
+    if co and co.judge:
+        thesis = _extract_macro_summary(bias_obj, co)
+        thesis = thesis.removeprefix("Macro: ").strip()
+    elif bias_obj and bias_obj.raw_section:
+        thesis = bias_obj.raw_section[:300].strip()
+    return {
+        "bias_at_open": bias_norm,
+        "conviction_at_open": int(conv),
+        "timeframe_at_open": tf,
+        "thesis_at_open": thesis[:400],
+    }
+
+
+@app.get("/api/positions")
+async def api_positions_list():
+    """Return active positions (with current price, P&L, advice) and recent
+    closed positions (with P&L). The advice block is regenerated on every
+    request because it depends on the latest run's state.
+    """
+    runs = list_runs()
+    latest_run = load_run(runs[0]) if runs else None
+    active = _positions.list_active()
+    closed = _positions.list_closed_recent()
+
+    active_out = []
+    for pos in active:
+        current_price = _prices.get_latest_close(pos.instrument)
+        if current_price is None:
+            # No price means we can't compute P&L or advise — return the
+            # position raw with a placeholder. User still sees it on the page.
+            active_out.append({
+                "position": pos.to_dict(),
+                "current_price": None,
+                "advice": {
+                    "action": "review",
+                    "urgency": "low",
+                    "reason": (f"Could not fetch latest price for {pos.instrument}. "
+                               f"Manually verify before any action."),
+                },
+            })
+            continue
+        advice = advise_position(pos, current_price, latest_run)
+        active_out.append({
+            "position": pos.to_dict(),
+            "current_price": round(current_price, 4),
+            "advice": advice.to_dict(),
+        })
+
+    return JSONResponse({
+        "active": active_out,
+        "closed_recent": [pos.to_dict() for pos in closed],
+        "latest_run_date": latest_run.run_date if latest_run else None,
+        "instruments_known": sorted(INSTRUMENT_TO_TICKER.keys()),
+    })
+
+
+@app.post("/api/positions")
+async def api_positions_open(req: OpenPositionRequest):
+    inst = req.instrument.upper().strip()
+    if inst not in INSTRUMENT_TO_TICKER:
+        raise HTTPException(
+            400, f"Unknown instrument {inst!r}. "
+            f"Supported: {sorted(INSTRUMENT_TO_TICKER.keys())}",
+        )
+    if req.direction not in ("long", "short"):
+        raise HTTPException(400, "direction must be 'long' or 'short'")
+    if req.entry_price <= 0:
+        raise HTTPException(400, "entry_price must be positive")
+
+    # Snapshot macro state — use the requested run if specified, else latest
+    snap_run = None
+    if req.snapshot_run_date:
+        snap_run = load_run(req.snapshot_run_date)
+    if snap_run is None:
+        runs = list_runs()
+        if runs:
+            snap_run = load_run(runs[0])
+    snapshot = _macro_snapshot(snap_run, inst)
+
+    pos = _positions.open(
+        instrument=inst,
+        direction=req.direction,
+        entry_price=req.entry_price,
+        entry_date=req.entry_date,
+        size_units=req.size_units,
+        emergency_stop=req.emergency_stop,
+        notes=req.notes,
+        **snapshot,
+    )
+    return JSONResponse({"position": pos.to_dict()}, status_code=201)
+
+
+@app.post("/api/positions/{position_id}/close")
+async def api_positions_close(position_id: str, req: ClosePositionRequest):
+    pos = _positions.close(
+        position_id=position_id,
+        close_price=req.close_price,
+        close_reason=req.close_reason,
+        close_date=req.close_date,
+    )
+    if pos is None:
+        raise HTTPException(404, f"No active position with id {position_id!r}")
+    return JSONResponse({"position": pos.to_dict()})
+
+
+@app.post("/api/positions/{position_id}/note")
+async def api_positions_add_note(position_id: str, req: NoteRequest):
+    pos = _positions.add_note(position_id, req.note)
+    if pos is None:
+        raise HTTPException(404, f"No position with id {position_id!r}")
+    return JSONResponse({"position": pos.to_dict()})
+
+
+@app.post("/api/positions/{position_id}/stop")
+async def api_positions_update_stop(position_id: str, req: StopRequest):
+    pos = _positions.update_emergency_stop(position_id, req.emergency_stop)
+    if pos is None:
+        raise HTTPException(
+            404, f"No active position with id {position_id!r}",
+        )
+    return JSONResponse({"position": pos.to_dict()})
+
+
+@app.delete("/api/positions/{position_id}")
+async def api_positions_delete(position_id: str):
+    """Hard-delete a position. Use only for mistakes; closed trades should be
+    closed via /close so they go to the journal.
+    """
+    if not _positions.delete(position_id):
+        raise HTTPException(404, f"No position with id {position_id!r}")
+    return JSONResponse({"deleted": position_id})
 
 
 # ---------- API: manual run trigger ----------
