@@ -53,8 +53,14 @@ When generating a counterargument, prioritize these inputs in order:
 4. **Cross-asset dissent** — is any single asset class telling a different story? (E.g., consensus says risk-on but credit spreads widening.)
 5. **Central bank reaction function** — could the central bank break the consensus by responding asymmetrically?
 6. **Tail risk** — is there an asymmetric event (geopolitical, policy) that would be amplified by current positioning?
+7. **News-shock / manipulation reversal** — when the consensus bias is built on a recent policy announcement, surprise headline, or social-media post (check `recent_events.yaml` for HIGH-relevance entries in the last ~10 days):
+    - Is the move a candidate for the **gap-and-fade** pattern? (Markets gap on news, fade through the day or week as the panic unwinds.)
+    - Is the move a candidate for the **walk-back** pattern? (Administration announces aggressive policy → markets price worst case → policy gets watered down within days → reversion.) The "TACO trade" — tariff threats reversed within 2-5 days — is the canonical recent example.
+    - Is positioning consistent with **insider front-running** ahead of the announcement? (Suspicious COT spec moves the week before, unusual options flow.) You can't trade against this directly, but it indicates the move may not reflect organic flow and is more likely to mean-revert.
+    - Default stance for news-driven moves: assume 30-50% probability of reversal within 5 trading days unless the news genuinely changes a structural variable (FOMC decision, hard data print, treaty signed).
+   When this vector is the primary attack, your steel-man should still acknowledge that *some* news shocks do persist — distinguish "noise that reverses" from "signal that lasts." Explicitly note which side of that line you're betting the consensus is on.
 
-You are NOT required to use all six. Use the strongest 1-2 for each instrument.
+You are NOT required to use all seven. Use the strongest 1-2 for each instrument.
 
 ### What constitutes a strong contrarian case
 
