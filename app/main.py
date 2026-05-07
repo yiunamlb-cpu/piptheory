@@ -756,8 +756,13 @@ def _build_open_trades_block(run: Run) -> list[dict]:
 # ─── ALL INSTRUMENTS TABLE ──────────────────────────────────────────────────
 
 def _build_instruments_table(run: Run, open_instruments: set[str]) -> list[dict]:
-    """One row per instrument. Always shows everything in the universe."""
+    """One row per instrument. Always shows everything in the universe.
+
+    Source order: bias cards from the Strategist, plus any instruments that
+    have a Filter card but no bias card (defensive against Strategist
+    truncation — at least show what we have)."""
     rows: list[dict] = []
+    bias_instruments = {b.instrument for b in run.instrument_biases}
     for b in run.instrument_biases:
         co = run.council.get(b.instrument)
         fc = run.tradability.get(b.instrument)
@@ -797,6 +802,28 @@ def _build_instruments_table(run: Run, open_instruments: set[str]) -> list[dict]
             "verdict": verdict,
             "is_open_position": b.instrument in open_instruments,
         })
+    # Add any instruments that have a Filter card but no Strategist bias
+    # card (this run was truncated). Show them with a "Strategist output
+    # missing" state so the user knows the run was partial. Skip any
+    # instrument no longer in the active universe (e.g. archived ZN from
+    # pre-removal runs).
+    for inst, fc in run.tradability.items():
+        if inst in bias_instruments or inst not in ACTIVE_UNIVERSE:
+            continue
+        rows.append({
+            "symbol": inst,
+            "name": display_label(inst),
+            "direction_raw": "—",
+            "direction": "no view",
+            "conviction": 0,
+            "strength_band": "trash",
+            "strength_label": "—",
+            "state": "Strategist output missing for this run (partial)",
+            "state_class": "neutral",
+            "verdict": fc.verdict,
+            "is_open_position": inst in open_instruments,
+        })
+
     rows.sort(key=lambda r: (
         0 if r["is_open_position"] else (1 if r["state_class"] == "good" else
                                           2 if r["state_class"] == "warn" else 3),
@@ -833,6 +860,18 @@ def _build_home_context(run: Run, runs: list[str], date: str, surface: str) -> d
     open_instruments = {t["instrument"] for t in trades}
     instruments = _build_instruments_table(run, open_instruments)
 
+    # Detect partial run — Strategist truncation. If we have fewer bias
+    # cards than the active universe, the Strategist call hit max_tokens
+    # mid-output. Surface this so the user knows to re-run.
+    n_complete = len(run.instrument_biases)
+    n_expected = len(ACTIVE_UNIVERSE)
+    partial_run = n_complete < n_expected
+    partial_msg = (
+        f"This run is partial — only {n_complete} of {n_expected} instruments "
+        f"have full macro analysis (the Strategist response was cut off). "
+        f"Click Run again to regenerate."
+    ) if partial_run else ""
+
     return {
         "surface": surface,
         "run_date": date,
@@ -841,6 +880,8 @@ def _build_home_context(run: Run, runs: list[str], date: str, surface: str) -> d
         "macro": macro,
         "trades": trades,
         "instruments": instruments,
+        "partial_run": partial_run,
+        "partial_msg": partial_msg,
         "brief_md": run.layer5_pm_brief or "",
         "personas": [
             {"key": "default", "label": "Default analyst"},

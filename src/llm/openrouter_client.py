@@ -111,6 +111,14 @@ class OpenRouterClient:
 
         log.info("openrouter_call_start", model=model, tier=tier.value)
 
+        # Default a generous max_tokens so long-form agents (Strategist with
+        # 9 bias cards, Contrarian challenges, PM brief) don't get truncated
+        # mid-output by the model's default cap. Cost is per *generated* token,
+        # not per cap, so a high ceiling is free unless the model actually
+        # uses it. Override via the explicit param when a tighter cap is
+        # needed.
+        effective_max_tokens = max_tokens if max_tokens is not None else 16000
+
         kwargs: dict[str, Any] = {
             "model": model,
             "messages": [
@@ -118,11 +126,10 @@ class OpenRouterClient:
                 {"role": "user", "content": user},
             ],
             "temperature": temperature,
+            "max_tokens": effective_max_tokens,
             # Ask OpenRouter to include cost in response
             "extra_body": {"usage": {"include": True}},
         }
-        if max_tokens is not None:
-            kwargs["max_tokens"] = max_tokens
         if response_format is not None:
             kwargs["response_format"] = response_format
 
@@ -148,6 +155,23 @@ class OpenRouterClient:
 
         content = response.choices[0].message.content or ""
         usage = response.usage
+
+        # Catch silent truncation. finish_reason='length' means the model hit
+        # max_tokens and was cut off mid-output — produced a partial response.
+        # Most-recent surfaced bug: the Strategist's 9-instrument bias-card
+        # output got cut after 3 cards because max_tokens defaulted too low.
+        # Now that we set 16k by default this should be rare, but log loudly
+        # if it ever fires again so it's not a silent failure mode.
+        finish_reason = getattr(response.choices[0], "finish_reason", None)
+        if finish_reason == "length":
+            log.warning(
+                "openrouter_response_truncated",
+                model=model,
+                output_tokens=usage.completion_tokens if usage else 0,
+                max_tokens=effective_max_tokens,
+                content_chars=len(content),
+                hint="Increase max_tokens or split the prompt into smaller calls.",
+            )
 
         # OpenRouter returns cost in the usage object via the include flag
         raw = response.model_dump()

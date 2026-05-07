@@ -33,6 +33,14 @@
     <div class="run-banner-progress"><div class="run-banner-bar" id="run-bar"></div></div>
   </div>
 
+  {# ─── Partial-run notice ─────────────────────────────────────────── #}
+  {% if partial_run %}
+  <div class="run-banner" style="background: var(--warn-tint); border-color: var(--warn-border);">
+    <div style="font-weight: 500; margin-bottom: 6px;">⚠ Partial run</div>
+    <div style="font-size: 13px; color: var(--warn-text);">{{ partial_msg }}</div>
+  </div>
+  {% endif %}
+
   {# ─── ACTION cards (open trades that need attention) ─────────────── #}
   {% if today.actions %}
   <div class="section-label">Action needed</div>

@@ -42,6 +42,19 @@
     <pre class="run-banner-log" id="run-log" hidden></pre>
   </div>
 
+  {# ─── Partial-run notice ─────────────────────────────────────────── #}
+  {% if partial_run %}
+  <div class="run-banner" style="background: var(--warn-tint); border-color: var(--warn-border); margin-bottom: 14px;">
+    <div class="run-banner-row">
+      <span style="color: var(--warn);">⚠</span>
+      <div>
+        <div class="run-banner-stage">{{ partial_msg }}</div>
+      </div>
+      <button class="btn btn-sm btn-primary" id="run-now-btn-partial" onclick="document.getElementById('run-now-btn').click()" style="margin-left: auto;">▶ Run again</button>
+    </div>
+  </div>
+  {% endif %}
+
   {# ─── Top row: TODAY (left) + MACRO (right) ───────────────────────── #}
   <div class="top-row">
 
