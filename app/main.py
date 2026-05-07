@@ -41,6 +41,7 @@ from dashboard.loader import (  # noqa: E402
     platform_symbol,
 )
 from src.config import ROOT  # noqa: E402
+from src.data import upcoming_events  # noqa: E402
 from src.data.prices import INSTRUMENT_TO_TICKER, PriceClient  # noqa: E402
 from src.llm import OpenRouterClient  # noqa: E402
 from src.orchestration.pipeline import ACTIVE_UNIVERSE  # noqa: E402  single source of truth
@@ -514,6 +515,358 @@ def _build_unified_watchlist(run: Run) -> list[dict]:
     return rows
 
 
+# ===========================================================================
+# NEW HOME-VIEW CONTEXT BUILDERS
+# Used by the redesigned single-page dashboard (desktop + mobile surfaces).
+# Each builder returns plain-dict data — templates do display only, no logic.
+# ===========================================================================
+
+# Strength label for an integer conviction. Bands, not digits — the UI shows
+# "moderate" for a 6 and a 7 because they're the same band; numeric value is
+# also shown for users who want it.
+def _strength_band(conviction: int) -> str:
+    if conviction >= 8: return "strong"
+    if conviction >= 6: return "moderate"
+    if conviction >= 5: return "weak"
+    return "trash"
+
+
+def _strength_label(conviction: int) -> str:
+    return {
+        "strong": "Strong",
+        "moderate": "Moderate",
+        "weak": "Weak",
+        "trash": "Very weak",
+    }.get(_strength_band(conviction), "Unknown")
+
+
+def _normalise_dir_word(bias: str) -> str:
+    b = (bias or "").lower()
+    if "long" in b or "bull" in b: return "long"
+    if "short" in b or "bear" in b: return "short"
+    return "no view"
+
+
+# ─── TODAY: actions + ideas ─────────────────────────────────────────────────
+
+def _build_today_block(run: Run) -> dict:
+    """The 'TODAY' panel: bubble up open-trade actions that need attention,
+    plus surface fresh trade ideas.
+
+    Returns a dict with two lists:
+      actions: open positions where the advisor says trim/close/emergency/trail_stop
+      ideas:   setups (not already open as trades) — tradable_now first,
+               then high-conviction watches
+    """
+    actions: list[dict] = []
+    ideas: list[dict] = []
+
+    # ----- ACTIONS: open positions needing action -----
+    try:
+        positions = _positions.list_active()
+    except Exception:
+        positions = []
+
+    open_instruments: set[str] = {p.instrument for p in positions}
+    for pos in positions:
+        cur = _prices.get_latest_close(pos.instrument)
+        if cur is None:
+            continue
+        adv = advise_position(pos, cur, run)
+        # Only the urgency-meaningful actions go to TODAY. Hold and Review are
+        # not actions; they show up in the trades strip but don't bubble.
+        if adv.action in ("emergency_close", "close", "trim", "trail_stop"):
+            actions.append({
+                "kind": "position_action",
+                "position_id": pos.id,
+                "instrument": pos.instrument,
+                "name": display_label(pos.instrument),
+                "direction": pos.direction,
+                "action": adv.action,
+                "action_label": _action_word(adv.action),
+                "urgency": adv.urgency,
+                "reason": adv.reason,
+                "pnl_pct": adv.pnl_pct,
+            })
+    # Sort by urgency: high → med → low
+    urgency_rank = {"high": 0, "med": 1, "low": 2}
+    actions.sort(key=lambda a: urgency_rank.get(a["urgency"], 9))
+
+    # ----- IDEAS: fresh setups -----
+    candidates: list[dict] = []
+    for b in run.instrument_biases:
+        if b.instrument in open_instruments:
+            continue  # already a trade — don't re-suggest
+        co = run.council.get(b.instrument)
+        fc = run.tradability.get(b.instrument)
+        # Authoritative conviction
+        if co and co.judge_conviction:
+            conv = co.judge_conviction
+            bias_raw = co.judge_bias or b.bias
+        else:
+            conv = b.conviction
+            bias_raw = b.bias
+        direction = _normalise_dir_word(bias_raw)
+        if direction == "no view" or conv < 5:
+            continue
+        verdict = fc.verdict if fc else ""
+        if verdict == "tradable_now":
+            tier = 0
+        elif verdict == "watch" and conv >= 6:
+            tier = 1
+        else:
+            continue
+
+        macro_summary = _extract_macro_summary(b, co).removeprefix("Macro: ").strip()
+        chart_summary = _extract_chart_summary(fc, has_council=co is not None).removeprefix("Chart: ").strip()
+        invalidation = _filter_field(fc.raw, "invalidation_level") if fc else ""
+        candidates.append({
+            "kind": "idea",
+            "instrument": b.instrument,
+            "name": display_label(b.instrument),
+            "direction": direction,
+            "conviction": conv,
+            "strength_band": _strength_band(conv),
+            "strength_label": _strength_label(conv),
+            "verdict": verdict,
+            "verdict_label": "Ready" if verdict == "tradable_now" else "Watch",
+            "macro_summary": macro_summary,
+            "chart_summary": chart_summary,
+            "invalidation": invalidation,
+            "tier": tier,
+        })
+    candidates.sort(key=lambda c: (c["tier"], -c["conviction"], c["instrument"]))
+    ideas = candidates[:3]  # show top 3 max
+
+    return {"actions": actions, "ideas": ideas}
+
+
+def _action_word(action: str) -> str:
+    return {
+        "hold": "Hold",
+        "review": "Review",
+        "trim": "Trim",
+        "trail_stop": "Trail stop",
+        "close": "Close",
+        "emergency_close": "Emergency close",
+    }.get(action, action.title())
+
+
+def _action_class(action: str) -> str:
+    """Return 'urgent' (red), 'attention' (amber), or '' for the action."""
+    if action in ("emergency_close", "close"): return "urgent"
+    if action in ("trim", "trail_stop", "review"): return "attention"
+    return ""
+
+
+# ─── MACRO PICTURE ──────────────────────────────────────────────────────────
+
+_THEME_HEADING_RE = re.compile(
+    r"^###\s+\d+\.\s+(.+?)\s+[—–-]\s+Conviction\s+(\d+)\s*/\s*10",
+    re.MULTILINE,
+)
+_REGIME_HEADER_RE = re.compile(
+    r"##\s*Regime\s*Snapshot\s*\n+\*\*([^*]+)\*\*",
+    re.IGNORECASE,
+)
+
+
+def _build_macro_block() -> dict:
+    """Parse THEMES.md into a structured block: regime headline + ranked theme
+    list + next catalyst.
+    """
+    themes_path = PROJECT_ROOT / "docs" / "THEMES.md"
+    if not themes_path.exists():
+        return {"regime": "", "themes": [], "next_catalyst": "", "days_to_catalyst": None}
+    text = themes_path.read_text(encoding="utf-8")
+
+    # Regime headline
+    regime = ""
+    m = _REGIME_HEADER_RE.search(text)
+    if m:
+        regime = m.group(1).strip().rstrip(".")
+        # Trim long regime lines to one sentence for the panel
+        regime = regime.split(". ")[0].rstrip(".") + "."
+
+    # Themes
+    themes = []
+    for tm in _THEME_HEADING_RE.finditer(text):
+        name = tm.group(1).strip()
+        conv = int(tm.group(2))
+        themes.append({"name": name, "conviction": conv, "pct": conv * 10})
+    themes.sort(key=lambda t: -t["conviction"])
+
+    # Next catalyst from events.yaml — first HIGH-severity event in next 14 days
+    try:
+        events = upcoming_events(days_ahead=14, min_severity="high")
+    except Exception:
+        events = []
+    next_catalyst = ""
+    days_to_catalyst = None
+    if events:
+        ev = events[0]
+        days_to_catalyst = ev.days_from_today
+        date_str = ev.date.strftime("%b %d")
+        next_catalyst = f"{date_str} — {ev.name}".strip(" —")
+    return {
+        "regime": regime,
+        "themes": themes[:6],
+        "next_catalyst": next_catalyst,
+        "days_to_catalyst": days_to_catalyst,
+    }
+
+
+# ─── OPEN TRADES STRIP ──────────────────────────────────────────────────────
+
+def _build_open_trades_block(run: Run) -> list[dict]:
+    """One row per open position. Includes pnl, current price, advisor verdict."""
+    try:
+        positions = _positions.list_active()
+    except Exception:
+        return []
+    rows: list[dict] = []
+    for pos in positions:
+        cur = _prices.get_latest_close(pos.instrument)
+        adv = advise_position(pos, cur or pos.entry_price, run)
+        rows.append({
+            "id": pos.id,
+            "instrument": pos.instrument,
+            "name": display_label(pos.instrument),
+            "direction": pos.direction,
+            "entry_price": pos.entry_price,
+            "current_price": cur,
+            "pnl_pct": adv.pnl_pct,
+            "action": adv.action,
+            "action_label": _action_word(adv.action),
+            "action_class": _action_class(adv.action),
+            "urgency": adv.urgency,
+            "reason": adv.reason,
+            "macro_aligned": adv.macro_aligned,
+            "conviction_now": adv.conviction_now,
+            "conviction_at_open": pos.conviction_at_open,
+            "thesis_at_open": pos.thesis_at_open,
+            "emergency_stop": pos.emergency_stop,
+            "stop_distance_pct": adv.stop_distance_pct,
+            "filter_verdict_now": adv.filter_verdict_now,
+            "notes": pos.notes,
+        })
+    return rows
+
+
+# ─── ALL INSTRUMENTS TABLE ──────────────────────────────────────────────────
+
+def _build_instruments_table(run: Run, open_instruments: set[str]) -> list[dict]:
+    """One row per instrument. Always shows everything in the universe."""
+    rows: list[dict] = []
+    for b in run.instrument_biases:
+        co = run.council.get(b.instrument)
+        fc = run.tradability.get(b.instrument)
+        if co and co.judge_conviction:
+            conv = co.judge_conviction
+            bias_raw = co.judge_bias or b.bias
+        else:
+            conv = b.conviction
+            bias_raw = b.bias
+        direction = _normalise_dir_word(bias_raw)
+
+        verdict = fc.verdict if fc else ""
+        # State word in plain language
+        if conv < 5 or verdict == "below_threshold":
+            state, state_class = "Macro view too weak to act", "neutral"
+        elif verdict == "tradable_now":
+            state, state_class = "Ready — chart is at a clean spot", "good"
+        elif verdict == "watch":
+            state, state_class = "Wait for cleaner pullback", "warn"
+        elif verdict == "pass_despite_bias":
+            state, state_class = "Skip — chart fighting the macro view", "bad"
+        elif verdict == "" and conv >= 5:
+            state, state_class = "Macro lean only", "neutral"
+        else:
+            state, state_class = "—", "neutral"
+
+        rows.append({
+            "symbol": b.instrument,
+            "name": display_label(b.instrument),
+            "direction_raw": bias_raw,
+            "direction": direction,
+            "conviction": conv,
+            "strength_band": _strength_band(conv),
+            "strength_label": _strength_label(conv),
+            "state": state,
+            "state_class": state_class,
+            "verdict": verdict,
+            "is_open_position": b.instrument in open_instruments,
+        })
+    rows.sort(key=lambda r: (
+        0 if r["is_open_position"] else (1 if r["state_class"] == "good" else
+                                          2 if r["state_class"] == "warn" else 3),
+        -r["conviction"], r["symbol"],
+    ))
+    return rows
+
+
+# ─── HOME CONTEXT (the whole page) ──────────────────────────────────────────
+
+def _detect_surface(request: Request) -> str:
+    """Return 'mobile' or 'desktop'. Order of precedence:
+      1. ?view=mobile|desktop query param (manual override; sticky via cookie)
+      2. user-agent detection (mobile UAs → mobile)
+      3. desktop default
+    """
+    override = request.query_params.get("view")
+    if override in ("mobile", "desktop"):
+        return override
+    cookie = request.cookies.get("nam_view")
+    if cookie in ("mobile", "desktop"):
+        return cookie
+    ua = (request.headers.get("user-agent") or "").lower()
+    mobile_markers = ("iphone", "android", "ipod", "mobile safari", "windows phone")
+    if any(m in ua for m in mobile_markers):
+        return "mobile"
+    return "desktop"
+
+
+def _build_home_context(run: Run, runs: list[str], date: str, surface: str) -> dict:
+    today = _build_today_block(run)
+    macro = _build_macro_block()
+    trades = _build_open_trades_block(run)
+    open_instruments = {t["instrument"] for t in trades}
+    instruments = _build_instruments_table(run, open_instruments)
+
+    return {
+        "surface": surface,
+        "run_date": date,
+        "runs": runs,
+        "today": today,
+        "macro": macro,
+        "trades": trades,
+        "instruments": instruments,
+        "brief_md": run.layer5_pm_brief or "",
+        "personas": [
+            {"key": "default", "label": "Default analyst"},
+            {"key": "druckenmiller", "label": "Stanley Druckenmiller"},
+            {"key": "dalio", "label": "Ray Dalio"},
+            {"key": "soros", "label": "George Soros"},
+            {"key": "marks", "label": "Howard Marks"},
+            {"key": "buffett", "label": "Warren Buffett"},
+        ],
+        # Per-instrument reasoning data — used by the "Why?" slide-over
+        "reasoning_by_symbol": {
+            b.instrument: {
+                "symbol": b.instrument,
+                "name": display_label(b.instrument),
+                "strategist_md": b.raw_section,
+                "council": run.council.get(b.instrument),
+                "filter_card": run.tradability.get(b.instrument),
+            }
+            for b in run.instrument_biases
+        },
+        "instruments_known": sorted(INSTRUMENT_TO_TICKER.keys()),
+        "active_universe": ACTIVE_UNIVERSE,
+        "render_time": datetime.now().strftime("%H:%M:%S"),
+    }
+
+
 # ---------- routes ----------
 
 @app.get("/", response_class=HTMLResponse)
@@ -535,71 +888,62 @@ async def run_page(request: Request, date: str):
     if not run:
         raise HTTPException(500, f"Failed to load run {date}")
 
-    by_verdict = _categorise_filter(run)
-    hero = _hero_state(run, by_verdict)
-    position_alerts = _hero_position_alerts(run)
+    surface = _detect_surface(request)
+    ctx = _build_home_context(run, runs, date, surface)
+    template = "dashboard_mobile.html" if surface == "mobile" else "dashboard_desktop.html"
 
-    watchlist = _build_unified_watchlist(run)
+    response = templates.TemplateResponse(request, template, ctx)
+    # Sticky-set the override cookie so a manual ?view= choice persists.
+    override = request.query_params.get("view")
+    if override in ("mobile", "desktop"):
+        response.set_cookie("nam_view", override, max_age=60 * 60 * 24 * 30, samesite="lax")
+    return response
 
-    # Three sections (no overlap):
-    #   setups          — tier 0 (Tradable now)
-    #   worth a look    — tiers 1 (Watch) and 2 (high conv, no filter yet)
-    #   other           — tier 3 (Skip) and 4 (Low conviction); collapsed
-    setups = [r for r in watchlist if r["tier"] == 0]
-    watch_and_context = [r for r in watchlist if r["tier"] in (1, 2)]
-    other = [r for r in watchlist if r["tier"] >= 3]
 
-    # Per-instrument data for the Reasoning tab
-    reasoning_per_instrument = []
-    for b in sorted(run.instrument_biases,
-                    key=lambda x: (-x.conviction, x.instrument)):
-        co = run.council.get(b.instrument)
-        fc = run.tradability.get(b.instrument)
-        reasoning_per_instrument.append({
-            "symbol": b.instrument,
-            "name": display_label(b.instrument),
-            "strategist_md": b.raw_section,
-            "strategist_conviction": b.conviction,
-            "council": co,
-            "judge_conviction": co.judge_conviction if co else 0,
-            "filter_card": fc,
-            "verdict": fc.verdict if fc else "",
-        })
+# ---------- API: reasoning + brief (used by slide-over / sheet) ----------
 
-    return templates.TemplateResponse(
-        request,
-        "dashboard.html",
-        {
-            "run_date": date,
-            "runs": runs,
-            "run": run,
-            "hero": hero,
-            "position_alerts": position_alerts,
-            "setups": setups,
-            "watch_and_context": watch_and_context,
-            "other": other,
-            "other_summary": " · ".join(
-                f"{r['symbol']} {r['conviction']}/10" for r in other
-            ),
-            "reasoning_per_instrument": reasoning_per_instrument,
-            "active_universe": ACTIVE_UNIVERSE,
-            "personas": [
-                {"key": "default", "label": "Default analyst"},
-                {"key": "druckenmiller", "label": "Stanley Druckenmiller"},
-                {"key": "dalio", "label": "Ray Dalio"},
-                {"key": "soros", "label": "George Soros"},
-                {"key": "marks", "label": "Howard Marks"},
-                {"key": "buffett", "label": "Warren Buffett"},
-            ],
-            "active_universe": ACTIVE_UNIVERSE,
-            "render_time": datetime.now().strftime("%H:%M:%S"),
-            "_display_helpers": {
-                "display_name": display_name,
-                "display_label": display_label,
-                "platform_symbol": platform_symbol,
-            },
-        },
-    )
+@app.get("/api/reasoning/{symbol}")
+async def api_reasoning(symbol: str, date: str | None = None):
+    """Return all agent outputs for an instrument so the dashboard can
+    render the 'Why?' detail panel without baking everything into the
+    initial page render.
+    """
+    runs = list_runs()
+    target = date if date and date in runs else (runs[0] if runs else None)
+    if not target:
+        raise HTTPException(404, "No runs available")
+    run = load_run(target)
+    if not run:
+        raise HTTPException(500, "Could not load run")
+    sym = symbol.upper()
+    bias_obj = next((b for b in run.instrument_biases if b.instrument == sym), None)
+    co = run.council.get(sym)
+    fc = run.tradability.get(sym)
+    return JSONResponse({
+        "symbol": sym,
+        "name": display_label(sym),
+        "strategist_md": bias_obj.raw_section if bias_obj else "",
+        "strategist_md_rendered": _render_markdown(bias_obj.raw_section) if bias_obj else "",
+        "judge_md": co.judge if co else "",
+        "judge_md_rendered": _render_markdown(co.judge) if co else "",
+        "bull_md": co.bull if co else "",
+        "bull_md_rendered": _render_markdown(co.bull) if co else "",
+        "bear_md": co.bear if co else "",
+        "bear_md_rendered": _render_markdown(co.bear) if co else "",
+        "filter_md": fc.raw if fc else "",
+        "filter_md_rendered": _render_markdown(fc.raw) if fc else "",
+    })
+
+
+@app.get("/api/brief")
+async def api_brief(date: str | None = None):
+    """Return the rendered PM brief for a run. Used by the mobile brief sheet."""
+    runs = list_runs()
+    target = date if date and date in runs else (runs[0] if runs else None)
+    if not target:
+        return JSONResponse({"html": ""})
+    run = load_run(target)
+    return JSONResponse({"html": _render_markdown(run.layer5_pm_brief) if run and run.layer5_pm_brief else ""})
 
 
 # ---------- API: chat ----------
