@@ -270,27 +270,47 @@
       if (logVisible) fetchLog();
     });
   }
-  if (runBtn) {
-    runBtn.addEventListener("click", async () => {
-      if (runBtn.disabled) return;
+  // Centralised run-trigger so both desktop button and mobile menu use
+  // the same code path. Previously the mobile menu's "Run now" item
+  // tried to .click() the desktop button, which doesn't exist on mobile —
+  // silent no-op. Now both surfaces call this directly.
+  async function triggerRunNow(opts) {
+    opts = opts || {};
+    const skipConfirm = opts.skipConfirm === true;
+    if (!skipConfirm) {
       const ok = confirm("Run a fresh pipeline now?\n\n10-15 min · ~$0.20.\nOverwrites today's brief.");
       if (!ok) return;
+    }
+    if (runBtn) {
       runBtn.disabled = true;
       runBtn.textContent = "Starting…";
-      wasRunning = true;
-      try {
-        const r = await fetch("/api/run", { method: "POST" });
-        if (r.ok) startPolling();
-        else {
-          alert("Could not start run: " + (await r.text()));
+    }
+    wasRunning = true;
+    try {
+      const r = await fetch("/api/run", { method: "POST" });
+      if (r.ok) {
+        startPolling();
+      } else {
+        const msg = "Could not start run: " + (await r.text());
+        alert(msg);
+        if (runBtn) {
           runBtn.disabled = false;
           runBtn.textContent = "▶ Run again";
         }
-      } catch (e) {
-        alert("Could not start run: " + e.message);
+      }
+    } catch (e) {
+      alert("Could not start run: " + e.message);
+      if (runBtn) {
         runBtn.disabled = false;
         runBtn.textContent = "▶ Run again";
       }
+    }
+  }
+
+  if (runBtn) {
+    runBtn.addEventListener("click", () => {
+      if (runBtn.disabled) return;
+      triggerRunNow();
     });
   }
   // Run-picker dropdown
@@ -664,6 +684,10 @@
   }
 
   function attachChatForm(formEl, inputEl, sendBtn, personaSel) {
+    if (!formEl || !inputEl || !sendBtn) {
+      console.warn("attachChatForm: missing element", { formEl, inputEl, sendBtn });
+      return;
+    }
     formEl.addEventListener("submit", async (e) => {
       e.preventDefault();
       const text = inputEl.value.trim();
@@ -681,7 +705,13 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ run_date: cfg.runDate, persona: askPersona, history: h }),
         });
-        const data = await r.json();
+        let data = null;
+        try { data = await r.json(); } catch (parseErr) {
+          // Server returned non-JSON (most likely an HTML error page or the
+          // server died mid-stream). Show the raw text instead of swallowing.
+          const text = await r.text().catch(() => "");
+          throw new Error(`server returned ${r.status} ${r.statusText} (not JSON). ${text.slice(0, 200)}`);
+        }
         if (r.ok) {
           const updated = loadChatHist();
           const personaLabel = personaSel
@@ -691,9 +721,14 @@
           saveChatHist(updated);
           renderChatHist();
         } else {
-          alert("Chat failed: " + (data.detail || "unknown"));
+          // Show actual server error rather than "unknown"
+          const detail = data && (data.detail || data.error || data.message);
+          alert(`Chat failed (${r.status}): ${detail || "see server log"}`);
         }
-      } catch (err) { alert("Chat failed: " + err.message); }
+      } catch (err) {
+        alert("Chat failed: " + (err.message || err));
+        console.error("Chat error", err);
+      }
       finally { sendBtn.disabled = false; sendBtn.textContent = "Send"; }
     });
   }
@@ -962,7 +997,7 @@
       case "close-modal":         e.preventDefault(); closeModal(target.dataset.target); closeOverlay(); break;
       case "scroll-top":          e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
       case "open-trade-detail":   e.preventDefault(); showPositionWhy(target.dataset.positionId); break;
-      case "run-now":             e.preventDefault(); closeAll(); if (runBtn) runBtn.click(); break;
+      case "run-now":             e.preventDefault(); closeAll(); triggerRunNow(); break;
       case "open-add-event":      e.preventDefault(); openAddEvent(); break;
       case "submit-add-event":    e.preventDefault(); submitAddEvent("desktop"); break;
       case "submit-add-event-mobile": e.preventDefault(); submitAddEvent("mobile"); break;

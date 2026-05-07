@@ -56,6 +56,26 @@ app = FastAPI(title="nam-hedgefund")
 templates = Jinja2Templates(directory=str(APP_ROOT / "templates"))
 app.mount("/static", StaticFiles(directory=str(APP_ROOT / "static")), name="static")
 
+
+# Cache-busting version string for /static/* references in templates.
+# Computed once per process restart from the most-recent mtime in the
+# static directory. After a deploy that touches CSS/JS, the version
+# string changes, so cached browsers re-fetch instead of serving stale
+# code. The previous bug — user's mobile browser cached the old app.js
+# from before the dashboard rebuild and silently broke chat/run buttons
+# — is exactly what this prevents.
+def _compute_static_version() -> str:
+    static_dir = APP_ROOT / "static"
+    try:
+        mtimes = [p.stat().st_mtime for p in static_dir.rglob("*") if p.is_file()]
+        return str(int(max(mtimes))) if mtimes else "0"
+    except Exception:
+        return "0"
+
+
+_STATIC_VERSION = _compute_static_version()
+templates.env.globals["static_version"] = _STATIC_VERSION
+
 # Module-level singletons. Each is cheap to keep around: PositionStore is a
 # file-backed CRUD shell, PriceClient holds nothing but a TTL config.
 _positions = PositionStore()

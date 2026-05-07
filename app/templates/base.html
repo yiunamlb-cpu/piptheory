@@ -8,11 +8,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/tokens.css">
+  <link rel="stylesheet" href="/static/tokens.css?v={{ static_version }}">
   {% if surface == "mobile" %}
-  <link rel="stylesheet" href="/static/mobile.css">
+  <link rel="stylesheet" href="/static/mobile.css?v={{ static_version }}">
   {% else %}
-  <link rel="stylesheet" href="/static/desktop.css">
+  <link rel="stylesheet" href="/static/desktop.css?v={{ static_version }}">
   {% endif %}
 </head>
 <body data-surface="{{ surface }}">
