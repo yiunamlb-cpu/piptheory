@@ -241,6 +241,48 @@ textarea { resize: vertical; }
 .chip-neutral { background: var(--neutral-tint); color: var(--text-2); border: 1px solid var(--border); }
 .chip-brand { background: var(--brand-tint); color: var(--brand-strong); border: 1px solid var(--brand-border); }
 
+/* ─── Term tooltips ───────────────────────────────────────────────────
+   Dotted underline on jargon; hover (desktop) or tap (mobile) to show
+   a definition popover. Kept lightweight — single floating tooltip
+   element, positioned by JS based on target rect. */
+
+.term {
+  border-bottom: 1px dotted var(--text-3);
+  cursor: help;
+  /* The dotted underline replaces text-decoration so links inside
+     the .term class still display normally if any. */
+}
+.term:hover { border-bottom-color: var(--text-2); }
+
+/* Make chips with data-term still readable but get a hint cursor */
+.chip[data-term], .pill[data-term] {
+  cursor: help;
+}
+
+#nh-tooltip {
+  position: fixed;
+  z-index: 200;
+  max-width: min(320px, calc(100vw - 24px));
+  background: var(--text);
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease-out;
+}
+#nh-tooltip.is-visible {
+  opacity: 1;
+  /* On mobile we want pointer-events to allow scrolling inside long
+     definitions, but not absorb the dismiss tap. The JS handles this
+     via document-level outside-click. */
+}
+#nh-tooltip strong { color: #fff; font-weight: 600; }
+#nh-tooltip a { color: var(--brand-border); }
+
 /* Modal/slide-over — shared base */
 .overlay {
   position: fixed;

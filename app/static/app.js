@@ -46,6 +46,123 @@
     return diffDays + " day" + (diffDays !== 1 ? "s" : "") + " ago";
   }
 
+  // ─── Glossary tooltips ──────────────────────────────────────────────
+  // One floating tooltip element shared across the page. Triggered by
+  // hover on desktop and tap on mobile. Source of truth for definitions
+  // is the GLOSSARY object below — to add a new term, just add a key and
+  // mark the element in the template with data-term="key".
+
+  const GLOSSARY = {
+    // Bias / verdict / state
+    "tradable_now": "<strong>Tradable now.</strong> Both the macro view and the chart say go: bias direction is firm, conviction is solid, and price is at a clean structural location (pullback to 20d SMA, not extended, no near-term blocking event).",
+    "watch": "<strong>Watch.</strong> Macro view supports the trade, but the chart isn't ready — price is extended, mid-range, or there's a binary event in the next 1-5 days. Wait for a cleaner setup; don't chase.",
+    "skip": "<strong>Skip — chart fights the macro.</strong> Macro view says go but the chart structure is broken or extreme late-chase. Pass on this entry; re-evaluate on a fresh setup.",
+    "low_conviction": "<strong>Low conviction.</strong> Macro view isn't strong enough (under 5/10) to act on. Stand aside.",
+    "no_view": "<strong>No view.</strong> The system has no clear directional read on this instrument today.",
+
+    // Strength bands
+    "strength": "<strong>Strength</strong> is how strongly the system thinks the bias direction is right. 1-10 scale. <strong>8+</strong> rare/strong, <strong>6-7</strong> solid, <strong>5</strong> weak, under 5 is noise. Wobbles 1 point day-to-day from LLM noise — only worry on 3+ point drops or direction flips.",
+    "direction": "<strong>Direction.</strong> The system's view on which way this instrument is biased — long, short, or no view. Comes from the Council's Judge after the Bull and Bear cases are debated.",
+    "state": "<strong>State.</strong> What the system thinks you should do with this instrument right now: Ready (green-lit), Wait (chart not ready), Skip (chart against), or Low conviction (macro too weak).",
+
+    // Advisor verbs (open positions)
+    "advisor_hold": "<strong>Hold.</strong> Default. Thesis intact, no action needed. Most days you'll see this on most positions.",
+    "advisor_review": "<strong>Review.</strong> Soft alert — macro view still aligned with the trade, but the chart has lost its clean state. No action required; just glance. Only worry if it persists for several days while P&L deteriorates.",
+    "advisor_trail_stop": "<strong>Trail stop.</strong> You're nicely in profit and the view still holds. Move your structural stop up to lock in part of the gain. Don't tighten so much that normal volatility takes you out.",
+    "advisor_trim": "<strong>Trim.</strong> Take some risk off. The case has weakened — conviction has dropped 3+ points since you opened, or you're in significant profit and the thesis has slipped. Sell roughly half; let the rest run.",
+    "advisor_close": "<strong>Close.</strong> The system has changed its mind. Either macro view has flipped against you at 6+/10, or chart structure has materially eroded. Get out and look for a cleaner re-entry later.",
+    "advisor_emergency_close": "<strong>Emergency close.</strong> Your structural stop has been breached. Close right now per the pre-defined plan — the whole point of a structural stop is you don't get to vote when price is at the level.",
+
+    // Event relevance
+    "relevance_high": "<strong>HIGH relevance.</strong> Regime-defining event — the kind that resets cross-asset positioning for days. Examples: surprise tariff announcements, hot CPI prints, FOMC decisions, geopolitical escalations. The Strategist treats these as authoritative for short-term framing.",
+    "relevance_medium": "<strong>MEDIUM relevance.</strong> Thematic — confirms or modifies an existing macro theme without redefining the regime. Examples: Fed-speaker hawkish tone, ECB hint at hike timing, OPEC commentary.",
+    "relevance_low": "<strong>LOW relevance.</strong> Noteworthy for context but unlikely to move the bias. Logged for completeness rather than for trading.",
+
+    // Other terms
+    "structural_stop": "<strong>Structural / emergency stop.</strong> The price level where, if hit, your macro thesis would be invalidated. Wider than a tight technical stop on purpose — it's about the thesis, not the wiggle room. Set it once on entry, use it as the line you don't argue with.",
+    "atr": "<strong>ATR (Average True Range).</strong> A measure of how much an instrument moves on a typical day, averaged over 14 days. The Filter uses it to detect 'extended' moves (recent range > 2× ATR = late-chase risk).",
+    "fred": "<strong>FRED.</strong> The Federal Reserve Economic Data API — source for CPI, PCE, payrolls, yields, and other US macro data the Layer 1 specialists pull each morning.",
+    "cot": "<strong>COT (Commitments of Traders).</strong> CFTC's weekly positioning report. Shows how leveraged funds vs. asset managers vs. dealers are positioned in each futures market. Lagged 3 days but useful for spotting crowded trades.",
+    "pnl": "<strong>P&L (profit and loss).</strong> Percentage move from your entry price, sign-aware on direction. Positive = trade is in profit; negative = in loss. Computed off the most recent daily close.",
+    "thesis_at_open": "<strong>Thesis at open.</strong> The macro narrative the Judge wrote at the moment you opened the trade. Frozen so the advisor can later detect 'thesis weakened' by comparing today's view against this baseline.",
+    "macro_now": "<strong>System view today.</strong> The latest run's bias direction and conviction for this instrument. 'Aligned' means it still agrees with your trade direction; 'opposed' means it's flipped. Numeric delta shows how much conviction has moved since you opened the position.",
+    "chart_now": "<strong>Chart check today.</strong> The Tradability Filter's structural read on the chart right now: green-lit (clean spot), watch (wait for pullback), ugly (chart against the macro view), or no chart check (macro too weak to gate on).",
+
+    // Architecture
+    "macro_picture": "<strong>Macro picture.</strong> The current regime — what big-picture themes are in force, ranked by conviction. Updated by the user in <code>THEMES.md</code> based on observed data and central-bank communication. The agents reason from these themes downstream.",
+    "council": "<strong>Bias Council.</strong> Per-instrument debate: a Bull advocate makes the strongest long case, a Bear advocate makes the strongest short case, then a Judge weighs both and decides direction + conviction. Runs only when the Strategist's initial conviction is 5/10 or higher.",
+    "filter": "<strong>Tradability Filter.</strong> The chart-only structural review that decides whether the bias is actionable *right now* — looks at trend alignment, location quality, ATR, and blocking events. Produces the Tradable / Watch / Skip verdict.",
+    "contrarian": "<strong>Contrarian agent.</strong> The red-team layer. Argues against the consensus bias on every instrument so the Council Judge has a steel-manned counter-case to weigh, not just confirmation bias.",
+  };
+
+  let _tipEl = null;
+  let _tipFor = null;
+  function getTip() {
+    if (_tipEl) return _tipEl;
+    _tipEl = document.createElement("div");
+    _tipEl.id = "nh-tooltip";
+    document.body.appendChild(_tipEl);
+    return _tipEl;
+  }
+  function positionTip(tip, target) {
+    const tipRect = tip.getBoundingClientRect();
+    const tRect = target.getBoundingClientRect();
+    const margin = 8;
+    // Prefer above; flip below if there's no room.
+    let top = tRect.top - tipRect.height - margin;
+    if (top < 8) top = tRect.bottom + margin;
+    let left = tRect.left + tRect.width / 2 - tipRect.width / 2;
+    if (left < 8) left = 8;
+    if (left + tipRect.width > window.innerWidth - 8) {
+      left = window.innerWidth - tipRect.width - 8;
+    }
+    tip.style.top = top + "px";
+    tip.style.left = left + "px";
+  }
+  function showTip(target) {
+    const term = target.dataset.term;
+    if (!term) return;
+    const def = GLOSSARY[term];
+    if (!def) return;
+    const tip = getTip();
+    tip.innerHTML = def;
+    tip.classList.add("is-visible");
+    _tipFor = target;
+    // Position after render so we have correct dimensions
+    requestAnimationFrame(() => positionTip(tip, target));
+  }
+  function hideTip() {
+    if (_tipEl) _tipEl.classList.remove("is-visible");
+    _tipFor = null;
+  }
+
+  // Desktop: hover. Mobile: tap to toggle.
+  if (surface !== "mobile") {
+    document.addEventListener("mouseover", (e) => {
+      const t = e.target.closest("[data-term]");
+      if (t) showTip(t);
+    });
+    document.addEventListener("mouseout", (e) => {
+      if (e.target.closest("[data-term]")) hideTip();
+    });
+  } else {
+    document.addEventListener("click", (e) => {
+      const t = e.target.closest("[data-term]");
+      if (t) {
+        e.preventDefault();
+        if (_tipFor === t) hideTip();
+        else showTip(t);
+      } else if (_tipFor) {
+        hideTip();
+      }
+    });
+  }
+  // Hide on scroll/resize so it doesn't drift away from its anchor
+  window.addEventListener("scroll", hideTip, true);
+  window.addEventListener("resize", hideTip);
+  // Esc dismisses
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") hideTip(); });
+
   // ─── Run-now button + status banner (shared across both surfaces) ────
 
   const runBtn = $("#run-now-btn");

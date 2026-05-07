@@ -46,7 +46,7 @@
   <div class="section-label">Action needed</div>
   {% for a in today.actions %}
   <article class="today-card urgent" data-position-id="{{ a.position_id }}">
-    <div class="today-card-tag urgent">⚠ {{ a.action_label|upper }}</div>
+    <div class="today-card-tag urgent term" data-term="advisor_{{ a.action }}">⚠ {{ a.action_label|upper }}</div>
     <div class="today-card-title">
       {{ a.instrument }}
       <span class="dir">{{ a.direction|upper }}</span>
@@ -68,7 +68,7 @@
   <div class="section-label">{% if today.actions %}Also: ideas worth a look{% else %}Today's ideas{% endif %}</div>
   {% for i in today.ideas %}
   <article class="today-card idea">
-    <div class="today-card-tag idea">
+    <div class="today-card-tag idea term" data-term="{% if i.verdict == 'tradable_now' %}tradable_now{% else %}watch{% endif %}">
       {% if i.verdict == "tradable_now" %}READY{% else %}WATCH{% endif %} · {{ i.strength_label|upper }}
     </div>
     <div class="today-card-title">
@@ -104,7 +104,7 @@
           {{ t.instrument }}<span class="dir">{{ t.direction|upper }}</span>
         </div>
         <div class="trade-row-action">
-          <strong>{{ t.action_label }}.</strong> {{ t.reason|truncate(80, True) }}
+          <strong class="term" data-term="advisor_{{ t.action }}">{{ t.action_label }}.</strong> {{ t.reason|truncate(80, True) }}
         </div>
       </div>
       <div class="trade-row-pnl {% if t.pnl_pct and t.pnl_pct >= 0 %}pnl-pos{% elif t.pnl_pct %}pnl-neg{% else %}pnl-flat{% endif %}">
