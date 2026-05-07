@@ -448,30 +448,49 @@
     // Body
     const body = document.createElement("div");
     body.className = "card-body";
+    // Build the metadata strip in plain language. Each line answers one
+    // simple question the user might ask while glancing at the card:
+    //   1. Where's my stop, and how close is price to it?
+    //   2. Does the system still agree with the direction of my trade?
+    //   3. Is the chart green-lit, on watch, or ugly today?
+    //   4. (Reminder) why did I open this?
     const stopLine = p.emergency_stop
-      ? `Stop: ${p.emergency_stop}` + (adv && adv.stop_distance_pct !== null
-          ? ` (${adv.stop_distance_pct.toFixed(1)}% away)` : "")
-      : "Stop: —";
-    const macroLine = adv && adv.conviction_now
-      ? `Macro now: ${adv.macro_aligned ? "aligned" : "OPPOSED"}, ${adv.conviction_now}/10`
-        + (adv.conviction_delta !== 0
-            ? ` (${adv.conviction_delta > 0 ? "+" : ""}${adv.conviction_delta} since open)`
-            : "")
-      : "Macro now: no view in latest run";
+      ? `Stop level: ${p.emergency_stop}` + (adv && adv.stop_distance_pct !== null
+          ? ` (price is ${adv.stop_distance_pct.toFixed(1)}% away)` : "")
+      : "Stop level: not set";
+    let macroLine;
+    if (adv && adv.conviction_now) {
+      const dir = adv.macro_aligned ? "still agrees with your trade" : "now LEANS THE OTHER WAY";
+      let deltaText = "no change since you opened";
+      if (adv.conviction_delta > 0) deltaText = `up ${adv.conviction_delta} since you opened`;
+      else if (adv.conviction_delta < 0) deltaText = `down ${Math.abs(adv.conviction_delta)} since you opened`;
+      macroLine = `System view today: ${dir} at ${adv.conviction_now}/10 confidence (${deltaText})`;
+    } else {
+      macroLine = "System view today: no fresh view (instrument fell below the council threshold this run)";
+    }
+    const filterLabels = {
+      tradable_now: "green-lit (chart is at a clean spot)",
+      watch: "on watch (wait for a cleaner spot before adding)",
+      pass_despite_bias: "ugly (chart is fighting the trade)",
+      below_threshold: "no chart check (system view too weak)",
+      skip_no_data: "no chart data available",
+      unparseable: "(chart check unavailable)",
+    };
     const filterLine = adv && adv.filter_verdict_now
-      ? `Chart now: ${adv.filter_verdict_now}` : "";
+      ? `Chart check today: ${filterLabels[adv.filter_verdict_now] || adv.filter_verdict_now}`
+      : "";
     body.innerHTML = `
       <div class="pos-stats">
-        <div><span class="muted">P&amp;L</span> <strong>${fmtPnl(pnl)}</strong></div>
-        <div><span class="muted">Current</span> <strong>${cur ?? "—"}</strong></div>
-        <div><span class="muted">Held</span> <strong>${daysHeldFromEntry(p.entry_date)}d</strong></div>
+        <div><span class="muted">Profit / loss</span> <strong>${fmtPnl(pnl)}</strong></div>
+        <div><span class="muted">Price now</span> <strong>${cur ?? "—"}</strong></div>
+        <div><span class="muted">Days open</span> <strong>${daysHeldFromEntry(p.entry_date)}</strong></div>
       </div>
       <p class="pos-advice"><strong>${actionLabel(adv && adv.action)}.</strong> ${escapeHTML(adv && adv.reason || "—")}</p>
       <div class="pos-meta">
         <div>${stopLine}</div>
         <div>${macroLine}</div>
         ${filterLine ? `<div>${filterLine}</div>` : ""}
-        ${p.thesis_at_open ? `<div class="pos-thesis"><span class="muted">Thesis at open:</span> ${escapeHTML(p.thesis_at_open)}</div>` : ""}
+        ${p.thesis_at_open ? `<div class="pos-thesis"><span class="muted">Why you opened it:</span> ${escapeHTML(p.thesis_at_open)}</div>` : ""}
         ${p.notes ? `<details class="pos-notes-block"><summary>Notes</summary><pre>${escapeHTML(p.notes)}</pre></details>` : ""}
       </div>
       <div class="pos-actions">
@@ -528,12 +547,12 @@
         positionsActive.innerHTML = `
           <div class="positions-empty-card">
             <p class="muted" style="margin-top: 0;">
-              No active positions yet. Once you take a trade on FTMO and record
-              it via the form below, it'll appear here as a card with the
-              system's current advisory.
+              You have no open trades recorded yet. Once you take a trade on
+              FTMO and fill in the form below, it'll show up here as a card
+              that tells you what the system thinks you should do with it.
             </p>
             <details class="collapse">
-              <summary style="font-size: 13px;">What an active position card looks like</summary>
+              <summary style="font-size: 13px;">See an example of what a trade card looks like</summary>
               <article class="card pos-card pos-action-hold" style="margin-top: 10px;">
                 <header class="card-head">
                   <div class="card-id">
@@ -543,25 +562,26 @@
                 </header>
                 <div class="card-body">
                   <div class="pos-stats">
-                    <div><span class="muted">P&amp;L</span> <strong>+4.39%</strong></div>
-                    <div><span class="muted">Current</span> <strong>4697.40</strong></div>
-                    <div><span class="muted">Held</span> <strong>3d</strong></div>
+                    <div><span class="muted">Profit / loss</span> <strong>+4.4%</strong></div>
+                    <div><span class="muted">Price now</span> <strong>4697.40</strong></div>
+                    <div><span class="muted">Days open</span> <strong>3</strong></div>
                   </div>
                   <p class="pos-advice">
-                    <strong>Hold.</strong> Thesis intact: long at 6/10. P&amp;L +4.4%.
+                    <strong>Hold.</strong> Trade is on track — system still
+                    leans long at 6/10, same as when you opened. Up 4.4%.
                   </p>
                   <div class="pos-meta">
-                    <div>Stop: 4400 (6.3% away)</div>
-                    <div>Macro now: aligned, 6/10 (0 since open)</div>
-                    <div>Chart now: watch</div>
-                    <div class="pos-thesis"><span class="muted">Thesis at open:</span> The structural bid from persistent central bank buying (PBoC) and a stagflation-lite regime makes gold a directional long over a multi-month horizon.</div>
+                    <div>Stop level: 4400 (price is 6.3% above it)</div>
+                    <div>System view today: still long, 6/10 confidence (no change since open)</div>
+                    <div>Chart check today: "watch" — wait for cleaner pullback if adding</div>
+                    <div class="pos-thesis"><span class="muted">Why you opened it:</span> Central bank buying and stagflation backdrop make gold a directional long for the next few months.</div>
                   </div>
                 </div>
               </article>
               <p class="muted" style="font-size: 12px; margin-top: 10px;">
-                Above: example of a healthy position. The pill at top-right is
-                the system's recommended action — see the help disclosure above
-                for what each pill means.
+                Above is what a healthy trade looks like. The coloured pill in
+                the top-right is the system's suggestion — read the help section
+                up top for what each colour and word means.
               </p>
             </details>
           </div>
