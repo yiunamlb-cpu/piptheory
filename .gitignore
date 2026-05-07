@@ -59,13 +59,15 @@ bias_cards/
 
 # --- Trade journal & positions (sensitive trading data) ---
 # These ignore the *runtime data*. The code lives at src/positions/ and
-# is re-included with the negation rule below.
+# is re-included with the negation rules below — but we exclude __pycache__
+# again because the broad re-include would otherwise pull it in.
 journal/
 trades/
 positions/
 fills/
 !src/positions/
 !src/positions/**
+src/positions/__pycache__/
 
 # --- Backtest outputs ---
 backtest_results/
