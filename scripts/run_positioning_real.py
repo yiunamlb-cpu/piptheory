@@ -24,7 +24,7 @@ from src.llm import OpenRouterClient
 console = Console()
 
 # Instruments with COT coverage (DXY uses ICE futures, often unavailable in CFTC TFF)
-COT_INSTRUMENTS = ["EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "GC", "CL", "ZN"]
+COT_INSTRUMENTS = ["EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "GC", "CL"]
 
 
 def build_user_message(summaries: list[dict]) -> str:

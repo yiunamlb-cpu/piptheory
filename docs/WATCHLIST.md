@@ -1,16 +1,18 @@
 # Watchlist
 
-Ten instruments. Cover every macro theme; minimize redundancy; all FTMO-tradeable; all deeply liquid.
+Nine instruments. Cover every macro theme; minimize redundancy; all FTMO-tradeable; all deeply liquid.
 
-Composition: ~50% FX, 20% indices, 20% commodities, 10% rates. FX-weighted because FX is the most analytically tractable asset class for a solo operator with LLM agents — cleaner driver set, two-sided macro plays, COT data is rich, central bank communication is the master variable.
+Composition: ~55% FX, 22% indices, 22% commodities. FX-weighted because FX is the most analytically tractable asset class for a solo operator with LLM agents — cleaner driver set, two-sided macro plays, COT data is rich, central bank communication is the master variable.
+
+**Note on rates:** ZN (10Y Treasury Note) was previously on the watchlist as the rates expression. It was removed in May 2026 because FTMO doesn't offer it as a tradable. The rates view is still actively tracked — Fed-Watcher (Layer 1) consumes UST 2Y/10Y/30Y from FRED and the Strategist uses that to inform USDJPY, gold, and equity bias cards. We just don't produce a "tradable" verdict for an instrument we can't actually trade.
 
 ## Focus list (formerly "active universe")
 
 The user-facing dashboard term is **focus list** — instruments that go through the full pipeline (Layer 1 macro → Layer 2 strategist → Layer 3 contrarian → Layer 4 council debate → Layer 4b Tradability Filter → Layer 5 PM brief). The internal code constant is still `ACTIVE_UNIVERSE` in `src/orchestration/pipeline.py`.
 
-**Current focus list: all 10 instruments** (DXY, EURUSD, USDJPY, GBPUSD, AUDUSD, ES, NQ, GC, CL, ZN).
+**Current focus list: all 9 instruments** (DXY, EURUSD, USDJPY, GBPUSD, AUDUSD, ES, NQ, GC, CL).
 
-The focus list started as the 3 most-tradeable on FTMO (ES, NQ, GC) per the architectural review's "keep the universe small while we refine" guidance. It was later expanded to all 10 once the pipeline was producing reliable output.
+The focus list started as the 3 most-tradeable on FTMO (ES, NQ, GC) per the architectural review's "keep the universe small while we refine" guidance. It was later expanded to the full FTMO-eligible set once the pipeline was producing reliable output.
 
 **What "in the focus list" means concretely:**
 - The Layer 4 council (Bull / Bear / Judge) runs for the instrument when its Strategist conviction meets the threshold (currently 5/10).
@@ -69,15 +71,9 @@ Instruments outside the focus list (currently none) would still get Layer 1-3 an
 **Why:** Direct expression of energy-shock theme. Iran/Middle East premium prices through here.
 **Caveats:** **Geopolitical whipsaw risk** — a ceasefire can wipe out a position in hours. Cap size; use options-equivalent thinking on stop placement.
 
-## Rates (1)
-
-### ZN — 10-Year US Treasury Note Futures
-**Theme expressions:** Fed path, inflation expectations, growth, term premium.
-**Why:** Cleanest single-instrument expression of duration view. Short ZN (long yields) is the expression vehicle for "stagflation, Fed stuck" theme.
-**Caveats:** Tight ranges in low-vol regimes; can chop for weeks between catalysts. Not a high-trade-frequency instrument.
-
 ## What's Deliberately NOT On The List
 
+- **ZN / Treasury futures** — not offered on FTMO. Rates view still tracked from FRED but not as a tradable instrument.
 - **Single equities** — earnings idiosyncrasy + gap risk violates emergency-stop framework
 - **Crypto** — different vol/liquidity regime; different analytical toolkit; not a clean macro expression
 - **EM FX** — illiquid, intervention risk, prop firms often restrict
@@ -86,7 +82,7 @@ Instruments outside the focus list (currently none) would still get Layer 1-3 an
 
 ## Rules for Adding/Removing
 
-**Bar to add:** Must express a macro theme that the existing 10 don't capture cleanly, AND must be FTMO-tradeable with reasonable spreads. Example: if a "China stimulus actually working" regime emerges, copper or HG might earn a temporary slot.
+**Bar to add:** Must express a macro theme that the existing 9 don't capture cleanly, AND must be FTMO-tradeable with reasonable spreads. Example: if a "China stimulus actually working" regime emerges, copper or HG might earn a temporary slot.
 
 **Bar to remove:** Instrument that hasn't produced a tradeable setup in 6+ months OR has structurally changed (delisting, prop-firm restriction, structural liquidity collapse).
 

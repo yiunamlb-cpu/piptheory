@@ -87,7 +87,6 @@ For instruments with structural shifts (e.g., gold's positioning regime changed 
 | **AUD** | Leveraged Funds net | China-sensitive — shifts often lead China-narrative shifts |
 | **GC (Gold)** | Managed Money net | Central bank buying off-COT; positioning understates true flow |
 | **CL (Oil)** | Managed Money + Producer/Merchant | Watch divergence — when speculators long while producers hedging short = extension top risk |
-| **ZN (10Y Treasury)** | Leveraged Funds vs. Asset Managers | Asset Managers often structurally long duration; Leveraged Funds tactical |
 | **ES (S&P)** | Leveraged Funds + Asset Managers | Positioning less informative for indices than for FX/commodities |
 | **NQ (Nasdaq)** | Leveraged Funds | Often correlated with ES; small differential signal |
 | **DXY** | Aggregate of FX components | Use weighted aggregate of EUR, JPY, GBP, CAD, AUD positioning |

@@ -45,7 +45,7 @@ def test_cot() -> None:
     cols = ["instrument", "status", "report_date", "data_age", "net", "pct_3y", "trend_4w", "extreme_6w"]
     for c in cols:
         table.add_column(c)
-    for instrument in ["EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "GC", "CL", "ZN"]:
+    for instrument in ["EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "GC", "CL"]:
         try:
             s = cot.summary(instrument)
         except Exception as e:

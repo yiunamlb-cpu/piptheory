@@ -60,9 +60,16 @@ This is not a "Fed cutting, risk-on" regime. It's not a "hard recession" regime 
 | **NQ** | Tactical long dips, preferred over ES | Theme 5 most direct expression | 6/10 |
 | **GC (Gold)** | Bullish | Theme 1 (inflation), Theme 4 (China buying), policy uncertainty, Iran tail | 8/10 |
 | **CL (Oil)** | Bullish bias / event-driven | Theme 1 directly | 7/10 with size cap (geopolitical whipsaw risk) |
-| **ZN (US 10Y)** | Bearish bonds (long yields) | Themes 1, 2, 3 all push yields up | 7/10 |
 
-**Highest-conviction expressions right now:** Long gold, short ZN (long yields), long EURUSD pullbacks. Cleanest cross-confirmed theme expressions.
+**Rates context (not directly tradable on FTMO — informs FX/equity bias):**
+The "long yields / short duration" view is supported by Themes 1, 2, and 3.
+Conviction on the rates view itself is 7/10. We don't trade Treasuries, so
+this expression flows into: stronger USDJPY (rate differential), pressure
+on long-duration equity multiples (NQ resistance into rate spikes), and
+positive rate-shock risk for gold-vs-real-yield sensitivity. When the rates
+view weakens, expect dollar softening and gold tailwind.
+
+**Highest-conviction expressions right now:** Long gold, long EURUSD pullbacks. Cleanest cross-confirmed theme expressions on the FTMO universe.
 
 **Watch carefully / lower size:** USDJPY (intervention), CL (geopolitical whipsaw), AUDUSD (theme cross-currents).
 

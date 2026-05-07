@@ -87,7 +87,7 @@ For each bias, verify cross-asset signals are consistent:
 - Long EURUSD thesis → DXY should be soft, EUR-USD rate spread should be widening
 - Long gold thesis → real yields softening, DXY stable-to-soft, geopolitical premium present
 - Long ES/NQ thesis → credit spreads tight, breadth good, vol regime supportive
-- Short ZN (long yields) thesis → growth firm or inflation rising or both, dollar firm
+- Long-yields / bearish-bonds context (rates view tracked but not directly traded — FTMO doesn't offer Treasuries) → growth firm or inflation rising or both, dollar firm; expressed via USDJPY long, NQ duration-sensitivity caps
 
 If cross-asset signals dissent, flag the dissent and lower conviction.
 
@@ -147,7 +147,7 @@ WATCHLIST PRIORITY: [A+ | A | B | C]
   C: low conviction; monitor only
 ```
 
-After the per-instrument cards, produce a **summary table** ranking all 10 instruments by conviction, with their primary theme alignment.
+After the per-instrument cards, produce a **summary table** ranking all 9 instruments by conviction, with their primary theme alignment.
 
 ## Memory Block (Letta — Phase B)
 

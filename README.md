@@ -18,7 +18,7 @@ Foundation phase. Architecture drafted, scaffold initialized. Agents and data pi
 
 ## Universe
 
-10 instruments: DXY, EURUSD, USDJPY, GBPUSD, AUDUSD, ES, NQ, GC, CL, ZN.
+9 instruments: DXY, EURUSD, USDJPY, GBPUSD, AUDUSD, ES, NQ, GC, CL. (ZN was removed in May 2026 — FTMO doesn't offer Treasury futures; rates view still tracked from FRED.)
 
 ## Strategy
 

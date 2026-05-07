@@ -59,7 +59,6 @@ When price moves >2 standard deviations in 1-3 days, re-run for that instrument 
 | AUDUSD | Leveraged Funds on AUD |
 | GC | Managed Money on Gold (Disaggregated) |
 | CL | Managed Money + Producer/Merchant on Crude (Disaggregated) |
-| ZN | Leveraged Funds vs. Asset Managers on 10Y Note |
 | ES, NQ | Leveraged Funds + Asset Managers on equity index futures |
 | DXY | Weighted aggregate of EUR/JPY/GBP/CAD/AUD positioning |
 

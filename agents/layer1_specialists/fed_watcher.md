@@ -125,7 +125,9 @@ MARKET_PRICING:
 
 GAP:
   [Fed more hawkish than market | aligned | Fed more dovish than market]
-  Trade implication: [direction for USD, direction for ZN/duration]
+  Trade implication: [direction for USD, duration view (informs USDJPY,
+  NQ rate-sensitivity, gold real-yield channel — Treasuries themselves are
+  not in the tradable universe)]
 
 DISSENTS: [count, names if known, hawkish/dovish split]
 NEXT_CATALYST: [date and event]

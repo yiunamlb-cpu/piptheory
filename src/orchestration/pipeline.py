@@ -42,9 +42,12 @@ from src.orchestration.context import (
 
 log = structlog.get_logger(__name__)
 
-# Watchlist for Layer 2 strategist coverage (still produces context bias cards
-# for all of these so the human can see the wider macro picture).
-FULL_WATCHLIST = ["DXY", "EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "ES", "NQ", "GC", "CL", "ZN"]
+# Watchlist for Layer 2 strategist coverage. ZN (10Y Treasury Note) is
+# excluded — FTMO doesn't offer it as a tradable, so producing bias and
+# tradability cards for it would generate setups the user can't act on.
+# Rates context still flows through Fed-Watcher (FRED-sourced UST 2Y/10Y/30Y)
+# and informs the FX bias cards.
+FULL_WATCHLIST = ["DXY", "EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "ES", "NQ", "GC", "CL"]
 
 # Focus list: instruments that go through Layer 4 council + Layer 4b filter.
 # Expanded to the full watchlist per user direction. Council still requires
@@ -53,8 +56,8 @@ FULL_WATCHLIST = ["DXY", "EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "ES", "NQ", "GC
 # on most of the universe. Cost scales accordingly.
 ACTIVE_UNIVERSE = list(FULL_WATCHLIST)
 
-# Subset with COT positioning data.
-COT_INSTRUMENTS = ["EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "GC", "CL", "ZN"]
+# Subset with COT positioning data. ZN dropped — see FULL_WATCHLIST comment.
+COT_INSTRUMENTS = ["EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "GC", "CL"]
 
 # Layer 4 council runs only for ACTIVE_UNIVERSE instruments where Layer 2
 # conviction >= this threshold.
