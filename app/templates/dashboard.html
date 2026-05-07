@@ -226,12 +226,91 @@
         <h3 style="margin: 0;">Active positions</h3>
         <p class="section-help" style="margin-top: 4px;">
           Trades you've opened on FTMO. The system never executes — you record
-          entries here so the advisor can flag when the macro thesis or chart
+          entries here so the system can flag when the macro thesis or chart
           structure has materially changed. Close marks a trade exit; closed
-          trades go to the journal that Layer 7 Calibration will read once
-          enough have accumulated.
+          trades go to the journal for monthly review.
         </p>
       </div>
+
+      <!-- HELP DISCLOSURE — "How to read this tab" -->
+      <details class="methodology" style="margin-bottom: 14px;">
+        <summary>How to read this tab</summary>
+        <div class="methodology-body">
+          <p><strong>What you see per position.</strong> Each position renders as
+            a card with: a P&L row, a coloured pill at the top-right showing the
+            recommended action, a one-sentence reason, and a metadata strip with
+            the macro state, chart verdict, stop distance, and thesis at open.</p>
+
+          <p><strong>What the action pills mean.</strong> The system runs a rule
+            ladder against each open position on every page-load. Top of the ladder
+            wins. Pills, in order of urgency:</p>
+
+          <ul class="pills-help-list">
+            <li>
+              <span class="pill pos-pill pos-action-emergency">Emergency close</span>
+              Your structural stop has been breached. <strong>Don't deliberate</strong> —
+              close per the pre-defined plan. Whole point of having a structural stop is
+              you don't get to vote when price is at the level.
+            </li>
+            <li>
+              <span class="pill pos-pill pos-action-close">Close</span>
+              Either macro view has flipped to the opposite direction at 6+/10
+              conviction, OR the chart structure has eroded (Filter verdict turned to
+              <em>pass_despite_bias</em>). The system's own analysis no longer supports
+              the position. Exit; re-enter on a cleaner setup if your view holds.
+            </li>
+            <li>
+              <span class="pill pos-pill pos-action-trim">Trim</span>
+              Conviction has dropped 3+ points since open, or position is in
+              meaningful profit with conviction slipping. Take some risk off; keep a
+              residual on for the case where the thesis re-firms.
+            </li>
+            <li>
+              <span class="pill pos-pill pos-action-trail">Trail stop</span>
+              In profit (≥5%) with the macro thesis still intact. Consider raising
+              the emergency stop to lock in gains. Don't tighten so much that normal
+              volatility takes you out — the stop is structural, not technical.
+            </li>
+            <li>
+              <span class="pill pos-pill pos-action-review">Review</span>
+              <strong>Soft alert.</strong> Macro view still aligned with the
+              position, but the Filter says <em>watch</em> rather than
+              <em>tradable_now</em> — chart has lost its clean location. <strong>No
+              action required.</strong> Glance, note, move on. Only acts as a real
+              signal if it persists for several days while P&L deteriorates.
+            </li>
+            <li>
+              <span class="pill pos-pill pos-action-hold">Hold</span>
+              Default. Thesis intact, no action needed. Most days will be Hold.
+            </li>
+          </ul>
+
+          <p><strong>Reading the wobble.</strong> The macro conviction number on
+            each card moves day-to-day. A 6→5→6→7 oscillation is normal LLM noise,
+            not a real change in view — the system has hysteresis built in (Trim
+            triggers on a 3+ drop from open, Close triggers on a 6+ opposite-direction
+            reading). Don't react to single-point moves. Trade the band, not the digit.</p>
+
+          <p><strong>What "macro now" tells you.</strong> The metadata strip on
+            each card shows whether the latest run still aligns with your position
+            direction, the current conviction, and how many points it's moved since
+            you opened. <em>Aligned</em> means same direction; <em>OPPOSED</em> means
+            the system's bias has flipped to the opposite of your trade.</p>
+
+          <p><strong>Buttons on each card.</strong></p>
+          <ul>
+            <li><strong>Mark closed</strong> — when you've actually exited on FTMO.
+              Records exit price + reason; appends to the journal.</li>
+            <li><strong>Add note</strong> — timestamped log entry. Use for
+              "trimmed half here", "moved stop", "ignored advisor and was right",
+              etc. This becomes your trade narrative for review.</li>
+            <li><strong>Move stop / Set stop</strong> — update the structural
+              invalidation level. The system never moves it for you.</li>
+            <li><strong>Delete</strong> — only for mistakes (opened in error). If
+              you actually closed the trade, use Mark closed so it goes to the journal.</li>
+          </ul>
+        </div>
+      </details>
 
       <!-- ACTIVE POSITIONS LIST -->
       <div id="positions-active" class="positions-list" aria-live="polite">

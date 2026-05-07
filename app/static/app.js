@@ -525,10 +525,47 @@
       // Active list
       positionsActive.innerHTML = "";
       if (active.length === 0) {
-        const empty = document.createElement("p");
-        empty.className = "muted positions-empty";
-        empty.textContent = "No active positions. Use the form below to record one.";
-        positionsActive.appendChild(empty);
+        positionsActive.innerHTML = `
+          <div class="positions-empty-card">
+            <p class="muted" style="margin-top: 0;">
+              No active positions yet. Once you take a trade on FTMO and record
+              it via the form below, it'll appear here as a card with the
+              system's current advisory.
+            </p>
+            <details class="collapse">
+              <summary style="font-size: 13px;">What an active position card looks like</summary>
+              <article class="card pos-card pos-action-hold" style="margin-top: 10px;">
+                <header class="card-head">
+                  <div class="card-id">
+                    <div class="card-symbol">GC <span class="card-name">LONG · entry 4500</span></div>
+                  </div>
+                  <span class="pill pos-pill pos-action-hold">Hold</span>
+                </header>
+                <div class="card-body">
+                  <div class="pos-stats">
+                    <div><span class="muted">P&amp;L</span> <strong>+4.39%</strong></div>
+                    <div><span class="muted">Current</span> <strong>4697.40</strong></div>
+                    <div><span class="muted">Held</span> <strong>3d</strong></div>
+                  </div>
+                  <p class="pos-advice">
+                    <strong>Hold.</strong> Thesis intact: long at 6/10. P&amp;L +4.4%.
+                  </p>
+                  <div class="pos-meta">
+                    <div>Stop: 4400 (6.3% away)</div>
+                    <div>Macro now: aligned, 6/10 (0 since open)</div>
+                    <div>Chart now: watch</div>
+                    <div class="pos-thesis"><span class="muted">Thesis at open:</span> The structural bid from persistent central bank buying (PBoC) and a stagflation-lite regime makes gold a directional long over a multi-month horizon.</div>
+                  </div>
+                </div>
+              </article>
+              <p class="muted" style="font-size: 12px; margin-top: 10px;">
+                Above: example of a healthy position. The pill at top-right is
+                the system's recommended action — see the help disclosure above
+                for what each pill means.
+              </p>
+            </details>
+          </div>
+        `;
       } else {
         active.forEach((item) => positionsActive.appendChild(buildPositionCard(item)));
       }

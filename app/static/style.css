@@ -1021,6 +1021,43 @@ textarea:focus, input:focus {
    Positions tab
    =========================================================== */
 
+/* Help list inside the Positions tab "How to read this tab" disclosure.
+   Each <li> starts with a sample pill so you see colour + label together. */
+.pills-help-list {
+  list-style: none;
+  margin: 12px 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pills-help-list > li {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 10px;
+  align-items: start;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.pills-help-list > li .pill {
+  justify-self: start;
+}
+@media (max-width: 600px) {
+  .pills-help-list > li {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+/* Empty-state container for the Positions tab */
+.positions-empty-card {
+  padding: 16px;
+  background: var(--surface-soft);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+}
+
 /* Position alert banner — appears below hero when any open position
    has urgent advice from the latest run. */
 .position-alert-banner {
