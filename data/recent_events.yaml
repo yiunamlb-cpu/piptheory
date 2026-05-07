@@ -1,0 +1,30 @@
+# Recent events log — manually maintained.
+#
+# This file is the system's only news interface. Layer 0 doesn't scrape
+# headlines, so when something material happens (Trump tariff announcement,
+# surprise OPEC cut, Fed-speaker hawkish pivot, geopolitical event) you
+# add a one-line entry here. The Strategist reads it as input alongside
+# FRED data and your THEMES.md. Without this, the system is event-blind:
+# it sees the price candle, not the cause.
+#
+# Format:
+#   - date:      YYYY-MM-DD (the event's date, not when you logged it)
+#     headline:  one short line, plain English
+#     impact:    optional — what moved and by how much (cross-asset)
+#     notes:     optional — your interpretation, regime implication
+#     relevance: high | medium | low
+#                  high = regime-defining ("Trump 25% Mexico tariff")
+#                  medium = thematic ("ECB Lagarde hints June hike")
+#                  low = noteworthy but minor
+#     affects:   optional — list of instruments most affected
+#                  e.g. [USDMXN, NQ, GC] or just [USD]
+#
+# Pruning:
+#   The loader keeps the last 30 calendar days only when feeding the
+#   Strategist. Keep older entries here for your own reference if useful.
+#
+# Updates:
+#   Edit this file directly OR use the "Add event" form on the dashboard
+#   (Tools footer on desktop; bottom-sheet menu on mobile).
+
+events: []

@@ -99,6 +99,17 @@ def fed_watcher_input(rate_snapshot: pd.DataFrame) -> str:
 
 def strategist_input(layer1_outputs: dict[str, str], themes: str) -> str:
     today = datetime.now().date().isoformat()
+
+    # Pull the user-maintained recent events log. The system has no news
+    # API — this is the only channel by which Trump-era headlines, surprise
+    # tariff announcements, or off-cycle Fed-speaker comments enter the
+    # pipeline. Treat it as authoritative ground-truth news context.
+    try:
+        from src.data import render_recent_events_block
+        recent_events_text = render_recent_events_block()
+    except Exception as e:
+        recent_events_text = f"(recent_events.yaml unavailable: {e})"
+
     parts = [
         f"# FX + Cross-Asset Strategist — Synthesis, {today}",
         "",
@@ -112,9 +123,22 @@ def strategist_input(layer1_outputs: dict[str, str], themes: str) -> str:
         "freshest supporting evidence justifies. Note where stale data is "
         "doing load-bearing work in your synthesis.",
         "",
+        "**News note:** The block titled 'Recent regime-relevant events' below "
+        "is the user-maintained log of off-cycle news (tariff announcements, "
+        "Fed-speaker pivots, geopolitical events). The system has no news scraper, "
+        "so this is your only source of unstructured news context. Respect it: "
+        "if a HIGH-relevance event there contradicts a Layer 1 specialist's tone, "
+        "the news event wins for short-term framing. If the log is empty, the "
+        "user has flagged no material news in the last 30 days — reason from "
+        "FRED data and THEMES.md alone.",
+        "",
         "## Active themes (from docs/THEMES.md)",
         "",
         themes,
+        "",
+        "## Recent regime-relevant events (from data/recent_events.yaml)",
+        "",
+        recent_events_text,
         "",
         "## Layer 1 specialist outputs",
         "",

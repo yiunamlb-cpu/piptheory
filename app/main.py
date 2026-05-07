@@ -41,7 +41,12 @@ from dashboard.loader import (  # noqa: E402
     platform_symbol,
 )
 from src.config import ROOT  # noqa: E402
-from src.data import upcoming_events  # noqa: E402
+from src.data import (  # noqa: E402
+    add_recent_event,
+    delete_recent_event,
+    load_recent_events,
+    upcoming_events,
+)
 from src.data.prices import INSTRUMENT_TO_TICKER, PriceClient  # noqa: E402
 from src.llm import OpenRouterClient  # noqa: E402
 from src.orchestration.pipeline import ACTIVE_UNIVERSE  # noqa: E402  single source of truth
@@ -860,6 +865,21 @@ def _build_home_context(run: Run, runs: list[str], date: str, surface: str) -> d
     open_instruments = {t["instrument"] for t in trades}
     instruments = _build_instruments_table(run, open_instruments)
 
+    # Recent events log (user-maintained news input)
+    try:
+        recent_events_raw = load_recent_events()
+    except Exception:
+        recent_events_raw = []
+    recent_events = [{
+        "date": e.date.isoformat(),
+        "days_ago": e.days_ago,
+        "headline": e.headline,
+        "impact": e.impact,
+        "notes": e.notes,
+        "relevance": e.relevance,
+        "affects": e.affects or [],
+    } for e in recent_events_raw[:10]]  # top 10 newest for the panel
+
     # Detect partial run — Strategist truncation. If we have fewer bias
     # cards than the active universe, the Strategist call hit max_tokens
     # mid-output. Surface this so the user knows to re-run.
@@ -880,6 +900,7 @@ def _build_home_context(run: Run, runs: list[str], date: str, surface: str) -> d
         "macro": macro,
         "trades": trades,
         "instruments": instruments,
+        "recent_events": recent_events,
         "partial_run": partial_run,
         "partial_msg": partial_msg,
         "brief_md": run.layer5_pm_brief or "",
@@ -939,6 +960,79 @@ async def run_page(request: Request, date: str):
     if override in ("mobile", "desktop"):
         response.set_cookie("nam_view", override, max_age=60 * 60 * 24 * 30, samesite="lax")
     return response
+
+
+# ---------- API: recent events log (manual news input) ----------
+
+class RecentEventRequest(BaseModel):
+    date: str | None = None    # YYYY-MM-DD; defaults to today
+    headline: str
+    impact: str = ""
+    notes: str = ""
+    relevance: str = "medium"  # high | medium | low
+    affects: list[str] | None = None
+
+
+@app.get("/api/recent-events")
+async def api_recent_events_list():
+    """Return all logged events, most recent first."""
+    events = load_recent_events()
+    return JSONResponse({"events": [
+        {
+            "date": e.date.isoformat(),
+            "days_ago": e.days_ago,
+            "headline": e.headline,
+            "impact": e.impact,
+            "notes": e.notes,
+            "relevance": e.relevance,
+            "affects": e.affects or [],
+        }
+        for e in events
+    ]})
+
+
+@app.post("/api/recent-events")
+async def api_recent_events_add(req: RecentEventRequest):
+    if not req.headline.strip():
+        raise HTTPException(400, "headline is required")
+    try:
+        ev = add_recent_event(
+            date_=req.date,
+            headline=req.headline,
+            impact=req.impact,
+            notes=req.notes,
+            relevance=req.relevance,
+            affects=req.affects,
+        )
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    return JSONResponse({
+        "event": {
+            "date": ev.date.isoformat(),
+            "headline": ev.headline,
+            "impact": ev.impact,
+            "notes": ev.notes,
+            "relevance": ev.relevance,
+            "affects": ev.affects or [],
+        }
+    }, status_code=201)
+
+
+class DeleteEventRequest(BaseModel):
+    date: str
+    headline: str
+
+
+@app.post("/api/recent-events/delete")
+async def api_recent_events_delete(req: DeleteEventRequest):
+    """Delete an event by exact date + headline match. POST (not DELETE)
+    because the body carries identifying fields and FastAPI's DELETE
+    body support is uneven across clients.
+    """
+    ok = delete_recent_event(req.date, req.headline)
+    if not ok:
+        raise HTTPException(404, "No matching event found")
+    return JSONResponse({"deleted": True})
 
 
 # ---------- API: reasoning + brief (used by slide-over / sheet) ----------

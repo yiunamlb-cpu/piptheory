@@ -139,6 +139,22 @@
     <a class="macro-link" data-action="open-brief">Read full brief →</a>
   </div>
 
+  {# ─── Recent events log (compact preview) ───────────────────────── #}
+  <div class="section-label">News log
+    {% if recent_events %}<span class="muted" style="text-transform: none; letter-spacing: 0; font-weight: 400;"> · {{ recent_events|length }}</span>{% endif %}
+  </div>
+  <div class="link-row" data-action="open-events-log">
+    {% if recent_events %}
+    <span style="display:flex;flex-direction:column;gap:2px;">
+      <strong style="font-size:14px;">{{ recent_events[0].headline|truncate(60, True) }}</strong>
+      <span class="muted" style="font-size:12px;">{{ recent_events[0].date }} · {{ recent_events[0].relevance|upper }}</span>
+    </span>
+    {% else %}
+    <span>No events logged — tap to add</span>
+    {% endif %}
+    <span class="arrow">→</span>
+  </div>
+
   {# ─── Link rows ─────────────────────────────────────────────────────── #}
   <div class="section-label">More</div>
   <div class="link-row" data-action="open-instruments-list">

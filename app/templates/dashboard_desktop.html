@@ -168,6 +168,50 @@
     </section>
   </div>
 
+  {# ─── Recent events log (user-maintained news input) ─────────────── #}
+  <section class="section">
+    <div class="section-head">
+      <h2 class="section-title">Recent events log
+        <span class="muted" style="text-transform: none; letter-spacing: 0; font-weight: 400; margin-left: 8px;">
+          (your news input — the system has no news API)
+        </span>
+      </h2>
+      <div class="section-aside">
+        <button class="btn btn-sm" data-action="open-add-event">+ Add event</button>
+      </div>
+    </div>
+    {% if recent_events %}
+    <ul class="events-list">
+      {% for e in recent_events %}
+      <li class="event-row event-row-{{ e.relevance }}">
+        <div class="event-row-head">
+          <span class="event-date">{{ e.date }}</span>
+          <span class="muted">({{ e.days_ago }}d ago)</span>
+          <span class="chip chip-{% if e.relevance == 'high' %}bad{% elif e.relevance == 'medium' %}warn{% else %}neutral{% endif %}">
+            {{ e.relevance|upper }}
+          </span>
+          <span class="event-headline">{{ e.headline }}</span>
+          <button class="btn btn-sm btn-ghost event-delete" data-action="delete-event"
+                  data-date="{{ e.date }}" data-headline="{{ e.headline }}" title="Delete">×</button>
+        </div>
+        {% if e.impact or e.notes or e.affects %}
+        <div class="event-row-meta">
+          {% if e.impact %}<div><span class="muted">Impact:</span> {{ e.impact }}</div>{% endif %}
+          {% if e.notes %}<div><span class="muted">Note:</span> {{ e.notes }}</div>{% endif %}
+          {% if e.affects %}<div><span class="muted">Affects:</span> {{ e.affects|join(', ') }}</div>{% endif %}
+        </div>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="trades-empty" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);">
+      No events logged. When something material happens (Trump tariff, surprise data, geopolitical shock),
+      add it here so the system factors it into tomorrow's analysis.
+    </div>
+    {% endif %}
+  </section>
+
   {# ─── Open trades strip ─────────────────────────────────────────────── #}
   <section class="section">
     <div class="section-head">
@@ -364,6 +408,63 @@
         <button type="submit" class="btn btn-primary" id="chat-send">Send</button>
       </form>
     </div>
+  </div>
+</div>
+
+{# ─── Modal: Add a recent event ───────────────────────────────────── #}
+<div id="modal-add-event" class="modal" aria-hidden="true">
+  <div class="modal-card">
+    <header class="modal-head">
+      <span class="modal-title">Log a recent event</span>
+      <button class="slideover-close" data-action="close-modal" data-target="modal-add-event">×</button>
+    </header>
+    <div class="modal-body">
+      <p class="muted" style="margin-top: 0; font-size: 13px;">
+        The system has no news API — this is how news enters the pipeline.
+        Tomorrow's Strategist run will read this log and factor it into its analysis.
+      </p>
+      <form id="add-event-form">
+        <div class="field-row">
+          <div class="field">
+            <label for="ae-date">Date</label>
+            <input type="date" id="ae-date" name="date" required>
+          </div>
+          <div class="field">
+            <label for="ae-relevance">Relevance</label>
+            <select id="ae-relevance" name="relevance">
+              <option value="high">High — regime-defining</option>
+              <option value="medium" selected>Medium — thematic</option>
+              <option value="low">Low — minor</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="ae-headline">Headline (one line, plain English)</label>
+          <input type="text" id="ae-headline" name="headline" maxlength="200" required
+                 placeholder='e.g. "Trump announces 25% tariff on Mexican imports"'>
+        </div>
+        <div class="field">
+          <label for="ae-impact">Cross-asset impact <span class="muted">(optional)</span></label>
+          <input type="text" id="ae-impact" name="impact"
+                 placeholder='e.g. "Peso -3%, NQ -1.2%, gold +0.8%"'>
+        </div>
+        <div class="field">
+          <label for="ae-notes">Your interpretation <span class="muted">(optional)</span></label>
+          <textarea id="ae-notes" name="notes" rows="2"
+                    placeholder='e.g. "Confirms trade-war regime; gold catching safe-haven bid"'></textarea>
+        </div>
+        <div class="field">
+          <label for="ae-affects">Affects <span class="muted">(optional, comma-separated symbols)</span></label>
+          <input type="text" id="ae-affects" name="affects"
+                 placeholder="e.g. USDMXN, NQ, GC">
+        </div>
+      </form>
+    </div>
+    <footer class="modal-foot">
+      <span class="muted" id="ae-status" style="margin-right: auto; font-size: 12px;"></span>
+      <button class="btn btn-ghost" data-action="close-modal" data-target="modal-add-event">Cancel</button>
+      <button class="btn btn-primary" data-action="submit-add-event">Save</button>
+    </footer>
   </div>
 </div>
 

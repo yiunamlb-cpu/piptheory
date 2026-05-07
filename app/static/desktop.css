@@ -508,6 +508,58 @@ body {
 .chat-form { display: flex; gap: 8px; }
 .chat-form textarea { flex: 1; min-height: 44px; }
 
+/* Recent events log */
+.events-list {
+  list-style: none;
+  margin: 0; padding: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.event-row {
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+}
+.event-row:first-child { border-top: none; }
+.event-row-high { background: var(--bad-tint); }
+.event-row-head {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  font-size: 14px;
+}
+.event-date {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+.event-headline {
+  font-weight: 500;
+  flex: 1;
+  min-width: 200px;
+}
+.event-delete {
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 8px;
+  height: 24px;
+  margin-left: auto;
+}
+.event-row-meta {
+  margin-top: 4px;
+  margin-left: 0;
+  font-size: 12px;
+  color: var(--text-2);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 6px;
+  border-left: 2px solid var(--border);
+}
+
 /* Closed trades list */
 .closed-list {
   list-style: none;

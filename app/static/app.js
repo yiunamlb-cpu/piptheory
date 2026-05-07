@@ -671,6 +671,152 @@
     openSheet("More", html);
   }
 
+  // ─── Recent events log ───────────────────────────────────────────────
+
+  function openAddEvent() {
+    const today = new Date().toISOString().slice(0, 10);
+    if (surface === "mobile") {
+      const html = `
+        <p class="muted" style="margin-top: 0; font-size: 13px;">
+          The system has no news API — this is how news enters the pipeline.
+          Tomorrow's run will read this log.
+        </p>
+        <form id="ae-form-m">
+          <div class="field-row">
+            <div class="field">
+              <label for="aem-date">Date</label>
+              <input type="date" id="aem-date" value="${today}" required>
+            </div>
+            <div class="field">
+              <label for="aem-relevance">Relevance</label>
+              <select id="aem-relevance">
+                <option value="high">High</option>
+                <option value="medium" selected>Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="aem-headline">Headline</label>
+            <input type="text" id="aem-headline" maxlength="200" required
+                   placeholder='e.g. "Trump tariff on Mexico"'>
+          </div>
+          <div class="field">
+            <label for="aem-impact">Cross-asset impact (optional)</label>
+            <input type="text" id="aem-impact"
+                   placeholder='e.g. "Peso -3%, NQ -1.2%"'>
+          </div>
+          <div class="field">
+            <label for="aem-notes">Your interpretation (optional)</label>
+            <textarea id="aem-notes" rows="2"></textarea>
+          </div>
+          <div class="field">
+            <label for="aem-affects">Affects (optional, comma-separated)</label>
+            <input type="text" id="aem-affects" placeholder="e.g. USDMXN, NQ, GC">
+          </div>
+        </form>
+      `;
+      const foot = `
+        <button class="btn btn-ghost" data-action="close-sheet">Cancel</button>
+        <button class="btn btn-primary" data-action="submit-add-event-mobile">Save</button>
+      `;
+      openSheet("Log a recent event", html, foot);
+    } else {
+      $("#ae-date").value = today;
+      $("#ae-headline").value = "";
+      $("#ae-impact").value = "";
+      $("#ae-notes").value = "";
+      $("#ae-affects").value = "";
+      $("#ae-relevance").value = "medium";
+      $("#ae-status").textContent = "";
+      openModal("modal-add-event");
+    }
+  }
+
+  async function submitAddEvent(form) {
+    const fd = (form === "mobile")
+      ? {
+          date: $("#aem-date").value,
+          headline: $("#aem-headline").value.trim(),
+          impact: $("#aem-impact").value.trim(),
+          notes: $("#aem-notes").value.trim(),
+          relevance: $("#aem-relevance").value,
+          affects: $("#aem-affects").value.split(",").map(s => s.trim()).filter(Boolean),
+        }
+      : {
+          date: $("#ae-date").value,
+          headline: $("#ae-headline").value.trim(),
+          impact: $("#ae-impact").value.trim(),
+          notes: $("#ae-notes").value.trim(),
+          relevance: $("#ae-relevance").value,
+          affects: $("#ae-affects").value.split(",").map(s => s.trim()).filter(Boolean),
+        };
+    if (!fd.headline) { alert("Headline required."); return; }
+    try {
+      const r = await fetch("/api/recent-events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(fd),
+      });
+      if (r.ok) {
+        closeAll();
+        setTimeout(() => location.reload(), 200);
+      } else {
+        const err = await r.text();
+        if (form === "mobile") alert("Failed: " + err);
+        else $("#ae-status").textContent = "Failed: " + err;
+      }
+    } catch (e) { alert("Failed: " + e.message); }
+  }
+
+  async function deleteEvent(date, headline) {
+    if (!confirm(`Delete this event?\n\n${date}: ${headline}`)) return;
+    try {
+      const r = await fetch("/api/recent-events/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date, headline }),
+      });
+      if (r.ok) location.reload();
+      else alert("Delete failed: " + (await r.text()));
+    } catch (e) { alert("Delete failed: " + e.message); }
+  }
+
+  async function showEventsLog() {
+    if (surface !== "mobile") return;
+    openSheet("News log", "<p class='muted'>Loading…</p>",
+      `<button class="btn btn-primary" style="flex:1;" data-action="open-add-event">+ Add event</button>`);
+    try {
+      const r = await fetch("/api/recent-events");
+      const data = await r.json();
+      const events = data.events || [];
+      if (events.length === 0) {
+        $("#sheet-body").innerHTML = `
+          <p class="muted" style="text-align:center;padding:20px 0;">
+            No events logged. Tap "+ Add event" below to add one.<br><br>
+            <span style="font-size:12px;">Tomorrow's analysis run will read whatever you log here.</span>
+          </p>`;
+        return;
+      }
+      $("#sheet-body").innerHTML = events.map(e => `
+        <article style="padding: 10px 12px; background: ${e.relevance === 'high' ? 'var(--bad-tint)' : 'var(--surface-soft)'};
+                        border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 6px;">
+          <div style="display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 4px;">
+            <span class="muted" style="font-family: var(--mono); font-size: 12px;">${e.date}</span>
+            <span class="muted" style="font-size: 11px;">${e.days_ago}d ago</span>
+            <span class="chip ${e.relevance === 'high' ? 'chip-bad' : (e.relevance === 'medium' ? 'chip-warn' : 'chip-neutral')}">${e.relevance.toUpperCase()}</span>
+            <button class="btn btn-sm btn-ghost" style="margin-left:auto;" data-action="delete-event"
+                    data-date="${e.date}" data-headline="${escapeHTML(e.headline)}">×</button>
+          </div>
+          <div style="font-weight: 500; margin-bottom: 4px;">${escapeHTML(e.headline)}</div>
+          ${e.impact ? `<div class="muted" style="font-size: 12px;">Impact: ${escapeHTML(e.impact)}</div>` : ""}
+          ${e.notes ? `<div class="muted" style="font-size: 12px;">Note: ${escapeHTML(e.notes)}</div>` : ""}
+          ${e.affects && e.affects.length ? `<div class="muted" style="font-size: 12px;">Affects: ${e.affects.join(", ")}</div>` : ""}
+        </article>
+      `).join("");
+    } catch (e) { $("#sheet-body").innerHTML = "<p class='muted'>Couldn't load.</p>"; }
+  }
+
   // ─── Single click dispatcher ─────────────────────────────────────────
 
   document.addEventListener("click", async (e) => {
@@ -700,6 +846,11 @@
       case "scroll-top":          e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); break;
       case "open-trade-detail":   e.preventDefault(); showPositionWhy(target.dataset.positionId); break;
       case "run-now":             e.preventDefault(); closeAll(); if (runBtn) runBtn.click(); break;
+      case "open-add-event":      e.preventDefault(); openAddEvent(); break;
+      case "submit-add-event":    e.preventDefault(); submitAddEvent("desktop"); break;
+      case "submit-add-event-mobile": e.preventDefault(); submitAddEvent("mobile"); break;
+      case "delete-event":        e.preventDefault(); deleteEvent(target.dataset.date, target.dataset.headline); break;
+      case "open-events-log":     e.preventDefault(); showEventsLog(); break;
     }
   });
 

@@ -41,6 +41,13 @@ Once per day, after Layer 1 specialists have produced fresh outputs:
 - Latest Geopolitical Risk output
 - Current `THEMES.md` (full)
 - Current price levels for all watchlist instruments
+- **`recent_events.yaml`** (user-maintained off-cycle news log — tariff
+  announcements, Fed-speaker pivots, geopolitical events the system
+  doesn't see otherwise). The system has no news API; this is the
+  only channel for unstructured news context. Treat HIGH-relevance
+  entries as authoritative — if a HIGH event contradicts a specialist's
+  tone, the news event wins for short-term framing. An empty log means
+  the user has flagged no material news in the last 30 days.
 
 ### Required (Phase B)
 
