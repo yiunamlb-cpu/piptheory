@@ -12,18 +12,29 @@ $ErrorActionPreference = "Stop"
 $taskName = "NamHedgefund-Watchdog"
 $repo = "C:\Users\user\Downloads\claude hedgefund"
 $script = Join-Path $repo "scripts\dashboard_watchdog.ps1"
+$vbsWrapper = Join-Path $repo "scripts\run_hidden.vbs"
 
 if (-not (Test-Path $script)) {
     Write-Error "Watchdog script not found: $script"
+    exit 1
+}
+if (-not (Test-Path $vbsWrapper)) {
+    Write-Error "VBS wrapper not found: $vbsWrapper"
     exit 1
 }
 
 # Remove any existing version so install is idempotent
 Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue
 
+# Launch via wscript.exe → run_hidden.vbs → powershell.exe → script.
+# wscript runs windowless from the kernel's perspective, no console flash.
+# Previous version used powershell.exe directly with -WindowStyle Hidden,
+# which still flashed a console for ~50ms because the hide flag is applied
+# after the process has spawned its window. The user noticed this as a
+# flicker every 2 minutes — this fix removes it.
 $action = New-ScheduledTaskAction `
-    -Execute "powershell.exe" `
-    -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$script`""
+    -Execute "wscript.exe" `
+    -Argument "`"$vbsWrapper`" `"$script`""
 
 # Repeat every 2 minutes, indefinitely. Start time is now (so it runs
 # immediately after registration). Trigger needs a duration; using 9999

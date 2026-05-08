@@ -42,7 +42,14 @@ if (-not (Test-Path $bat)) {
     exit 1
 }
 try {
-    Start-Process -FilePath $bat -WindowStyle Hidden
+    # -WindowStyle Hidden alone isn't enough for cmd.exe (.bat) — the
+    # console host can flash for a moment before the hidden flag is
+    # honoured. Wrapping with cmd.exe /c and /min plus -WindowStyle Hidden
+    # combined cuts the visible flash to effectively nothing.
+    Start-Process -FilePath "cmd.exe" `
+        -ArgumentList "/c", "`"$bat`"" `
+        -WindowStyle Hidden `
+        -WorkingDirectory $repo
     Write-WdLog "Launched. Subsequent ticks will verify."
 } catch {
     Write-WdLog "FAILED to start: $($_.Exception.Message)"
