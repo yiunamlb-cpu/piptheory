@@ -11,30 +11,32 @@ $ErrorActionPreference = "Stop"
 
 $taskName = "NamHedgefund-Watchdog"
 $repo = "C:\Users\user\Downloads\claude hedgefund"
-$script = Join-Path $repo "scripts\dashboard_watchdog.ps1"
-$vbsWrapper = Join-Path $repo "scripts\run_hidden.vbs"
+$watchdog = Join-Path $repo "scripts\dashboard_watchdog.vbs"
 
-if (-not (Test-Path $script)) {
-    Write-Error "Watchdog script not found: $script"
-    exit 1
-}
-if (-not (Test-Path $vbsWrapper)) {
-    Write-Error "VBS wrapper not found: $vbsWrapper"
+if (-not (Test-Path $watchdog)) {
+    Write-Error "Watchdog script not found: $watchdog"
     exit 1
 }
 
 # Remove any existing version so install is idempotent
 Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue
 
-# Launch via wscript.exe → run_hidden.vbs → powershell.exe → script.
-# wscript runs windowless from the kernel's perspective, no console flash.
-# Previous version used powershell.exe directly with -WindowStyle Hidden,
-# which still flashed a console for ~50ms because the hide flag is applied
-# after the process has spawned its window. The user noticed this as a
-# flicker every 2 minutes — this fix removes it.
+# Launch the watchdog directly via wscript.exe. wscript is genuinely
+# windowless from the kernel's perspective — no console process is ever
+# created — so this never flashes a window on the scheduler tick.
+#
+# Previous attempts:
+#   v1 (628c5d6): powershell.exe -WindowStyle Hidden — flashed because
+#     PowerShell creates a console before the hide flag takes effect.
+#   v2 (27a702e): wscript run_hidden.vbs that exec'd powershell —
+#     still flashed because the .vbs spawned PowerShell which is itself
+#     a console app.
+#   v3 (this):    pure VBScript, no PowerShell anywhere in the chain.
+#     Watchdog logic ported to .vbs (HTTP health check via MSXML2,
+#     hidden Run via WshShell). Truly silent.
 $action = New-ScheduledTaskAction `
     -Execute "wscript.exe" `
-    -Argument "`"$vbsWrapper`" `"$script`""
+    -Argument "`"$watchdog`""
 
 # Repeat every 2 minutes, indefinitely. Start time is now (so it runs
 # immediately after registration). Trigger needs a duration; using 9999
