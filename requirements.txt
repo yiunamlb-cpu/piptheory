@@ -17,3 +17,7 @@ fastapi>=0.115.0
 uvicorn[standard]>=0.32.0
 jinja2>=3.1.4
 markdown>=3.7
+# PDF extraction — used by scripts/fetch_central_bank_statements.py
+# for BoJ statements (boj.or.jp publishes Policy Board decisions as
+# PDF, not HTML).
+pypdf>=4.0

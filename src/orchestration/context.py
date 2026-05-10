@@ -147,6 +147,14 @@ def _load_ecb_text() -> str:
     return _load_central_bank_text("ecb_latest.txt", "(No ECB statement text loaded.")
 
 
+def _load_boe_text() -> str:
+    return _load_central_bank_text("boe_latest.txt", "(No BoE statement text loaded.")
+
+
+def _load_boj_text() -> str:
+    return _load_central_bank_text("boj_latest.txt", "(No BoJ statement text loaded.")
+
+
 def fed_watcher_input(rate_snapshot: pd.DataFrame) -> str:
     today = datetime.now().date().isoformat()
     fomc_text = _load_fomc_text()
@@ -221,6 +229,88 @@ def ecb_watcher_input(rate_snapshot: pd.DataFrame) -> str:
             "and rely on the recent_events log for any Lagarde / Schnabel / "
             "Lane signals. Note in your output that statement text was "
             "unavailable.\n",
+        )
+    parts.extend([
+        "## Cross-asset rate snapshot (US, for context)",
+        "",
+        fred_snapshot_to_text(rate_snapshot),
+    ])
+    return "\n".join(parts)
+
+
+def boe_watcher_input(rate_snapshot: pd.DataFrame) -> str:
+    """Build the BoE-Watcher specialist's user message. Same shape as
+    fed_watcher_input but BoE-flavoured. Reads data/boe_latest.txt."""
+    today = datetime.now().date().isoformat()
+    boe_text = _load_boe_text()
+    parts = [
+        f"# BoE-Watcher — Daily Read, {today}",
+        "",
+        FRESHNESS_INSTRUCTION,
+        "",
+    ]
+    if boe_text:
+        parts.extend([
+            "## Latest MPC statement / minutes / monetary policy report (user-maintained)",
+            "",
+            boe_text,
+            "",
+            "Treat this text as authoritative for current MPC stance. The BoE "
+            "publishes minutes same-day as the statement (unlike Fed's 3-week "
+            "lag) so vote splits are immediately available — focus on those, "
+            "individually-attributed dissent reasoning, and language drift on "
+            "key phrases (\"sufficiently restrictive\", \"for an extended "
+            "period\", \"more persistent\", \"second-round effects\", \"forceful\").",
+            "",
+        ])
+    else:
+        parts.append(
+            "NOTE: data/boe_latest.txt has no current BoE text loaded. Reason "
+            "from the rate snapshot below as cross-asset context only and rely "
+            "on the recent_events log for any BoE / Bailey / Pill signals. "
+            "Note in your output that statement text was unavailable.\n",
+        )
+    parts.extend([
+        "## Cross-asset rate snapshot (US, for context)",
+        "",
+        fred_snapshot_to_text(rate_snapshot),
+    ])
+    return "\n".join(parts)
+
+
+def boj_watcher_input(rate_snapshot: pd.DataFrame) -> str:
+    """Build the BoJ-Watcher specialist's user message. Same shape as
+    fed_watcher_input but BoJ-flavoured. Reads data/boj_latest.txt."""
+    today = datetime.now().date().isoformat()
+    boj_text = _load_boj_text()
+    parts = [
+        f"# BoJ-Watcher — Daily Read, {today}",
+        "",
+        FRESHNESS_INSTRUCTION,
+        "",
+    ]
+    if boj_text:
+        parts.extend([
+            "## Latest BoJ Policy Board statement / Outlook Report / Summary of Opinions (user-maintained)",
+            "",
+            boj_text,
+            "",
+            "Treat this text as authoritative for current BoJ stance. BoJ "
+            "language is conservative — small shifts matter. Track key "
+            "phrases: \"sustained, stable\" achievement of 2%, \"highly "
+            "accommodative\", \"patient/cautious\", references to wage data "
+            "(shunto results, real wage growth turning positive), bond "
+            "purchase pace changes, dissents in the Summary of Opinions. "
+            "Distinguish BoJ stance from MoF FX intervention — they are "
+            "separate institutions even if they coordinate.",
+            "",
+        ])
+    else:
+        parts.append(
+            "NOTE: data/boj_latest.txt has no current BoJ text loaded. Reason "
+            "from the rate snapshot below as cross-asset context only and rely "
+            "on the recent_events log for any BoJ / Ueda / wage data signals. "
+            "Note in your output that statement text was unavailable.\n",
         )
     parts.extend([
         "## Cross-asset rate snapshot (US, for context)",

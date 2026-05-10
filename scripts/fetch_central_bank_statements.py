@@ -60,6 +60,30 @@ ECB_MEETINGS_2026 = [
     date(2026, 12, 17),
 ]
 
+# BoE MPC meeting end dates (~8/year). Update at start of each year.
+BOE_MEETINGS_2026 = [
+    date(2026, 2, 5),
+    date(2026, 3, 19),
+    date(2026, 5, 7),
+    date(2026, 6, 18),
+    date(2026, 8, 6),
+    date(2026, 9, 17),
+    date(2026, 11, 5),
+    date(2026, 12, 17),
+]
+
+# BoJ Policy Board meeting end dates (~8/year, every 6 weeks).
+BOJ_MEETINGS_2026 = [
+    date(2026, 1, 23),
+    date(2026, 3, 19),
+    date(2026, 4, 28),
+    date(2026, 6, 17),
+    date(2026, 7, 31),
+    date(2026, 9, 18),
+    date(2026, 10, 30),
+    date(2026, 12, 18),
+]
+
 
 # ─── HTTP utilities ─────────────────────────────────────────────────────
 
@@ -282,17 +306,191 @@ def fetch_ecb(today: date | None = None) -> bool:
     return False
 
 
+# ─── BoE ─────────────────────────────────────────────────────────────────
+# BoE publishes monetary policy summaries at:
+#   /monetary-policy-summary-and-minutes/{YYYY}/{month-name}-{YYYY}
+# Use the publication index page; pick the most recent matching link.
+
+_BOE_BASE = "https://www.bankofengland.co.uk"
+_BOE_INDEX = _BOE_BASE + "/news/2026"
+_BOE_PUB_INDEX = _BOE_BASE + "/monetary-policy-summary-and-minutes"
+
+
+def _boe_find_url_for_date(meeting: date) -> str | None:
+    """Find the BoE summary/minutes URL for a meeting date.
+    BoE publishes at /monetary-policy-summary-and-minutes/{YYYY}/{month}-{YYYY}.
+    """
+    month_name = meeting.strftime("%B").lower()
+    candidates = [
+        f"{_BOE_PUB_INDEX}/{meeting.year}/{month_name}-{meeting.year}",
+        f"{_BOE_BASE}/news/{meeting.year}/{month_name}/monetary-policy-summary-and-minutes-{month_name}-{meeting.year}",
+    ]
+    for url in candidates:
+        try:
+            html = _http_get(url, allow_404=True)
+        except Exception:
+            continue
+        if html is None:
+            continue
+        # Make sure the page actually contains MPC content, not a generic
+        # archive landing
+        if re.search(r"monetary policy committee|mpc voted|bank rate", html, re.IGNORECASE):
+            return url
+    return None
+
+
+def fetch_boe(today: date | None = None) -> bool:
+    today = today or date.today()
+    out_path = DATA_DIR / "boe_latest.txt"
+    past = [d for d in BOE_MEETINGS_2026 if d <= today]
+    past.sort(reverse=True)
+    if not past:
+        print("BoE: no past meetings in 2026 schedule yet", file=sys.stderr)
+        return False
+    for meeting in past:
+        url = _boe_find_url_for_date(meeting)
+        if not url:
+            continue
+        try:
+            html = _http_get(url)
+        except Exception as e:
+            print(f"BoE: error fetching {url}: {e}", file=sys.stderr)
+            continue
+        body = _strip_html(html, content_selectors=[
+            ".main-content", ".rich-text", "main", "article", ".col-md-8",
+        ])
+        if len(body) < 500:
+            print(f"BoE: {meeting} response too short", file=sys.stderr)
+            continue
+        header_lines = [
+            f"Source: {url}",
+            f"Statement date: {meeting.isoformat()}",
+            f"Fetched: {today.isoformat()}",
+        ]
+        _write_with_header(out_path, header_lines, body)
+        print(f"BoE: wrote {len(body):,} chars from {meeting.isoformat()}")
+        return True
+    print("BoE: no statement URL found for any past 2026 meeting", file=sys.stderr)
+    return False
+
+
+# ─── BoJ ─────────────────────────────────────────────────────────────────
+# BoJ publishes Policy Board decisions as PDF at:
+#   /en/mopo/mpmdeci/mpr_{YYYY}/k{YYMMDD}a.pdf  (statement)
+#   /en/mopo/mpmsche_minu/minu_{YYYY}/g{YYMMDD}.pdf  (minutes, ~1 month later)
+# We extract text from the PDF using pypdf and write it to boj_latest.txt.
+
+_BOJ_BASE = "https://www.boj.or.jp"
+
+
+def _http_get_bytes(url: str, allow_404: bool = False) -> bytes | None:
+    """Like _http_get but returns raw bytes (for PDFs)."""
+    r = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=TIMEOUT)
+    if allow_404 and r.status_code == 404:
+        return None
+    r.raise_for_status()
+    return r.content
+
+
+def _extract_pdf_text(pdf_bytes: bytes) -> str:
+    """Extract plain text from PDF bytes using pypdf. Joins all pages.
+    Light cleanup: collapse whitespace, normalise line breaks."""
+    try:
+        from pypdf import PdfReader
+        from io import BytesIO
+    except ImportError:
+        print("pypdf not installed — run: pip install pypdf", file=sys.stderr)
+        return ""
+    try:
+        reader = PdfReader(BytesIO(pdf_bytes))
+        pages = []
+        for page in reader.pages:
+            text = page.extract_text() or ""
+            if text.strip():
+                pages.append(text)
+        out = "\n\n".join(pages)
+        out = re.sub(r"[ \t]+", " ", out)
+        out = re.sub(r"\n{3,}", "\n\n", out)
+        return out.strip()
+    except Exception as e:
+        print(f"BoJ PDF extraction failed: {e}", file=sys.stderr)
+        return ""
+
+
+def _boj_find_url_for_date(meeting: date) -> str | None:
+    """Try BoJ URL patterns. As of 2024-2026 the working pattern for
+    statements is /en/mopo/mpmdeci/mpr_{YYYY}/k{YYMMDD}a.pdf.
+    """
+    yymmdd = meeting.strftime("%y%m%d")
+    candidates = [
+        # Statement (PDF) — current pattern
+        f"{_BOJ_BASE}/en/mopo/mpmdeci/mpr_{meeting.year}/k{yymmdd}a.pdf",
+        # Older patterns kept as fallback
+        f"{_BOJ_BASE}/en/mopo/mpmdeci/state_{meeting.year}/k{yymmdd}a.pdf",
+    ]
+    for url in candidates:
+        try:
+            r = requests.head(url, headers={"User-Agent": USER_AGENT}, timeout=10, allow_redirects=True)
+            if r.status_code == 200:
+                return url
+        except Exception:
+            continue
+    return None
+
+
+def fetch_boj(today: date | None = None) -> bool:
+    today = today or date.today()
+    out_path = DATA_DIR / "boj_latest.txt"
+    past = [d for d in BOJ_MEETINGS_2026 if d <= today]
+    past.sort(reverse=True)
+    if not past:
+        print("BoJ: no past meetings in 2026 schedule yet", file=sys.stderr)
+        return False
+    for meeting in past:
+        url = _boj_find_url_for_date(meeting)
+        if not url:
+            continue
+        try:
+            pdf_bytes = _http_get_bytes(url)
+        except Exception as e:
+            print(f"BoJ: error fetching {url}: {e}", file=sys.stderr)
+            continue
+        if not pdf_bytes:
+            continue
+        body = _extract_pdf_text(pdf_bytes)
+        if len(body) < 300:
+            print(f"BoJ: {meeting} extracted text too short ({len(body)} chars)", file=sys.stderr)
+            continue
+        header_lines = [
+            f"Source: {url}",
+            f"Statement date: {meeting.isoformat()}",
+            f"Fetched: {today.isoformat()}",
+        ]
+        _write_with_header(out_path, header_lines, body)
+        print(f"BoJ: wrote {len(body):,} chars from {meeting.isoformat()}")
+        return True
+    print("BoJ: no statement URL found for any past 2026 meeting", file=sys.stderr)
+    return False
+
+
 # ─── CLI ────────────────────────────────────────────────────────────────
 
 
 def main(argv: list[str]) -> int:
-    do_fomc = "--ecb-only" not in argv
-    do_ecb = "--fomc-only" not in argv
+    only = next((a.removeprefix("--") for a in argv if a.startswith("--") and a.endswith("-only")), None)
+    do_fomc = only in (None, "fomc")
+    do_ecb = only in (None, "ecb")
+    do_boe = only in (None, "boe")
+    do_boj = only in (None, "boj")
     ok = True
     if do_fomc:
         ok = fetch_fomc() and ok
     if do_ecb:
         ok = fetch_ecb() and ok
+    if do_boe:
+        ok = fetch_boe() and ok
+    if do_boj:
+        ok = fetch_boj() and ok
     return 0 if ok else 1
 
 

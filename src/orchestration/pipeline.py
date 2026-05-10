@@ -29,6 +29,8 @@ from src.data import score_history, thesis_tracker
 from src.llm import OpenRouterClient
 from src.orchestration.context import (
     bear_advocate_input,
+    boe_watcher_input,
+    boj_watcher_input,
     bull_advocate_input,
     contrarian_input,
     ecb_watcher_input,
@@ -136,21 +138,46 @@ class BiasEngine:
         result = run_agent("layer1_specialists/fed_watcher", user_msg, client=self.client)
         return result.content
 
+    def run_boe_watcher(self) -> str:
+        """Run the BoE-Watcher specialist. Reads data/boe_latest.txt and
+        UK-specific FRED series alongside US context.
+        """
+        log.info("layer1_boe_start")
+        snapshot = self.fred.snapshot([
+            "uk_cpi_yoy", "uk_unrate", "uk_bank_rate_proxy", "gilt_10y",
+            "ffr_effective", "ust_10y",
+        ])
+        user_msg = boe_watcher_input(snapshot)
+        result = run_agent("layer1_specialists/boe_watcher", user_msg, client=self.client)
+        return result.content
+
+    def run_boj_watcher(self) -> str:
+        """Run the BoJ-Watcher specialist. Reads data/boj_latest.txt and
+        Japan-specific FRED series alongside US context (US-JP rate
+        differential is the dominant USDJPY driver).
+        """
+        log.info("layer1_boj_start")
+        snapshot = self.fred.snapshot([
+            "jp_cpi_yoy", "jp_call_rate_proxy", "jgb_10y",
+            "ffr_effective", "ust_10y", "real_10y",
+        ])
+        user_msg = boj_watcher_input(snapshot)
+        result = run_agent("layer1_specialists/boj_watcher", user_msg, client=self.client)
+        return result.content
+
     def run_ecb_watcher(self) -> str:
         """Run the ECB-Watcher specialist. Reads data/ecb_latest.txt (user-
-        maintained ECB statement / account text) plus the US rate snapshot
-        as cross-asset context. Audit feedback (May 2026): EURUSD analysis
-        was thin without a dedicated ECB lens — Fed-Watcher is the same
-        pattern, just for the ECB.
+        maintained ECB statement / account text) plus eurozone + US rate
+        snapshots — the eurozone series let the agent reason about HICP
+        directly rather than via cross-asset proxy.
         """
         log.info("layer1_ecb_start")
-        # Same FRED snapshot the Fed-Watcher uses — relevant as cross-asset
-        # context (US rates ≈ EUR-USD differential signal). Eurozone-native
-        # FRED series can be added later.
         snapshot = self.fred.snapshot([
-            "ffr_effective", "ffr_target_upper",
-            "ust_2y", "ust_10y", "ust_30y", "real_10y",
-            "breakeven_5y5y", "breakeven_10y",
+            # Eurozone-native series (added May 2026)
+            "ezn_hicp_yoy", "ezn_hicp_core_yoy", "ezn_unrate",
+            "bund_10y", "estr_proxy",
+            # US series for cross-asset rate-differential context
+            "ffr_effective", "ust_2y", "ust_10y", "real_10y",
         ])
         user_msg = ecb_watcher_input(snapshot)
         result = run_agent("layer1_specialists/ecb_watcher", user_msg, client=self.client)
@@ -171,10 +198,10 @@ class BiasEngine:
         return result.content
 
     def run_layer1_parallel(self, themes: str | None = None) -> dict[str, str]:
-        """Run the five Layer 1 specialists concurrently.
+        """Run the seven Layer 1 specialists concurrently.
 
         Each reads its own data sources and produces an independent output;
-        no cross-specialist dependencies. Five threads, OpenRouter calls
+        no cross-specialist dependencies. Seven threads, OpenRouter calls
         block on network I/O, GIL-friendly.
 
         themes is optional and only consumed by the Geopolitical Risk
@@ -182,12 +209,14 @@ class BiasEngine:
         """
         log.info("layer1_parallel_start")
         themes_text = themes if themes is not None else load_themes()
-        with ThreadPoolExecutor(max_workers=5, thread_name_prefix="L1") as ex:
+        with ThreadPoolExecutor(max_workers=7, thread_name_prefix="L1") as ex:
             futures = {
                 "inflation": ex.submit(self.run_inflation_tracker),
                 "positioning": ex.submit(self.run_positioning_analyst),
                 "fed": ex.submit(self.run_fed_watcher),
                 "ecb": ex.submit(self.run_ecb_watcher),
+                "boe": ex.submit(self.run_boe_watcher),
+                "boj": ex.submit(self.run_boj_watcher),
                 "geopolitical": ex.submit(self.run_geopolitical_risk, themes_text),
             }
             outputs: dict[str, str] = {}
@@ -498,6 +527,8 @@ class BiasEngine:
         (out_dir / "01_layer1_positioning.md").write_text(layer1.get("positioning", ""), encoding="utf-8")
         (out_dir / "01_layer1_fed.md").write_text(layer1.get("fed", ""), encoding="utf-8")
         (out_dir / "01_layer1_ecb.md").write_text(layer1.get("ecb", ""), encoding="utf-8")
+        (out_dir / "01_layer1_boe.md").write_text(layer1.get("boe", ""), encoding="utf-8")
+        (out_dir / "01_layer1_boj.md").write_text(layer1.get("boj", ""), encoding="utf-8")
         (out_dir / "01_layer1_geopolitical.md").write_text(layer1.get("geopolitical", ""), encoding="utf-8")
 
         # Layer 2

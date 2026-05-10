@@ -71,6 +71,29 @@ MACRO_SERIES: dict[str, dict[str, str]] = {
         "hy_oas": "BAMLH0A0HYM2",             # ICE BofA US High Yield OAS
         "ig_oas": "BAMLC0A0CM",               # ICE BofA US Corporate OAS
     },
+    # Non-US central banks / data — populated for the ECB / BoE / BoJ
+    # specialist Watchers. The exact FRED IDs vary in availability
+    # (some euro-area series on FRED are quarterly with significant
+    # lags; the agents are told to flag stale data in their output).
+    "eurozone": {
+        "ezn_hicp_yoy": "CP0000EZ19M086NEST",     # HICP all items YoY
+        "ezn_hicp_core_yoy": "CPHPLA01EZM659N",   # HICP core (ex food/energy)
+        "ezn_unrate": "LRHUTTTTEZM156S",          # unemployment rate
+        "ezn_pmi_proxy": "EZ19PRMNTO01IXOBSAM",   # industrial production proxy
+        "bund_10y": "IRLTLT01DEM156N",            # German 10y govt bond
+        "estr_proxy": "IR3TIB01EZM156N",          # 3m euribor proxy for €STR
+    },
+    "uk": {
+        "uk_cpi_yoy": "CPGRLE01GBM659N",          # UK CPI all items YoY
+        "uk_unrate": "LRHUTTTTGBM156S",
+        "uk_bank_rate_proxy": "IR3TIB01GBM156N",  # 3m sterling LIBOR/SONIA proxy
+        "gilt_10y": "IRLTLT01GBM156N",            # UK 10y gilt
+    },
+    "japan": {
+        "jp_cpi_yoy": "JPNCPIALLMINMEI",          # Japan CPI YoY
+        "jp_call_rate_proxy": "IR3TIB01JPM156N",  # 3m Japan rate proxy
+        "jgb_10y": "IRLTLT01JPM156N",             # Japan 10y JGB
+    },
 }
 
 
