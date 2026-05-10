@@ -1,4 +1,4 @@
-# FOMC latest statement / minutes — manually maintained.
+# FOMC latest statement / minutes — manually maintained or auto-fetched.
 #
 # Paste the most recent FOMC statement (or relevant minutes excerpt)
 # below the marker line. The Fed-Watcher specialist reads this on each
@@ -9,16 +9,34 @@
 #   - After each FOMC meeting (~8x/year): replace the body with the
 #     full statement text from federalreserve.gov
 #   - When FOMC minutes are released (~3 weeks after each meeting):
-#     paste the most actionable section (usually the staff economic
-#     and financial outlook + Committee policy actions)
+#     paste the most actionable section
 #   - Mid-cycle: paste any high-impact Fed-speaker prepared remarks
-#     (Powell at Jackson Hole, semi-annual testimony, etc.)
 #
-# Format: don't worry about it. The agent will parse whatever's here.
-# Free-form prose is fine. Including the date at the top helps the
-# agent know the freshness.
+# Auto-fetch: run `scripts/fetch_central_bank_statements.py` after each
+# meeting. It pulls the latest from federalreserve.gov and writes here.
 #
 # ─── PASTE BELOW THIS LINE ─────────────────────────────────────────
 
-(No FOMC statement text loaded. Update this file after the next FOMC
-meeting or when minutes are released. Paste the full statement, dated.)
+Source: https://www.federalreserve.gov/newsevents/pressreleases/monetary20260429a.htm
+Statement date: 2026-04-29
+Fetched: 2026-05-11
+
+April 29, 2026
+
+For release at 2:00 p.m. EDT Share
+
+Share
+
+Recent indicators suggest that economic activity has been expanding at a solid pace. Job gains have remained low, on average, and the unemployment rate has been little changed in recent months. Inflation is elevated, in part reflecting the recent increase in global energy prices.
+
+The Committee seeks to achieve maximum employment and inflation at the rate of 2 percent over the longer run. Developments in the Middle East are contributing to a high level of uncertainty about the economic outlook. The Committee is attentive to the risks to both sides of its dual mandate.
+
+In support of its goals, the Committee decided to maintain the target range for the federal funds rate at 3-1/2 to 3-3/4 percent. In considering the extent and timing of additional adjustments to the target range for the federal funds rate, the Committee will carefully assess incoming data, the evolving outlook, and the balance of risks. The Committee is strongly committed to supporting maximum employment and returning inflation to its 2 percent objective.
+
+In assessing the appropriate stance of monetary policy, the Committee will continue to monitor the implications of incoming information for the economic outlook. The Committee would be prepared to adjust the stance of monetary policy as appropriate if risks emerge that could impede the attainment of the Committee's goals. The Committee's assessments will take into account a wide range of information, including readings on labor market conditions, inflation pressures and inflation expectations, and financial and international developments.
+
+Voting for the monetary policy action were Jerome H. Powell, Chair; John C. Williams, Vice Chair; Michael S. Barr; Michelle W. Bowman; Lisa D. Cook; Philip N. Jefferson; Anna Paulson; and Christopher J. Waller. Voting against this action were Stephen I. Miran, who preferred to lower the target range for the federal funds rate by 1/4 percentage point at this meeting; and Beth M. Hammack, Neel Kashkari, and Lorie K. Logan, who supported maintaining the target range for the federal funds rate but did not support inclusion of an easing bias in the statement at this time.
+
+For media inquiries, please email [email protected] or call 202-452-2955.
+
+Implementation Note issued April 29, 2026
