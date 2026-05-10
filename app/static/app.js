@@ -88,6 +88,13 @@
     "macro_now": "<strong>System view today.</strong> The latest run's bias direction and conviction for this instrument. 'Aligned' means it still agrees with your trade direction; 'opposed' means it's flipped. Numeric delta shows how much conviction has moved since you opened the position.",
     "chart_now": "<strong>Chart check today.</strong> The Tradability Filter's structural read on the chart right now: green-lit (clean spot), watch (wait for pullback), ugly (chart against the macro view), or no chart check (macro too weak to gate on).",
 
+    // History / trend
+    "trend_history": "<strong>7-day trend.</strong> The conviction reading on this instrument across the last seven runs. Read in bands, not digits — wobble of ±1 is LLM noise. A sustained drift of 2-3 points is a real macro shift. The arrow shows ↑ rising, ↓ falling, → stable; the badge says whether the readings are stable, oscillating, or trending.",
+    "stability_stable": "<strong>Stable.</strong> All readings within a 1-point band over the window. The macro view hasn't materially changed — wobble is pure noise. Hold positions through this without flinching.",
+    "stability_oscillating": "<strong>Oscillating.</strong> Readings span 2+ points but no clear direction. Could be LLM noise on a thin macro signal, or genuine ambivalence in the data. Don't act on individual prints; wait for the band to consolidate.",
+    "stability_trending": "<strong>Trending.</strong> Readings show a sustained directional drift — conviction is firming or fading. This is actual signal, not noise. If you're holding a position, the thesis is materially shifting; re-read the Judge's reasoning to confirm whether to stay in.",
+    "stability_n/a": "<strong>Not enough history.</strong> Fewer than 3 runs recorded for this instrument so the trend pattern can't be classified yet.",
+
     // Architecture
     "macro_picture": "<strong>Macro picture.</strong> The current regime — what big-picture themes are in force, ranked by conviction. Updated by the user in <code>THEMES.md</code> based on observed data and central-bank communication. The agents reason from these themes downstream.",
     "council": "<strong>Bias Council.</strong> Per-instrument debate: a Bull advocate makes the strongest long case, a Bear advocate makes the strongest short case, then a Judge weighs both and decides direction + conviction. Runs only when the Strategist's initial conviction is 5/10 or higher.",
@@ -774,16 +781,24 @@
 
   function showInstrumentsList() {
     if (surface !== "mobile") return;
-    const items = (cfg.instruments || []).map(r => `
-      <li class="${r.is_open_position ? "has-position" : ""}" data-symbol="${r.symbol}" data-action="why-instrument">
-        <span class="symbol">${r.symbol}</span>
-        <div class="meta">
-          ${escapeHTML(r.direction_raw || "—")}<br>
-          <span class="muted">${escapeHTML(r.state)}</span>
-        </div>
-        <span class="muted">${r.conviction}/10</span>
-      </li>
-    `).join("");
+    const items = (cfg.instruments || []).map(r => {
+      const h = r.history || {};
+      const arrow = h.trend_arrow || "";
+      const avg = h.weighted_avg_3d != null ? `avg ${h.weighted_avg_3d}` : "";
+      const stab = h.stability && h.stability !== "n/a" ? h.stability : "";
+      const trendBits = [arrow, avg, stab].filter(Boolean).join(" · ");
+      return `
+        <li class="${r.is_open_position ? "has-position" : ""}" data-symbol="${r.symbol}" data-action="why-instrument">
+          <span class="symbol">${r.symbol}</span>
+          <div class="meta">
+            ${escapeHTML(r.direction_raw || "—")}<br>
+            <span class="muted">${escapeHTML(r.state)}</span>
+            ${trendBits ? `<br><span class="muted" style="font-size: 11px;">${trendBits}</span>` : ""}
+          </div>
+          <span class="muted">${r.conviction}/10</span>
+        </li>
+      `;
+    }).join("");
     openSheet("All instruments", `<ul class="instr-list-mobile">${items}</ul>`);
   }
 
@@ -1014,4 +1029,35 @@
       showInstrumentReasoning(row.dataset.symbol);
     });
   });
+
+  // ─── Sparkline rendering ────────────────────────────────────────────
+  // Each .sparkline carries a JSON array of conviction integers (oldest
+  // first). Build a small inline SVG showing the trend as a polyline
+  // with a highlighted dot for today's value.
+  function renderSparkline(el) {
+    let convs;
+    try { convs = JSON.parse(el.dataset.convictions || "[]"); }
+    catch (e) { return; }
+    if (!convs.length) return;
+    const W = 70, H = 18, PAD = 2;
+    const minV = 0, maxV = 10;
+    const stepX = convs.length > 1 ? (W - 2 * PAD) / (convs.length - 1) : 0;
+    const points = convs.map((v, i) => {
+      const x = PAD + i * stepX;
+      // Invert Y because SVG origin is top-left
+      const y = H - PAD - ((v - minV) / (maxV - minV)) * (H - 2 * PAD);
+      return [x, y];
+    });
+    const lineD = points.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+    const dots = points.map(([x, y], i) => {
+      const cls = (i === points.length - 1) ? "spark-dot spark-dot-last" : "spark-dot";
+      const r = (i === points.length - 1) ? 2.5 : 1.5;
+      return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" class="${cls}" />`;
+    }).join("");
+    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+      <polyline class="spark-line" points="${lineD}" />
+      ${dots}
+    </svg>`;
+  }
+  $$(".sparkline").forEach(renderSparkline);
 })();

@@ -25,6 +25,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from src.agents import run_agent
 from src.config import BIAS_CARDS_DIR
 from src.data import CotClient, FredClient, PriceClient, render_event_block, upcoming_events
+from src.data import score_history
 from src.llm import OpenRouterClient
 from src.orchestration.context import (
     bear_advocate_input,
@@ -413,6 +414,15 @@ class BiasEngine:
         }
 
     @staticmethod
+    def _extract_judge_bias(judge_card: str) -> str:
+        """Extract the Judge's FINAL BIAS line. Used to feed the score
+        history's bias direction so we can detect direction flips."""
+        if not judge_card:
+            return ""
+        m = re.search(r"FINAL\s*BIAS\s*:?\s*\**\s*([^\n*]+)", judge_card, re.IGNORECASE)
+        return m.group(1).strip() if m else ""
+
+    @staticmethod
     def _extract_verdict(filter_output: str) -> str:
         """Best-effort extraction of the verdict from the filter agent's output."""
         m = re.search(
@@ -545,7 +555,50 @@ class BiasEngine:
                     filter_card.get("agent_output") or "_no output_", encoding="utf-8"
                 )
 
+                # Append to per-instrument score history. Same date re-runs
+                # replace rather than duplicate so the sparkline stays
+                # one-point-per-day.
+                judge_conv = self._extract_conviction(council_outputs["judge"])
+                judge_bias = self._extract_judge_bias(council_outputs["judge"])
+                try:
+                    score_history.record_run(
+                        run_date=run_date,
+                        instrument=inst,
+                        bias=judge_bias,
+                        conviction=judge_conv,
+                        source="judge",
+                    )
+                except Exception as e:
+                    log.warning("score_history_record_failed", instrument=inst, error=str(e))
+
         log.info("layer4_parallel_complete", completed=len(filter_results))
+
+        # Score history for instruments where the council DIDN'T run
+        # (Strategist conviction below threshold). The dashboard's
+        # sparkline still wants a data point so the trend line doesn't
+        # have gaps. Use Strategist's conviction + bias direction.
+        for inst in ACTIVE_UNIVERSE:
+            if inst in result.layer4_council:
+                continue  # Judge value already recorded inside the loop
+            section = self._extract_per_instrument_section(result.layer2_strategist, inst)
+            conv = self._extract_conviction(section)
+            # Best-effort bias direction from the strategist section
+            bias_match = re.search(
+                r"(?:DIRECTION|BIAS)[^\n]*?:\s*\**\s*([^\n*]+)",
+                section, re.IGNORECASE,
+            )
+            bias = bias_match.group(1).strip() if bias_match else ""
+            try:
+                score_history.record_run(
+                    run_date=run_date,
+                    instrument=inst,
+                    bias=bias,
+                    conviction=conv,
+                    source="strategist",
+                )
+            except Exception as e:
+                log.warning("score_history_strategist_record_failed",
+                            instrument=inst, error=str(e))
 
         if filter_results:
             (filter_dir / "_summary.json").write_text(

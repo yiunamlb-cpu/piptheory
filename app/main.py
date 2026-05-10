@@ -45,6 +45,7 @@ from src.data import (  # noqa: E402
     add_recent_event,
     delete_recent_event,
     load_recent_events,
+    score_history,
     upcoming_events,
 )
 from src.data.prices import INSTRUMENT_TO_TICKER, PriceClient  # noqa: E402
@@ -814,6 +815,7 @@ def _build_instruments_table(run: Run, open_instruments: set[str]) -> list[dict]
         else:
             state, state_class = "—", "neutral"
 
+        hist = score_history.summary_for(b.instrument, n=7)
         rows.append({
             "symbol": b.instrument,
             "name": display_label(b.instrument),
@@ -826,6 +828,7 @@ def _build_instruments_table(run: Run, open_instruments: set[str]) -> list[dict]
             "state_class": state_class,
             "verdict": verdict,
             "is_open_position": b.instrument in open_instruments,
+            "history": hist,
         })
     # Add any instruments that have a Filter card but no Strategist bias
     # card (this run was truncated). Show them with a "Strategist output

@@ -508,6 +508,32 @@ body {
 .chat-form { display: flex; gap: 8px; }
 .chat-form textarea { flex: 1; min-height: 44px; }
 
+/* Per-instrument 7-day conviction sparkline + trend indicators in the
+   instrument table. The sparkline itself is rendered as inline SVG by JS
+   from the data-convictions attribute — see app.js renderSparklines(). */
+.instr-history { white-space: nowrap; font-size: 13px; }
+.sparkline {
+  display: inline-block;
+  width: 70px;
+  height: 18px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+.sparkline svg { width: 100%; height: 100%; }
+.sparkline .spark-line { fill: none; stroke: var(--brand); stroke-width: 1.5; }
+.sparkline .spark-dot { fill: var(--brand); }
+.sparkline .spark-dot-last { fill: var(--brand-strong); r: 2.5; }
+.trend-arrow {
+  display: inline-block;
+  font-weight: 600;
+  margin-right: 4px;
+  font-size: 14px;
+}
+.trend-arrow.trend-stable { color: var(--text-2); }
+.trend-arrow.trend-trending { color: var(--warn); }
+.trend-arrow.trend-oscillating { color: var(--text-3); }
+.trend-arrow.trend-n\/a { color: var(--text-3); }
+
 /* Recent events log */
 .events-list {
   list-style: none;

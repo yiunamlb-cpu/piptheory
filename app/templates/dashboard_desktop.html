@@ -282,6 +282,7 @@
             <th>Symbol</th>
             <th><span class="term" data-term="direction">Direction</span></th>
             <th><span class="term" data-term="strength">Strength</span></th>
+            <th><span class="term" data-term="trend_history">7-day trend</span></th>
             <th><span class="term" data-term="state">State</span></th>
             <th></th>
           </tr>
@@ -298,6 +299,18 @@
                 </span>
                 <span class="muted">{{ r.conviction }}/10</span>
               </span>
+            </td>
+            <td class="instr-history">
+              {% if r.history.n_entries >= 2 %}
+                <span class="sparkline" data-convictions="{{ r.history.convictions|tojson }}" aria-hidden="true"></span>
+                <span class="trend-arrow trend-{{ r.history.stability }}" title="Last {{ r.history.n_entries }} runs">{{ r.history.trend_arrow }}</span>
+                <span class="muted" style="font-size: 11px;">avg {{ r.history.weighted_avg_3d }}</span>
+                <span class="chip chip-{% if r.history.stability == 'stable' %}good{% elif r.history.stability == 'trending' %}warn{% elif r.history.stability == 'oscillating' %}neutral{% else %}neutral{% endif %}"
+                      data-term="stability_{{ r.history.stability }}"
+                      style="margin-left: 6px;">{{ r.history.stability }}</span>
+              {% else %}
+                <span class="muted" style="font-size: 12px;">—</span>
+              {% endif %}
             </td>
             <td class="instr-state">{{ r.state }}</td>
             <td><a class="why-link" data-action="why-instrument" data-symbol="{{ r.symbol }}">Why? →</a></td>
