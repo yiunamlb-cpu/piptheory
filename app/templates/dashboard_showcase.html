@@ -6,30 +6,28 @@
 
   {# ─── Top bar ────────────────────────────────────────────────────── #}
   <header class="sc-top">
-    <div class="sc-brand">
-      <span class="sc-mark" aria-hidden="true"></span>
-      <span>nam-hedgefund</span>
-      <span style="color: var(--text-3); font-weight: 400; font-size: 13px; margin-left: 8px;">·  Showcase</span>
-    </div>
-    <div class="sc-meta">
-      <strong>{{ run_date }}</strong> · <span id="last-updated">…</span>
+    <div class="sc-brand">NAM·HEDGEFUND</div>
+    <div class="sc-top-meta">
+      <span>v0.1 / showcase</span>
+      <span class="sep">/</span>
+      <span>{{ run_date }}</span>
+      <span class="sep">/</span>
+      <span id="last-updated">…</span>
     </div>
     <div class="sc-actions">
       <select id="run-picker" class="sc-select" aria-label="Run date">
-        {% for r in runs %}
-        <option value="{{ r }}" {% if r == run_date %}selected{% endif %}>{{ r }}</option>
-        {% endfor %}
+        {% for r in runs %}<option value="{{ r }}" {% if r == run_date %}selected{% endif %}>{{ r }}</option>{% endfor %}
       </select>
-      <button id="run-now-btn" class="sc-btn sc-btn-primary">▶ Run again</button>
+      <button id="run-now-btn" class="sc-btn sc-btn-primary">▶ Run</button>
     </div>
   </header>
 
   {# ─── Run-status banner ──────────────────────────────────────────── #}
   <div id="run-status-banner" class="run-banner" hidden>
     <div class="run-banner-row">
-      <div class="run-banner-spinner" aria-hidden="true"></div>
+      <div class="run-banner-spinner"></div>
       <div>
-        <div class="run-banner-stage" id="run-stage">Starting…</div>
+        <div id="run-stage">Starting…</div>
         <div class="run-banner-meta">
           <span id="run-elapsed">00:00</span><span class="dot-sep">·</span><span id="run-pct">0%</span>
         </div>
@@ -38,198 +36,384 @@
     <div class="run-banner-progress"><div class="run-banner-bar" id="run-bar"></div></div>
   </div>
 
-  {# ─── Hero: regime + macro picture ───────────────────────────────── #}
-  <div class="sc-hero">
-
-    <section class="sc-card">
-      <div class="sc-eyebrow">Today</div>
-
-      {% if regime and regime.label %}
-      <div class="sc-regime-tag {{ regime.label|lower }}">
-        <span class="sc-regime-dot"></span>{{ regime.label }}
+  {# ─── Hero ──────────────────────────────────────────────────────── #}
+  <section class="sc-hero">
+    <div>
+      <div class="sc-hero-eyebrow">
+        <span class="lbl">A multi-agent macro engine for one</span>
+        <span class="sep">/</span>
+        <span>v0.1-preview</span>
       </div>
-      {% endif %}
 
       <h1 class="sc-hero-headline">
-        {% if today.actions %}
-          {{ today.actions|length }} open trade{{ "s" if today.actions|length != 1 }} need attention
-        {% elif today.ideas %}
-          {{ today.ideas|length }} setup{{ "s" if today.ideas|length != 1 }} on the table
-        {% else %}
-          Stand aside. Cash is a position.
-        {% endif %}
+        Read the macro.<br>
+        Trade with
+        <span class="accent">conviction</span>.
       </h1>
-      <p class="sc-hero-subline">
-        {% if today.actions %}
-          The advisor has flagged actions on positions you're holding. Review below or open the desktop view to act.
-        {% elif today.ideas %}
-          Macro view supports {{ today.ideas[0].direction }} on {{ today.ideas[0].instrument }}{% if today.ideas|length > 1 %} and others{% endif %}. Click through for the full thesis.
-        {% else %}
-          No setup is at a clean structural location and the macro view isn't strong enough to force the issue. Most days will be like this.
-        {% endif %}
+
+      <p class="sc-hero-body">
+        Seven specialist agents read FRED data, COT positioning, central-bank
+        statements (FOMC, ECB, BoE, BoJ) and your hand-curated themes.
+        A Strategist synthesises. A Contrarian red-teams. A Bull and Bear
+        argue per instrument; a Judge calls the bias. A Tradability Filter
+        gates the chart. Today's pipeline produced
+        <strong>{{ instruments|length }} instrument reads</strong> across
+        <strong>{{ macro.themes|length }} active themes</strong>.
       </p>
 
-      <div class="sc-hero-stats">
-        <div>
-          <div class="sc-hero-stat-num" data-counter="{{ instruments|length }}">{{ instruments|length }}</div>
-          <div class="sc-hero-stat-label">instruments</div>
-        </div>
-        <div>
-          <div class="sc-hero-stat-num" data-counter="{{ macro.themes|length }}">{{ macro.themes|length }}</div>
-          <div class="sc-hero-stat-label">active themes</div>
-        </div>
-        <div>
-          <div class="sc-hero-stat-num" data-counter="{{ trades|length }}">{{ trades|length }}</div>
-          <div class="sc-hero-stat-label">open trades</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="sc-card">
-      <div class="sc-eyebrow">Macro themes</div>
-      {% if macro.themes %}
-      <ul class="sc-themes-list">
-        {% for t in macro.themes %}
-        <li class="sc-theme-row">
-          <span class="name">{{ t.name }}</span>
-          <span class="conv">{{ t.conviction }}/10</span>
-          <span class="sc-theme-bar"><span style="--bar-target: {{ t.pct }}%; animation-delay: {{ loop.index0 * 0.08 }}s;"></span></span>
-        </li>
-        {% endfor %}
-      </ul>
-      {% else %}
-      <p style="color: var(--text-3); font-size: 13px;">No themes loaded.</p>
+      {% if regime and regime.label %}
+      <div class="sc-hero-tag">REGIME / {{ regime.label }} · G:{{ regime.growth_score }} · I:{{ regime.inflation_score }}</div>
       {% endif %}
+    </div>
 
-      {% if macro.next_catalyst %}
-      <div class="sc-catalyst">
-        <span class="lbl">Next</span>
-        <span>{{ macro.next_catalyst }}</span>
-        {% if macro.days_to_catalyst is not none %}
-        <span class="when">{{ macro.days_to_catalyst }}d</span>
-        {% endif %}
-      </div>
-      {% endif %}
-    </section>
+    {# ─── Mascot illustration: betta fish + school in a circular frame ── #}
+    <svg class="sc-mascot" viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <!-- aquarium frame -->
+      <circle class="water" cx="240" cy="240" r="220" />
+      <circle class="frame" cx="240" cy="240" r="220" />
+      <!-- ripple lines -->
+      <ellipse class="ripple" cx="240" cy="180" rx="200" ry="6" />
+      <ellipse class="ripple" cx="240" cy="280" rx="200" ry="6" />
+      <ellipse class="ripple" cx="240" cy="350" rx="200" ry="6" />
+
+      <!-- big betta fish -->
+      <g transform="translate(60, 160)">
+        <!-- tail flowing back -->
+        <path class="bigfish" d="M 0 80 Q -50 40 -70 80 Q -85 110 -75 140 Q -60 170 -30 150 Q -10 130 0 110 Z" opacity="0.85"/>
+        <path class="bigfish" d="M 10 70 Q -25 30 -50 50 Q -65 75 -50 100 Z" opacity="0.7"/>
+        <!-- body -->
+        <ellipse class="bigfish" cx="60" cy="100" rx="80" ry="42" />
+        <!-- top fin -->
+        <path class="bigfish" d="M 30 70 Q 50 30 90 50 Q 100 65 80 80 Z" opacity="0.85"/>
+        <!-- bottom fin -->
+        <path class="bigfish" d="M 40 130 Q 60 165 95 150 Q 90 130 70 120 Z" opacity="0.85"/>
+        <!-- highlight -->
+        <ellipse class="bigfish-detail" cx="100" cy="92" rx="6" ry="6" />
+        <!-- gill detail -->
+        <path class="bigfish-detail" d="M 90 110 Q 95 100 95 90" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.4"/>
+      </g>
+
+      <!-- school of small fish -->
+      <g transform="translate(280, 200)">
+        <g class="school-fish">
+          <ellipse class="school" cx="0" cy="0" rx="14" ry="6" />
+          <path class="school" d="M -14 0 L -22 -5 L -22 5 Z" />
+        </g>
+        <g class="school-fish" transform="translate(40, -30)">
+          <ellipse class="school" cx="0" cy="0" rx="12" ry="5" />
+          <path class="school" d="M -12 0 L -19 -4 L -19 4 Z" />
+        </g>
+        <g class="school-fish" transform="translate(60, 20)">
+          <ellipse class="school" cx="0" cy="0" rx="13" ry="5" />
+          <path class="school" d="M -13 0 L -20 -4 L -20 4 Z" />
+        </g>
+        <g class="school-fish" transform="translate(90, -10)">
+          <ellipse class="school" cx="0" cy="0" rx="11" ry="4" />
+          <path class="school" d="M -11 0 L -17 -3 L -17 3 Z" />
+        </g>
+        <g class="school-fish" transform="translate(110, 40)">
+          <ellipse class="school" cx="0" cy="0" rx="10" ry="4" />
+          <path class="school" d="M -10 0 L -16 -3 L -16 3 Z" />
+        </g>
+        <g class="school-fish" transform="translate(130, -20)">
+          <ellipse class="school" cx="0" cy="0" rx="11" ry="4" />
+          <path class="school" d="M -11 0 L -17 -3 L -17 3 Z" />
+        </g>
+      </g>
+
+      <!-- bubbles -->
+      <circle class="bubble" cx="195" cy="120" r="4" />
+      <circle class="bubble" cx="180" cy="100" r="2.5" />
+      <circle class="bubble" cx="210" cy="80" r="3" />
+      <circle class="bubble" cx="170" cy="135" r="2" />
+    </svg>
+  </section>
+
+  {# ─── Hero stats triplet ─────────────────────────────────────────── #}
+  <div class="sc-stats">
+    <div class="sc-stat">
+      <div class="sc-stat-num" data-counter="{{ instruments|length }}">{{ instruments|length }}</div>
+      <div class="sc-stat-label">Universe</div>
+    </div>
+    <div class="sc-stat">
+      <div class="sc-stat-num" data-counter="{{ macro.themes|length }}">{{ macro.themes|length }}</div>
+      <div class="sc-stat-label">Active themes</div>
+    </div>
+    <div class="sc-stat">
+      <div class="sc-stat-num" data-counter="{{ trades|length }}">{{ trades|length }}</div>
+      <div class="sc-stat-label">Open trades</div>
+    </div>
   </div>
 
-  {# ─── Open positions strip ───────────────────────────────────────── #}
-  {% if trades %}
-  <section class="sc-section">
-    <div class="sc-section-title">
-      Open trades <span class="count">{{ trades|length }}</span>
+  {# ─── SECTION: Today's call ──────────────────────────────────────── #}
+  <section class="sc-section" style="margin-top: 96px;">
+    <div class="sc-section-mark">
+      <span class="glyph">■</span>
+      <span>Today's call</span>
+      <span class="sep">/</span>
+      <span class="meta">{{ run_date }}</span>
     </div>
+    <h2 class="sc-section-headline">
+      {% if today.actions %}
+        Action needed on {{ today.actions|length }} open trade{{ "s" if today.actions|length != 1 }}.
+      {% elif today.ideas %}
+        {{ today.ideas|length }} setup{{ "s" if today.ideas|length != 1 }} on the table.
+      {% else %}
+        Stand aside.
+      {% endif %}
+    </h2>
+    <p class="sc-section-sub">
+      {% if today.actions %}
+        The advisor flagged actions on positions you're holding. Each card below shows the verdict + macro reasoning. The system never executes — your call.
+      {% elif today.ideas %}
+        These passed the four-stage filter (Strategist macro → Contrarian red-team → Council debate → Tradability Filter). Click any for the full thesis.
+      {% else %}
+        No setup is at a clean structural location, no macro view is strong enough to force the issue. Most days will be like this. Cash is a position.
+      {% endif %}
+    </p>
+
+    {% if trades or today.ideas %}
     <div class="sc-positions">
       {% for t in trades %}
-      <div class="sc-pos {{ t.action_class }}" data-position-id="{{ t.id }}" data-action="why-position" data-id="{{ t.id }}">
-        <div class="sc-pos-head">
-          <div>
-            <span class="sc-pos-symbol">{{ t.instrument }}</span>
-            <span class="sc-pos-dir {{ t.direction|lower }}">{{ t.direction|upper }}</span>
-          </div>
-          <div class="sc-pos-pnl {% if t.pnl_pct and t.pnl_pct >= 0 %}pos{% elif t.pnl_pct %}neg{% endif %}">
+      <div class="sc-pos {{ t.action_class }}" data-action="why-position" data-id="{{ t.id }}">
+        <div class="sc-pos-meta">
+          <span>OPEN</span><span class="dot">·</span>
+          <span>{{ t.direction|upper }}</span><span class="dot">·</span>
+          <span>{{ t.instrument }}</span>
+        </div>
+        <div class="sc-pos-symbol">
+          {{ t.instrument }}
+          <span class="sc-pos-pnl {% if t.pnl_pct and t.pnl_pct >= 0 %}pos{% elif t.pnl_pct %}neg{% endif %}">
             {{ "%+.2f"|format(t.pnl_pct or 0) }}%
-          </div>
+          </span>
         </div>
-        <div class="sc-pos-action">
-          <span class="sc-pos-action-chip {{ t.action }}">{{ t.action_label }}</span>
-        </div>
-        <p class="sc-pos-reason">{{ t.reason|truncate(140, True) }}</p>
+        <div class="sc-pos-action"><strong>{{ t.action_label }}.</strong></div>
+        <p class="sc-pos-reason">{{ t.reason|truncate(180, True) }}</p>
         <div class="sc-pos-prices">
-          <span><strong>{{ "%g"|format(t.entry_price) }}</strong> entry</span>
-          <span>→ <strong>{{ "%g"|format(t.current_price or 0) if t.current_price else "—" }}</strong></span>
+          <span>entry <strong>{{ "%g"|format(t.entry_price) }}</strong></span>
+          <span>now <strong>{{ "%g"|format(t.current_price or 0) if t.current_price else "—" }}</strong></span>
           {% if t.emergency_stop %}<span>stop <strong>{{ "%g"|format(t.emergency_stop) }}</strong></span>{% endif %}
         </div>
       </div>
       {% endfor %}
-    </div>
-  </section>
-  {% endif %}
-
-  {# ─── Today's ideas ──────────────────────────────────────────────── #}
-  {% if today.ideas %}
-  <section class="sc-section">
-    <div class="sc-section-title">
-      Today's ideas <span class="count">{{ today.ideas|length }}</span>
-    </div>
-    <div class="sc-positions">
       {% for i in today.ideas %}
       <div class="sc-pos" data-action="why-instrument" data-symbol="{{ i.instrument }}">
-        <div class="sc-pos-head">
-          <div>
-            <span class="sc-pos-symbol">{{ i.instrument }}</span>
-            <span class="sc-pos-dir {{ i.direction }}">{{ i.direction|upper }}</span>
-          </div>
-          <div class="sc-pos-pnl" style="color: var(--brand-strong); text-shadow: 0 0 16px var(--brand-glow); font-size: 18px;">
-            {{ i.conviction }}/10
-          </div>
+        <div class="sc-pos-meta">
+          <span>{% if i.verdict == "tradable_now" %}READY{% else %}WATCH{% endif %}</span>
+          <span class="dot">·</span>
+          <span>{{ i.direction|upper }}</span><span class="dot">·</span>
+          <span>{{ i.strength_label|upper }}</span>
         </div>
-        <div class="sc-pos-action">
-          <span class="sc-pos-action-chip {% if i.verdict == 'tradable_now' %}trail_stop{% else %}review{% endif %}">
-            {% if i.verdict == "tradable_now" %}Ready{% else %}Watch{% endif %}
-          </span>
-          <span style="font-size: 11px; color: var(--text-3); margin-left: auto;">{{ i.strength_label }}</span>
+        <div class="sc-pos-symbol">
+          {{ i.instrument }}
+          <span class="sc-pos-pnl">{{ i.conviction }}/10</span>
         </div>
+        <div class="sc-pos-action"><strong>{% if i.verdict == "tradable_now" %}Take it.{% else %}Wait for cleaner pullback.{% endif %}</strong></div>
         <p class="sc-pos-reason">{{ i.macro_summary|truncate(180, True) }}</p>
-      </div>
-      {% endfor %}
-    </div>
-  </section>
-  {% endif %}
-
-  {# ─── Instrument matrix ──────────────────────────────────────────── #}
-  <section class="sc-section">
-    <div class="sc-section-title">
-      All instruments <span class="count">{{ instruments|length }}</span>
-    </div>
-    <div class="sc-matrix">
-      {% for r in instruments %}
-      {% set arrow_dir = "up" if r.direction == "long" else ("down" if r.direction == "short" else "flat") %}
-      <div class="sc-tile {{ 'has-position' if r.is_open_position }} dir-{{ arrow_dir }}"
-           data-action="why-instrument" data-symbol="{{ r.symbol }}">
-        <div class="sc-tile-head">
-          <span class="sc-tile-symbol">{{ r.symbol }}</span>
-          <span class="sc-tile-conv {{ r.strength_band }}">{{ r.conviction }}/10</span>
+        {% if i.invalidation %}
+        <div class="sc-pos-prices">
+          <span>invalid past <strong>{{ i.invalidation }}</strong></span>
         </div>
-        <div class="sc-tile-bias">{{ r.direction_raw or "—" }}</div>
-        {% if r.history.n_entries >= 2 %}
-        <svg class="sc-tile-spark" viewBox="0 0 100 32" preserveAspectRatio="none" data-convictions="{{ r.history.convictions|tojson }}">
-          <polyline class="line" />
-        </svg>
-        {% else %}
-        <div style="height: 32px;"></div>
         {% endif %}
-        <div class="sc-tile-state">{{ r.state }}</div>
-        <div class="sc-tile-arrow">
-          {% if arrow_dir == "up" %}↗{% elif arrow_dir == "down" %}↘{% else %}→{% endif %}
-        </div>
       </div>
       {% endfor %}
     </div>
+    {% endif %}
   </section>
 
-  {# ─── Today's brief inline (collapsed) ───────────────────────────── #}
+  {# ─── SECTION: Macro picture ───────────────────────────────────── #}
+  <section class="sc-section">
+    <div class="sc-section-mark">
+      <span class="glyph">◇</span>
+      <span>Macro picture</span>
+      <span class="sep">/</span>
+      <span class="meta">user-curated themes from THEMES.md</span>
+    </div>
+    <h2 class="sc-section-headline">{% if macro.regime %}{{ macro.regime }}{% else %}Active themes ranked by conviction{% endif %}</h2>
+
+    {% if macro.themes %}
+    <div class="sc-themes">
+      {% for t in macro.themes %}
+      <div class="sc-theme-row">
+        <span class="name">{{ t.name }}</span>
+        <span class="bar"><span style="--bar-target: {{ t.pct }}%; animation-delay: {{ loop.index0 * 0.06 }}s;"></span></span>
+        <span class="conv">{{ t.conviction }}/10</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if macro.next_catalyst %}
+    <div class="sc-catalyst">
+      <span class="lbl">Next catalyst</span>
+      <span>{{ macro.next_catalyst }}</span>
+      {% if macro.days_to_catalyst is not none %}
+      <span class="when">T-{{ macro.days_to_catalyst }}d</span>
+      {% endif %}
+    </div>
+    {% endif %}
+  </section>
+
+  {# ─── SECTION: How it reads the world (numbered workflow steps) ──── #}
+  <section class="sc-section">
+    <div class="sc-section-mark">
+      <span class="glyph">◆</span>
+      <span>Workflow</span>
+      <span class="sep">/</span>
+      <span class="meta">how today's call was produced</span>
+    </div>
+    <h2 class="sc-section-headline">Five layers, seven specialists.</h2>
+    <p class="sc-section-sub">
+      Each pipeline run cascades through structured layers. Earlier layers
+      are about reading the world; later layers about pressure-testing the
+      read.
+    </p>
+
+    <div class="sc-steps">
+      <div class="sc-step">
+        <div class="sc-step-num">01</div>
+        <div>
+          <div class="sc-step-title">
+            Specialists read the data
+            <span class="small">FRED · COT · central banks · news log</span>
+          </div>
+        </div>
+        <div class="sc-step-body">
+          Seven Layer 1 agents fire in parallel on every run: Inflation Tracker, Positioning Analyst, Fed-Watcher (with FOMC text), ECB-Watcher (with Lagarde transcript), BoE-Watcher (with MPC minutes), BoJ-Watcher (PDF-extracted Policy Board statement), Geopolitical Risk. Each writes structured output the Strategist can synthesise.
+        </div>
+      </div>
+
+      <div class="sc-step">
+        <div class="sc-step-num">02</div>
+        <div>
+          <div class="sc-step-title">
+            Strategist synthesises
+            <span class="small">per-instrument bias cards</span>
+          </div>
+        </div>
+        <div class="sc-step-body">
+          A senior FX & cross-asset strategist persona reads all Layer 1 output plus your <code>THEMES.md</code> regime tracker plus the <code>recent_events.yaml</code> news log. Produces one bias card per instrument: direction, conviction, driving themes, specialist support, invalidation, cross-asset confirmation.
+        </div>
+      </div>
+
+      <div class="sc-step">
+        <div class="sc-step-num">03</div>
+        <div>
+          <div class="sc-step-title">
+            Contrarian red-teams
+            <span class="small">attack vector hierarchy</span>
+          </div>
+        </div>
+        <div class="sc-step-body">
+          A persistent contrarian persona attacks the consensus on every instrument. Seven attack vectors: crowded positioning, narrative fragility, historical analog, cross-asset dissent, central-bank reaction, tail risk, news-shock reversal (announcement-driven regimes). Calibrated to be wrong 70% of the time on purpose.
+        </div>
+      </div>
+
+      <div class="sc-step">
+        <div class="sc-step-num">04</div>
+        <div>
+          <div class="sc-step-title">
+            Council debates
+            <span class="small">bull → bear → judge per instrument</span>
+          </div>
+        </div>
+        <div class="sc-step-body">
+          For each instrument the Strategist scored ≥ 5/10: a Bull advocate makes the strongest long case; a Bear makes the strongest short case; a Judge weighs them with explicit probability decomposition and assigns final direction + conviction. Runs in parallel across instruments.
+        </div>
+      </div>
+
+      <div class="sc-step">
+        <div class="sc-step-num">05</div>
+        <div>
+          <div class="sc-step-title">
+            Tradability Filter gates the chart
+            <span class="small">timeframe-aware structural review</span>
+          </div>
+        </div>
+        <div class="sc-step-body">
+          A separate setup-reviewer persona checks whether <em>price right now</em> is at a clean structural location consistent with the macro bias. Different rule sets per timeframe (tactical / swing / positional). Verdict: tradable_now / watch / pass_despite_bias / below_threshold.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# ─── SECTION: Instrument matrix ─────────────────────────────────── #}
+  <section class="sc-section">
+    <div class="sc-section-mark">
+      <span class="glyph">▤</span>
+      <span>Universe</span>
+      <span class="sep">/</span>
+      <span class="meta">{{ instruments|length }} instruments tracked</span>
+    </div>
+    <h2 class="sc-section-headline">Today's full read.</h2>
+
+    <table class="sc-matrix-table">
+      <thead>
+        <tr>
+          <th style="width: 18%;">Symbol</th>
+          <th style="width: 24%;">Direction</th>
+          <th style="width: 8%;">Conv.</th>
+          <th style="width: 14%;">7-day trend</th>
+          <th style="width: 28%;">State</th>
+          <th style="width: 8%;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in instruments %}
+        {% set arrow_dir = "up" if r.direction == "long" else ("down" if r.direction == "short" else "flat") %}
+        <tr class="{% if r.is_open_position %}has-position{% endif %}" data-action="why-instrument" data-symbol="{{ r.symbol }}">
+          <td>
+            <span class="symbol">
+              {{ r.symbol }}
+              <span class="name">{{ r.name }}</span>
+            </span>
+          </td>
+          <td class="bias">{{ r.direction_raw or "—" }}</td>
+          <td><span class="conv {{ r.strength_band }}">{{ r.conviction }}</span></td>
+          <td>
+            {% if r.history.n_entries >= 2 %}
+            <svg class="sc-spark dir-{{ arrow_dir }}" viewBox="0 0 100 28" preserveAspectRatio="none" data-convictions="{{ r.history.convictions|tojson }}">
+              <polyline class="line" />
+            </svg>
+            {% endif %}
+          </td>
+          <td class="state">{{ r.state }}</td>
+          <td><span class="sc-arrow">{% if arrow_dir == "up" %}↗{% elif arrow_dir == "down" %}↘{% else %}→{% endif %}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  {# ─── SECTION: Today's brief ─────────────────────────────────────── #}
   {% if brief_md %}
   <section class="sc-section">
-    <div class="sc-section-title">Today's brief</div>
+    <div class="sc-section-mark">
+      <span class="glyph">¶</span>
+      <span>Brief</span>
+      <span class="sep">/</span>
+      <span class="meta">PM synthesis</span>
+    </div>
+    <h2 class="sc-section-headline">In prose.</h2>
     <article class="sc-brief">{{ brief_md | markdown | safe }}</article>
   </section>
   {% endif %}
 
-  {# ─── Bottom tools ───────────────────────────────────────────────── #}
+  {# ─── Tools ──────────────────────────────────────────────────────── #}
   <div class="sc-tools">
-    <button class="sc-btn" data-action="open-new-trade">+ New trade</button>
+    <button class="sc-btn" data-action="open-new-trade">+ Record trade</button>
     <button class="sc-btn" data-action="open-ask">Ask</button>
     <button class="sc-btn" data-action="open-journal">Journal</button>
+    <span class="tools-meta">rendered {{ render_time }}</span>
   </div>
 </main>
 
-{# ─── Sticky surface-toggle: switches to desktop ─────────────────── #}
+{# ─── Sticky surface-toggle ──────────────────────────────────────── #}
 <a class="surface-toggle" href="?view=desktop" title="Switch to standard desktop view">
   <span class="arrow">←</span>Exit Showcase
 </a>
 
-{# ─── Slide-over for instrument detail (same component as desktop) ─ #}
+{# ─── Slide-over for instrument detail ──────────────────────────── #}
 <div id="overlay" class="overlay"></div>
 <aside id="slideover" class="slideover" aria-hidden="true">
   <header class="slideover-head">
@@ -241,7 +425,7 @@
   </div>
 </aside>
 
-{# ─── Modal: New trade (reused from desktop) ─────────────────────── #}
+{# ─── Modals (reused from desktop) ──────────────────────────────── #}
 <div id="modal-new-trade" class="modal" aria-hidden="true">
   <div class="modal-card">
     <header class="modal-head">
@@ -292,7 +476,6 @@
   </div>
 </div>
 
-{# ─── Modal: Ask ──────────────────────────────────────────────────── #}
 <div id="modal-ask" class="modal" aria-hidden="true">
   <div class="modal-card">
     <header class="modal-head">
@@ -302,9 +485,7 @@
     <div class="modal-body">
       <div class="field">
         <label for="ask-persona">Voice</label>
-        <select id="ask-persona">
-          {% for p in personas %}<option value="{{ p.key }}">{{ p.label }}</option>{% endfor %}
-        </select>
+        <select id="ask-persona">{% for p in personas %}<option value="{{ p.key }}">{{ p.label }}</option>{% endfor %}</select>
       </div>
       <div id="chat-history" class="chat-history" aria-live="polite"></div>
       <form id="chat-form" class="chat-form">
@@ -315,7 +496,6 @@
   </div>
 </div>
 
-{# ─── Modal: Journal ──────────────────────────────────────────────── #}
 <div id="modal-journal" class="modal" aria-hidden="true">
   <div class="modal-card">
     <header class="modal-head">
