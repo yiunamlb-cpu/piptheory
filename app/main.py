@@ -939,6 +939,82 @@ def _detect_surface(request: Request) -> str:
     return "desktop"
 
 
+def _build_graph(
+    instruments: list[dict],
+    macro_themes: list[dict],
+) -> dict:
+    """Produce a graph spec for the showcase surface — nodes for each
+    instrument + each macro theme, edges where an instrument's drivers
+    reference a theme.
+
+    Driver-to-theme matching: each Strategist driver line typically
+    contains the theme name (e.g. "Theme 2 – ECB Hawkish Pivot").
+    We do a simple keyword overlap between the theme name and the
+    driver string. Loose heuristic — over-links rather than under-links
+    so the graph has visual density.
+    """
+    # Lowercased theme name → tokens, for matching against driver text
+    def _tokens(s: str) -> set[str]:
+        words = re.findall(r"[a-zA-Z]{3,}", s.lower())
+        # Drop generic words
+        stop = {"the", "and", "for", "with", "from", "into", "via",
+                "theme", "themes", "primary", "secondary"}
+        return {w for w in words if w not in stop}
+
+    theme_tokens = [(t["name"], _tokens(t["name"])) for t in macro_themes]
+
+    nodes: list[dict] = []
+    edges: list[dict] = []
+
+    # Instrument nodes
+    for r in instruments:
+        bias = (r.get("direction") or "no view")
+        kind = "long" if bias == "long" else ("short" if bias == "short" else "neutral")
+        nodes.append({
+            "id": f"i:{r['symbol']}",
+            "type": "instrument",
+            "label": r["symbol"],
+            "kind": kind,                 # long / short / neutral
+            "conviction": r["conviction"],
+            "is_open_position": r.get("is_open_position", False),
+            "subtitle": r.get("name", ""),
+            "size": 9 + min(8, max(0, (r["conviction"] - 4) * 2)),  # bigger dot for higher conviction
+        })
+
+    # Theme nodes
+    for t in macro_themes:
+        nodes.append({
+            "id": f"t:{t['name']}",
+            "type": "theme",
+            "label": t["name"],
+            "kind": "theme",
+            "conviction": t["conviction"],
+            "size": 7 + t["conviction"] // 2,
+        })
+
+    # Edges from each instrument to each matching theme
+    for r in instruments:
+        thesis = r.get("thesis") or {}
+        drivers = thesis.get("drivers") or []
+        if not drivers:
+            continue
+        driver_text = " ".join(d.get("driver", "") for d in drivers)
+        d_tokens = _tokens(driver_text)
+        for theme_name, t_tokens in theme_tokens:
+            if not t_tokens:
+                continue
+            # Match if any salient theme word appears in driver text
+            overlap = t_tokens & d_tokens
+            if overlap:
+                edges.append({
+                    "source": f"i:{r['symbol']}",
+                    "target": f"t:{theme_name}",
+                    "weight": len(overlap),
+                })
+
+    return {"nodes": nodes, "edges": edges}
+
+
 def _build_home_context(run: Run, runs: list[str], date: str, surface: str) -> dict:
     today = _build_today_block(run)
     macro = _build_macro_block()
@@ -1016,6 +1092,7 @@ def _build_home_context(run: Run, runs: list[str], date: str, surface: str) -> d
         "ftmo": ftmo_dict,
         "trades": trades,
         "instruments": instruments,
+        "graph": _build_graph(instruments, macro["themes"]),
         "recent_events": recent_events,
         "partial_run": partial_run,
         "partial_msg": partial_msg,

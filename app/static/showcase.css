@@ -1,25 +1,44 @@
-/* nam-hedgefund — SHOWCASE surface (MiroFish-inspired editorial style)
-   White canvas, massive sans-serif headlines, monospace accent details,
-   numbered workflow steps, generous whitespace, decorative section
-   glyphs (■ ◇ ◆), slash-separated metadata. Same data the desktop and
-   mobile surfaces show, presented as an editorial spread. */
+/* nam-hedgefund — SHOWCASE surface (MiroFish-style graph dashboard).
+   Visualization-heavy, animation-heavy, sophisticated info-dense layout.
+   Force-directed network graph as the centerpiece showing how each
+   instrument's bias is driven by macro themes. Right column carries
+   the structured detail (today's call, regime, themes, trades).
+   Bottom strip is a live terminal-style log of pipeline events. */
 
 :root {
-  /* Override design tokens for the bright editorial canvas */
-  --bg: #ffffff;
+  --bg: #fafaf9;
   --surface: #ffffff;
-  --surface-alt: #fafaf9;
-  --surface-strong: #f5f5f4;
-  --border: #e7e5e4;
-  --border-strong: #d6d3d1;
+  --surface-alt: #f5f5f4;
   --rule: #1c1917;
+  --border: #e7e5e4;
+  --border-strong: #c9c5c1;
   --text: #0c0a09;
   --text-2: #57534e;
   --text-3: #a8a29e;
+
   --accent: #0d9488;
-  --good: #047857;
+  --accent-glow: rgba(13, 148, 136, 0.4);
+  --good: #059669;
+  --good-glow: rgba(5, 150, 105, 0.35);
   --warn: #b45309;
-  --bad: #b91c1c;
+  --warn-glow: rgba(180, 83, 9, 0.35);
+  --bad: #dc2626;
+  --bad-glow: rgba(220, 38, 38, 0.35);
+
+  /* Graph palette — distinct colors per node type */
+  --node-long: #0d9488;
+  --node-short: #dc2626;
+  --node-neutral: #78716c;
+  --node-theme: #c2410c;
+  --node-position: #0891b2;
+  --edge: #d6d3d1;
+  --edge-active: #1c1917;
+
+  /* Terminal log */
+  --term-bg: #0c0a09;
+  --term-text: #d4d4d8;
+  --term-dim: #71717a;
+  --term-accent: #2dd4bf;
 }
 
 body {
@@ -27,371 +46,353 @@ body {
   color: var(--text);
   font-family: 'Inter', sans-serif;
   font-feature-settings: "ss01", "tnum";
-  /* No background drift, no gradients — flat editorial */
 }
 
 .page {
-  max-width: 1380px;
-  margin: 0 auto;
-  padding: 28px 56px 96px;
+  padding: 0;
+  max-width: none;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 /* ─── Top bar ─────────────────────────────────────────────────────── */
-/* Editorial-magazine-style: brand top-left, hairline separator, meta on right. */
 
 .sc-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: 20px;
+  padding: 12px 24px;
   border-bottom: 1px solid var(--rule);
-  margin-bottom: 56px;
-  font-size: 13px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  background: var(--surface);
+  height: 56px;
+  flex-shrink: 0;
 }
 .sc-brand {
   font-weight: 700;
+  font-size: 13px;
   letter-spacing: 0.22em;
-  font-size: 14px;
+}
+.sc-brand .sub {
+  margin-left: 12px;
+  color: var(--text-3);
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  font-size: 11px;
 }
 .sc-top-meta {
   display: flex;
-  gap: 18px;
+  gap: 14px;
   align-items: center;
-  color: var(--text-2);
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: none;
-}
-.sc-top-meta .sep { color: var(--text-3); }
-.sc-actions { display: flex; gap: 8px; align-items: center; }
-.sc-select {
-  height: 32px;
-  padding: 0 26px 0 10px;
-  border: 1px solid var(--rule);
-  background: #fff;
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: none;
+  color: var(--text-2);
+  letter-spacing: 0.04em;
+}
+.sc-top-meta .pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-alt);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.sc-top-meta .pill.live::before {
+  content: "";
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--good);
+  box-shadow: 0 0 6px var(--good-glow);
+  animation: live-pulse 2s ease-in-out infinite;
+}
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(0.8); }
+}
+.sc-actions { display: flex; gap: 8px; align-items: center; }
+.sc-select {
+  height: 30px;
+  padding: 0 24px 0 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
   color: var(--text);
-  border-radius: 0;
+  border-radius: 4px;
   appearance: none;
   -webkit-appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath fill='%231c1917' d='M4 5L0 0h8z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 10px center;
+  background-position: right 8px center;
 }
 .sc-btn {
-  height: 32px;
+  height: 30px;
   padding: 0 14px;
   border: 1px solid var(--rule);
-  background: #fff;
-  color: var(--text);
+  background: var(--rule);
+  color: #fff;
   font-size: 11px;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   font-weight: 700;
   cursor: pointer;
-  border-radius: 0;
-  font-family: 'Inter', sans-serif;
-  transition: background 0.1s, color 0.1s;
+  border-radius: 4px;
+  transition: opacity 0.1s;
 }
-.sc-btn:hover {
-  background: var(--rule);
-  color: #fff;
+.sc-btn:hover { opacity: 0.85; }
+.sc-btn-ghost {
+  background: var(--surface);
+  color: var(--text);
 }
-.sc-btn-primary {
-  background: var(--rule);
-  color: #fff;
-}
-.sc-btn-primary:hover {
-  background: #fff;
-  color: var(--rule);
-}
+.sc-btn-ghost:hover { background: var(--surface-alt); }
 
-/* ─── Hero ─────────────────────────────────────────────────────────── */
-/* Two columns: left is editorial copy with eyebrow → headline → body;
-   right is the mascot / decorative aquarium frame. */
+/* ─── Main grid: graph (left) + detail panel (right) ────────────── */
 
-.sc-hero {
+.sc-main {
+  flex: 1 1 auto;
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  gap: 60px;
-  align-items: start;
-  padding: 24px 0 100px;
+  grid-template-columns: minmax(0, 1.4fr) minmax(360px, 480px);
+  min-height: 0;          /* allow children to scroll */
+}
+
+/* ─── Graph panel ─────────────────────────────────────────────────── */
+
+.sc-graph-panel {
   position: relative;
+  background: var(--surface);
+  border-right: 1px solid var(--rule);
+  overflow: hidden;
 }
-.sc-hero-eyebrow {
+.sc-graph-header {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 5;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 16px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: var(--text-2);
-  margin-bottom: 32px;
-  letter-spacing: 0.04em;
+  pointer-events: none;
 }
-.sc-hero-eyebrow .lbl {
+.sc-graph-title {
+  font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
-  letter-spacing: 0.18em;
   text-transform: uppercase;
-}
-.sc-hero-eyebrow .sep { color: var(--text-3); }
-
-.sc-hero-headline {
-  font-size: clamp(48px, 6vw, 88px);
-  font-weight: 800;
-  line-height: 0.98;
-  letter-spacing: -0.04em;
-  color: var(--text);
-  margin: 0 0 32px;
-}
-.sc-hero-headline .accent {
-  /* Italicized monospace inset for emphasis blocks within a hero copy */
-  display: inline-block;
-  font-family: 'JetBrains Mono', monospace;
-  font-style: italic;
-  font-weight: 600;
-  font-size: 0.55em;
-  letter-spacing: 0;
-  vertical-align: middle;
-  padding: 0.2em 0.5em;
-  background: var(--rule);
-  color: #fff;
-  margin: 0 0.1em;
-}
-
-.sc-hero-body {
-  font-size: 16px;
-  line-height: 1.55;
+  letter-spacing: 0.18em;
   color: var(--text-2);
-  max-width: 560px;
-  margin: 0 0 32px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  pointer-events: auto;
 }
-.sc-hero-body strong { color: var(--text); font-weight: 600; }
-
-.sc-hero-tag {
-  display: inline-block;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  font-weight: 700;
-  padding: 8px 14px;
-  border: 1.5px solid var(--rule);
-  letter-spacing: 0.04em;
-  background: #fff;
-  color: var(--rule);
+.sc-graph-controls {
+  display: flex;
+  gap: 6px;
+  pointer-events: auto;
 }
+.sc-graph-control {
+  width: 28px; height: 28px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(6px);
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--text-2);
+}
+.sc-graph-control:hover { background: var(--rule); color: #fff; }
 
-/* ─── Mascot illustration on hero right column ───────────────────── */
-/* SVG-based mini "aquarium" — a circular frame with the brand mark
-   fish + a school of smaller fish swimming. Drawn as inline SVG in the
-   template; sized here. */
-.sc-mascot {
+#sc-graph {
   width: 100%;
-  max-width: 480px;
-  margin-left: auto;
+  height: 100%;
   display: block;
+  cursor: grab;
 }
-.sc-mascot .water { fill: #f5f5f4; }
-.sc-mascot .frame { fill: none; stroke: var(--rule); stroke-width: 2; }
-.sc-mascot .ripple { stroke: var(--text-3); stroke-width: 0.8; fill: none; opacity: 0.5; }
-.sc-mascot .bigfish { fill: #14b8a6; }
-.sc-mascot .bigfish-detail { fill: #0c4a4e; }
-.sc-mascot .school { fill: #6ee7e5; }
-.sc-mascot .bubble { fill: var(--text-3); opacity: 0.45; }
-.sc-mascot .school-fish {
-  animation: school-swim 6s ease-in-out infinite;
-  transform-origin: center;
-}
-.sc-mascot .school-fish:nth-child(2n) { animation-duration: 5.4s; animation-delay: -1.5s; }
-.sc-mascot .school-fish:nth-child(3n) { animation-duration: 7s; animation-delay: -3s; }
-@keyframes school-swim {
-  0%, 100% { transform: translateX(0); }
-  50%      { transform: translateX(-8px); }
-}
+#sc-graph:active { cursor: grabbing; }
 
-/* ─── Section heading ─────────────────────────────────────────────── */
-/* Decorative geometric glyph + monospace label, e.g. "■ Today's call",
-   then a big headline below. */
-
-.sc-section {
-  margin-bottom: 88px;
-  position: relative;
+/* SVG graph nodes + edges */
+.gn-edge {
+  stroke: var(--edge);
+  stroke-width: 0.7;
+  fill: none;
+  opacity: 0.55;
+  transition: opacity 0.15s, stroke 0.15s, stroke-width 0.15s;
 }
-.sc-section-mark {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+.gn-edge.active {
+  stroke: var(--edge-active);
+  stroke-width: 1.4;
+  opacity: 1;
+}
+.gn-node-group { cursor: pointer; }
+.gn-node-circle {
+  stroke: rgba(0, 0, 0, 0.15);
+  stroke-width: 1;
+  transition: stroke 0.15s, stroke-width 0.15s, filter 0.15s;
+}
+.gn-node-group:hover .gn-node-circle,
+.gn-node-group.active .gn-node-circle {
+  stroke: var(--rule);
+  stroke-width: 2;
+}
+.gn-node-group.position .gn-node-circle {
+  stroke: var(--accent);
+  stroke-width: 2;
+  filter: drop-shadow(0 0 6px var(--accent-glow));
+}
+.gn-node-label {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  letter-spacing: 0.18em;
+  font-size: 10px;
+  font-weight: 600;
+  fill: var(--text);
+  pointer-events: none;
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+.gn-node-group.theme .gn-node-label {
+  fill: var(--text);
+  font-weight: 500;
+}
+.gn-node-group.dimmed { opacity: 0.18; }
+
+/* Legend */
+.sc-graph-legend {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
   text-transform: uppercase;
-  color: var(--text);
-  margin-bottom: 16px;
-}
-.sc-section-mark .glyph {
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  letter-spacing: 0;
-}
-.sc-section-mark .sep { color: var(--text-3); }
-.sc-section-mark .meta { color: var(--text-2); font-weight: 400; }
-
-.sc-section-headline {
-  font-size: clamp(36px, 4vw, 56px);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  margin: 0 0 24px;
-}
-.sc-section-sub {
-  font-size: 14px;
+  letter-spacing: 0.12em;
   color: var(--text-2);
-  max-width: 580px;
-  margin: 0 0 40px;
-  line-height: 1.55;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.sc-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.sc-legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
 }
 
-/* ─── Numbered workflow steps ────────────────────────────────────── */
-/* The "01 / Reality seed", "02 / Build the world", "03 / Run sim"
-   pattern from the MiroFish hero. Two-column: number/heading on left,
-   prose + meta on right. Hairline rule between steps. */
-
-.sc-steps {
-  display: flex;
-  flex-direction: column;
-  border-top: 1px solid var(--border);
-}
-.sc-step {
-  display: grid;
-  grid-template-columns: 80px minmax(0, 1fr) minmax(0, 1.4fr);
-  gap: 32px;
-  padding: 28px 0;
-  border-bottom: 1px solid var(--border);
-  align-items: start;
-}
-.sc-step-num {
-  font-family: 'JetBrains Mono', monospace;
+/* Selected-node detail card overlaid on graph */
+.sc-graph-detail {
+  position: absolute;
+  top: 60px;
+  left: 16px;
+  width: 280px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 16px;
+  z-index: 4;
   font-size: 13px;
-  font-weight: 700;
-  color: var(--text-3);
-  letter-spacing: 0.04em;
-  padding-top: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, opacity 0.2s;
 }
-.sc-step-title {
+.sc-graph-detail.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+}
+.sc-detail-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--text-3);
+  margin-bottom: 4px;
+  display: flex; justify-content: space-between;
+}
+.sc-detail-title {
   font-size: 22px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  line-height: 1.1;
+  margin-bottom: 4px;
 }
-.sc-step-title .small {
-  display: block;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
+.sc-detail-sub {
+  font-size: 12px;
+  color: var(--text-2);
+  margin-bottom: 12px;
+}
+.sc-detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+}
+.sc-detail-row .lbl {
   color: var(--text-3);
-  margin-top: 8px;
-}
-.sc-step-body {
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--text-2);
-}
-.sc-step-body strong { color: var(--text); font-weight: 600; }
-
-/* ─── Themes panel — list with right-aligned numbers ─────────────── */
-
-.sc-themes {
-  display: flex;
-  flex-direction: column;
-  border-top: 1px solid var(--border);
-}
-.sc-theme-row {
-  display: grid;
-  grid-template-columns: 1fr 100px 60px;
-  gap: 24px;
-  padding: 18px 0;
-  border-bottom: 1px solid var(--border);
-  align-items: center;
-}
-.sc-theme-row .name {
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-.sc-theme-row .bar {
-  height: 4px;
-  background: var(--surface-strong);
-}
-.sc-theme-row .bar > span {
-  display: block;
-  height: 100%;
-  background: var(--rule);
-  width: 0;
-  animation: bar-grow 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-@keyframes bar-grow {
-  to { width: var(--bar-target, 0%); }
-}
-.sc-theme-row .conv {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 16px;
-  font-weight: 700;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-/* ─── Catalyst chip ──────────────────────────────────────────────── */
-
-.sc-catalyst {
-  margin-top: 24px;
-  padding: 18px 22px;
-  border: 1px dashed var(--rule);
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-}
-.sc-catalyst .lbl {
-  font-size: 11px;
-  letter-spacing: 0.18em;
+  font-size: 10px;
   text-transform: uppercase;
-  color: var(--text-2);
+  letter-spacing: 0.12em;
 }
-.sc-catalyst .when {
-  margin-left: auto;
-  background: var(--rule);
-  color: #fff;
-  padding: 4px 10px;
-  font-weight: 700;
-}
-
-/* ─── Stat triplet (Low cost / High availability style row) ──────── */
-/* From MiroFish: two big monospace headings side-by-side with smaller
-   body underneath. For us: "Universe / Themes / Open trades" */
-
-.sc-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 48px;
-  margin-top: 56px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border);
-}
-.sc-stat {
+.sc-detail-row .val { font-weight: 600; }
+.sc-detail-actions {
+  margin-top: 12px;
   display: flex;
-  flex-direction: column;
   gap: 6px;
 }
+.sc-detail-actions button {
+  flex: 1;
+  height: 28px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  border: 1px solid var(--rule);
+  background: var(--rule);
+  color: #fff;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.sc-detail-actions button:hover { opacity: 0.85; }
+
+/* ─── Right column: structured detail panels ─────────────────────── */
+
+.sc-side {
+  background: var(--surface-alt);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  border-left: 1px solid var(--rule);  /* in case main grid is loose */
+}
+.sc-side-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid var(--rule);
+}
+.sc-stat {
+  padding: 14px 16px;
+  border-right: 1px solid var(--border);
+}
+.sc-stat:last-child { border-right: none; }
 .sc-stat-num {
-  font-family: 'Inter', sans-serif;
-  font-size: 44px;
+  font-size: 26px;
   font-weight: 700;
   letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
@@ -399,290 +400,295 @@ body {
 }
 .sc-stat-label {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
+  font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 0.18em;
   color: var(--text-2);
+  margin-top: 6px;
 }
 
-/* ─── Position cards ─────────────────────────────────────────────── */
-
-.sc-positions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 0;
-  border-top: 1px solid var(--border);
-  border-left: 1px solid var(--border);
-}
-.sc-pos {
+.sc-block {
+  padding: 16px;
   border-bottom: 1px solid var(--border);
-  border-right: 1px solid var(--border);
-  padding: 24px 28px;
-  background: #fff;
-  cursor: pointer;
-  transition: background 0.12s;
 }
-.sc-pos:hover { background: var(--surface-alt); }
-.sc-pos.urgent { background: #fef2f2; }
-.sc-pos.attention { background: #fffbeb; }
-.sc-pos-meta {
+.sc-block-head {
   display: flex;
-  align-items: baseline;
-  gap: 12px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--text-2);
-  margin-bottom: 12px;
-}
-.sc-pos-meta .dot { color: var(--text-3); }
-.sc-pos-symbol {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-}
-.sc-pos-pnl {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 18px;
-  font-weight: 700;
-}
-.sc-pos-pnl.pos { color: var(--good); }
-.sc-pos-pnl.neg { color: var(--bad); }
-.sc-pos-action {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 0.04em;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 10px;
 }
-.sc-pos-action::before { content: ">_ "; color: var(--text-3); }
-.sc-pos-action strong { color: var(--text); }
-.sc-pos-reason {
+.sc-block-head .glyph {
   font-size: 13px;
-  line-height: 1.6;
-  color: var(--text-2);
-  margin: 0 0 14px;
+  color: var(--accent);
 }
-.sc-pos-prices {
-  display: flex;
-  gap: 14px;
+.sc-block-head .lbl {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--text);
+  font-weight: 700;
+}
+.sc-block-head .meta {
+  margin-left: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
   color: var(--text-3);
+  text-transform: uppercase;
   letter-spacing: 0.04em;
 }
-.sc-pos-prices strong { color: var(--text); font-weight: 500; }
 
-/* ─── Instrument matrix — table-like ──────────────────────────────── */
-
-.sc-matrix-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-}
-.sc-matrix-table th {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--text-2);
-  font-weight: 400;
-  text-align: left;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--rule);
-}
-.sc-matrix-table td {
-  padding: 18px 16px;
-  border-bottom: 1px solid var(--border);
-  vertical-align: middle;
-}
-.sc-matrix-table tr {
-  cursor: pointer;
-  transition: background 0.1s;
-}
-.sc-matrix-table tr:hover {
-  background: var(--surface-alt);
-}
-.sc-matrix-table tr.has-position td:first-child {
-  border-left: 3px solid var(--rule);
-  padding-left: 14px;
-}
-.sc-matrix-table .symbol {
-  font-size: 18px;
-  font-weight: 700;
+/* Today block */
+.sc-today-headline {
+  font-size: 16px;
+  font-weight: 600;
   letter-spacing: -0.01em;
+  margin-bottom: 8px;
+  line-height: 1.3;
 }
-.sc-matrix-table .symbol .name {
-  display: block;
-  font-size: 11px;
-  font-weight: 400;
-  font-family: 'JetBrains Mono', monospace;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--text-3);
-  margin-top: 4px;
-}
-.sc-matrix-table .bias {
-  font-family: 'JetBrains Mono', monospace;
+.sc-today-sub {
   font-size: 12px;
   color: var(--text-2);
+  line-height: 1.5;
 }
-.sc-matrix-table .conv {
+.sc-today-action {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: #fef2f2;
+  border-left: 2px solid var(--bad);
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.sc-today-action:hover { background: #fee2e2; }
+.sc-today-action.idea {
+  background: #f0fdfa;
+  border-left-color: var(--accent);
+}
+.sc-today-action.idea:hover { background: #ccfbf1; }
+.sc-today-action .sym { font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+.sc-today-action .verb {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Regime tag */
+.sc-regime-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.sc-regime-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  animation: live-pulse 2s ease-in-out infinite;
+}
+.sc-regime-tag.reflation { background: rgba(13, 148, 136, 0.1); color: var(--accent); }
+.sc-regime-tag.reflation .sc-regime-dot { background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
+.sc-regime-tag.goldilocks { background: rgba(5, 150, 105, 0.1); color: var(--good); }
+.sc-regime-tag.goldilocks .sc-regime-dot { background: var(--good); box-shadow: 0 0 8px var(--good-glow); }
+.sc-regime-tag.stagflation { background: rgba(180, 83, 9, 0.1); color: var(--warn); }
+.sc-regime-tag.stagflation .sc-regime-dot { background: var(--warn); box-shadow: 0 0 8px var(--warn-glow); }
+.sc-regime-tag.deflation { background: rgba(220, 38, 38, 0.1); color: var(--bad); }
+.sc-regime-tag.deflation .sc-regime-dot { background: var(--bad); box-shadow: 0 0 8px var(--bad-glow); }
+.sc-regime-tag.transition { background: rgba(168, 162, 158, 0.16); color: var(--text-2); }
+.sc-regime-tag.transition .sc-regime-dot { background: var(--text-3); }
+.sc-regime-meta {
+  margin-top: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+/* Themes mini list */
+.sc-mini-themes {
+  list-style: none;
+  margin: 0; padding: 0;
+}
+.sc-mini-themes li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 12px;
+}
+.sc-mini-themes .conv {
   font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  font-size: 18px;
-}
-.sc-matrix-table .conv.weak { color: var(--text-3); }
-.sc-matrix-table .conv.moderate { color: var(--text); }
-.sc-matrix-table .conv.strong { color: var(--good); }
-.sc-matrix-table .state {
-  font-size: 13px;
-  color: var(--text-2);
-}
-.sc-spark {
-  width: 80px; height: 22px;
-  display: block;
-}
-.sc-spark .line {
-  fill: none;
-  stroke: var(--rule);
-  stroke-width: 1.4;
-  stroke-dasharray: 1000;
-  stroke-dashoffset: 1000;
-  animation: dash-in 1.4s ease-out 0.2s forwards;
-}
-.sc-spark.dir-down .line { stroke: var(--bad); }
-.sc-spark.dir-up .line { stroke: var(--good); }
-@keyframes dash-in { to { stroke-dashoffset: 0; } }
-.sc-arrow {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 16px;
-  color: var(--text-3);
-}
-
-/* ─── Brief inline ──────────────────────────────────────────────── */
-
-.sc-brief {
-  font-size: 16px;
-  line-height: 1.7;
-  color: var(--text-2);
-  max-width: 720px;
-  font-family: 'Inter', sans-serif;
-}
-.sc-brief h1, .sc-brief h2, .sc-brief h3 {
-  color: var(--text);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-.sc-brief h1 { font-size: 28px; margin-top: 1.2em; }
-.sc-brief h2 {
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--text-2);
-  margin-top: 2em;
-}
-.sc-brief h3 { font-size: 18px; margin-top: 1.4em; }
-.sc-brief code {
-  background: var(--surface-strong);
-  padding: 2px 6px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.88em;
-}
-.sc-brief blockquote {
-  border-left: 2px solid var(--rule);
-  margin: 1.4em 0;
-  padding-left: 18px;
-  color: var(--text);
-  font-style: italic;
-}
-.sc-brief ul, .sc-brief ol { padding-left: 1.5em; }
-.sc-brief li { margin: 0.4em 0; }
-.sc-brief p { margin: 0 0 1.2em; }
-
-/* ─── Tools strip — bottom of page ───────────────────────────────── */
-
-.sc-tools {
-  margin-top: 32px;
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: center;
-  padding-top: 32px;
-  border-top: 1px solid var(--rule);
-}
-.sc-tools .tools-meta {
-  margin-left: auto;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-3);
-}
-
-/* ─── Run-status banner override for the editorial canvas ──────── */
-
-[data-surface="showcase"] .run-banner {
-  background: #fff;
-  border: 1px solid var(--rule);
-  border-radius: 0;
-  color: var(--text);
-  font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
 }
-[data-surface="showcase"] .run-banner-spinner {
-  border-color: var(--border);
-  border-top-color: var(--rule);
+.sc-mini-themes .bar {
+  grid-column: 1 / -1;
+  height: 2px;
+  background: var(--border);
+  border-radius: 1px;
+  overflow: hidden;
 }
-[data-surface="showcase"] .run-banner-bar { background: var(--rule); }
+.sc-mini-themes .bar > span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  width: 0;
+  animation: bar-grow 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes bar-grow { to { width: var(--bar-target, 0%); } }
 
-/* ─── Surface-toggle overrides (Exit version on showcase) ──────── */
+/* Trades mini list */
+.sc-mini-trades {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.sc-mini-trades li {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 10px;
+  align-items: baseline;
+  padding: 8px;
+  background: var(--surface);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.sc-mini-trades li:hover { background: #fff; }
+.sc-mini-trades .sym {
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+.sc-mini-trades .dir {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.sc-mini-trades .pnl {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.sc-mini-trades .pnl.pos { color: var(--good); }
+.sc-mini-trades .pnl.neg { color: var(--bad); }
+.sc-mini-trades .verb {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+/* Empty state */
+.sc-empty {
+  font-size: 12px;
+  color: var(--text-3);
+  font-style: italic;
+}
+
+/* ─── Bottom terminal log ────────────────────────────────────────── */
+
+.sc-terminal {
+  background: var(--term-bg);
+  color: var(--term-text);
+  border-top: 1px solid var(--rule);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  height: 140px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+.sc-terminal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  border-bottom: 1px solid #1c1917;
+  background: #18181b;
+  flex-shrink: 0;
+}
+.sc-terminal-head .lbl {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--term-accent);
+  font-weight: 700;
+}
+.sc-terminal-head .meta {
+  font-size: 10px;
+  color: var(--term-dim);
+}
+.sc-terminal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 16px;
+  white-space: pre;
+}
+.sc-term-line {
+  display: block;
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.5;
+  color: var(--term-text);
+  opacity: 0;
+  animation: term-line-in 0.3s ease-out forwards;
+}
+@keyframes term-line-in {
+  from { opacity: 0; transform: translateX(-4px); }
+  to   { opacity: 0.85; transform: translateX(0); }
+}
+.sc-term-line .ts { color: var(--term-dim); }
+.sc-term-line .key { color: var(--term-accent); }
+.sc-term-line .val { color: var(--term-text); }
+.sc-term-line.warn { color: #fbbf24; }
+.sc-term-line.error { color: #f87171; }
+
+/* ─── Surface-toggle override for showcase: dark Exit button ───── */
+
 [data-surface="showcase"] .surface-toggle {
   background: var(--rule);
   box-shadow: -3px 0 12px rgba(0, 0, 0, 0.08);
   border-radius: 0;
 }
 
-/* ─── Modal overrides — keep clean editorial feel ──────────────── */
+/* ─── Modal / slide-over overrides ──────────────────────────────── */
+
 [data-surface="showcase"] .modal-card {
-  border-radius: 0;
+  border-radius: 6px;
   border: 1px solid var(--rule);
-  box-shadow: none;
-}
-[data-surface="showcase"] .slideover {
-  border-left: 1px solid var(--rule);
 }
 
-/* Tooltip — light theme uses default */
+/* Run-status banner — slim, anchored top of right column */
+[data-surface="showcase"] .run-banner {
+  background: var(--surface);
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  border-radius: 0;
+  margin: 0;
+  padding: 10px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
 
-/* ─── Mobile breakpoint ────────────────────────────────────────── */
+/* ─── Mobile breakpoint — collapse to stacked single-column ─────── */
 
-@media (max-width: 900px) {
-  .page { padding: 20px 24px 80px; }
-  .sc-hero {
+@media (max-width: 1100px) {
+  .sc-main {
     grid-template-columns: 1fr;
-    gap: 40px;
-    padding-bottom: 60px;
   }
-  .sc-hero-headline { font-size: clamp(40px, 10vw, 64px); }
-  .sc-mascot { max-width: 360px; margin: 0 auto; }
-  .sc-stats { grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-  .sc-stat-num { font-size: 32px; }
-  .sc-step {
-    grid-template-columns: 50px 1fr;
-    gap: 16px;
-  }
-  .sc-step-body { grid-column: 1 / -1; padding-top: 8px; }
-  .sc-section-headline { font-size: 32px; }
+  .sc-graph-panel { height: 60vh; min-height: 420px; border-right: none; border-bottom: 1px solid var(--rule); }
+  .sc-side { border-left: none; }
 }
-
-@media (max-width: 600px) {
-  .page { padding: 16px 18px 60px; }
-  .sc-top { flex-wrap: wrap; gap: 12px; }
-  .sc-section { margin-bottom: 56px; }
+@media (max-width: 700px) {
+  .sc-top-meta { display: none; }
+  .sc-graph-detail { width: calc(100% - 32px); top: 60px; }
 }
