@@ -941,12 +941,25 @@ def _build_home_context(run: Run, runs: list[str], date: str, surface: str) -> d
     instruments = _build_instruments_table(run, open_instruments)
     regime = _get_regime()
 
-    # FTMO informational summary — drawdown headroom, correlation
-    # warnings, weekend gap risk, swap costs. Pure information; no
-    # enforcement of sizing.
+    # FTMO informational summary — drawdown headroom (now realised-PL
+    # aware), correlation warnings, weekend gap risk, swap costs. Pure
+    # information; no enforcement of sizing.
     from src.positions.ftmo import compute_ftmo_status
     try:
-        ftmo = compute_ftmo_status(trades)
+        # Pull closed-trade journal entries for realised-PL-aware DD calc
+        try:
+            closed_positions = _positions.list_closed_recent()
+            closed_journal = [{
+                "instrument": p.instrument,
+                "direction": p.direction,
+                "entry_price": p.entry_price,
+                "close_price": p.close_price,
+                "pnl_pct": p.pnl_pct,
+                "size_units": p.size_units,
+            } for p in closed_positions]
+        except Exception:
+            closed_journal = []
+        ftmo = compute_ftmo_status(trades, closed_trades=closed_journal)
         ftmo_dict = {
             "account_size": ftmo.account_size,
             "trailing_dd_remaining_usd": round(ftmo.trailing_dd_remaining_usd, 2),

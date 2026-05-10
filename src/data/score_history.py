@@ -215,6 +215,73 @@ def direction_flips(entries: list[HistoryEntry]) -> int:
     return flips
 
 
+def delta_since_last_run(entries: list[HistoryEntry]) -> dict[str, Any]:
+    """Compare the most-recent entry vs the prior entry — the 'what
+    changed since yesterday' summary the audit asked for.
+
+    Returns:
+      changed: bool — true if anything material moved
+      kind:    "direction_flip" | "conviction_jump" | "conviction_drop" |
+               "minor" | "stable"
+      summary: short user-facing string
+      delta:   {bias_today, bias_prior, conviction_today, conviction_prior,
+                conviction_change}
+    """
+    if len(entries) < 2:
+        return {
+            "changed": False,
+            "kind": "stable",
+            "summary": "no prior run",
+            "delta": {},
+        }
+    today = entries[-1]
+    prior = entries[-2]
+    delta = {
+        "bias_today": today.bias,
+        "bias_prior": prior.bias,
+        "conviction_today": today.conviction,
+        "conviction_prior": prior.conviction,
+        "conviction_change": today.conviction - prior.conviction,
+    }
+    # Direction flip is the big signal
+    if today.bias != prior.bias and today.bias != "no view" and prior.bias != "no view":
+        return {
+            "changed": True,
+            "kind": "direction_flip",
+            "summary": f"flipped {prior.bias.upper()} → {today.bias.upper()}",
+            "delta": delta,
+        }
+    # Big conviction jumps
+    diff = today.conviction - prior.conviction
+    if diff >= 2:
+        return {
+            "changed": True,
+            "kind": "conviction_jump",
+            "summary": f"strengthened {prior.conviction} → {today.conviction}",
+            "delta": delta,
+        }
+    if diff <= -2:
+        return {
+            "changed": True,
+            "kind": "conviction_drop",
+            "summary": f"weakened {prior.conviction} → {today.conviction}",
+            "delta": delta,
+        }
+    if diff != 0:
+        return {
+            "changed": True,
+            "kind": "minor",
+            "summary": f"{prior.conviction} → {today.conviction}",
+            "delta": delta,
+        }
+    return {
+        "changed": False,
+        "kind": "stable",
+        "summary": "unchanged",
+        "delta": delta,
+    }
+
+
 def summary_for(instrument: str, n: int = 7) -> dict[str, Any]:
     """Bundle everything the dashboard needs for one instrument."""
     entries = history_for(instrument, n)
@@ -230,4 +297,5 @@ def summary_for(instrument: str, n: int = 7) -> dict[str, Any]:
         "stability": stability(entries),
         "direction_flips": direction_flips(entries),
         "n_entries": len(entries),
+        "delta": delta_since_last_run(entries),
     }

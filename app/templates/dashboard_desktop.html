@@ -313,7 +313,18 @@
         <tbody>
           {% for r in instruments %}
           <tr class="{% if r.is_open_position %}has-position{% endif %}" data-symbol="{{ r.symbol }}">
-            <td><span class="instr-symbol">{{ r.symbol }}</span> <span class="muted" style="margin-left: 6px;">{{ r.name }}</span></td>
+            <td>
+              <span class="instr-symbol">{{ r.symbol }}</span>
+              <span class="muted" style="margin-left: 6px;">{{ r.name }}</span>
+              {% set d = r.history.delta if r.history and r.history.delta else None %}
+              {% if d and d.changed and d.kind != "minor" %}
+              <span class="chip chip-{% if d.kind == 'direction_flip' %}bad{% elif d.kind == 'conviction_drop' %}warn{% elif d.kind == 'conviction_jump' %}good{% else %}neutral{% endif %}"
+                    data-term="delta_{{ d.kind }}"
+                    style="margin-left: 8px; font-size: 10px;">
+                {% if d.kind == "direction_flip" %}⚡ {% endif %}{{ d.summary }}
+              </span>
+              {% endif %}
+            </td>
             <td class="instr-bias">{{ r.direction_raw or "—" }}</td>
             <td>
               <span class="instr-strength">

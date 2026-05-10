@@ -102,6 +102,7 @@ def _estimate_notional_per_lot(instrument: str, price: float) -> float:
 
 def compute_ftmo_status(
     open_trades: list[dict],
+    closed_trades: list[dict] | None = None,
     config: dict | None = None,
     today: date | None = None,
 ) -> FtmoStatus:
@@ -109,31 +110,53 @@ def compute_ftmo_status(
 
     open_trades is the list produced by _build_open_trades_block(). Each
     item has at least: instrument, direction, entry_price, current_price,
-    pnl_pct, size_units (if recorded — defaults to 0.01 lot if unset).
+    pnl_pct, size_units.
+    closed_trades is the realised journal (each with pnl_pct, instrument,
+    entry/close prices, size_units). When provided, realised P&L feeds
+    the trailing-DD baseline so the headroom number is accurate rather
+    than the conservative starting-balance assumption.
     """
     cfg = config or load_config()
     today = today or date.today()
     account_size = float(cfg.get("account_size_usd", 100000.0))
     dd_pct = float(cfg.get("trailing_drawdown_pct", 5.0))
 
-    # Sum unrealised P&L in USD across open trades. Use a conservative
-    # per-instrument notional × pnl_pct.
-    pnl_usd = 0.0
+    # ── Realised P&L from closed trades (USD) ──
+    realised_pnl_usd = 0.0
+    for c in closed_trades or []:
+        # Use entry price for notional (rough — actual FTMO settlement
+        # uses prices at trade open + close; this approximation is
+        # consistent with how we compute open-trade P&L).
+        price_for_notional = (c.get("entry_price") or 0.0)
+        if not price_for_notional:
+            continue
+        notional = _estimate_notional_per_lot(c["instrument"], price_for_notional)
+        size_units = float(c.get("size_units") or 0.01)
+        realised_pnl_usd += notional * size_units * (float(c.get("pnl_pct") or 0.0) / 100.0)
+
+    # ── Unrealised P&L on open trades (USD) ──
+    unrealised_pnl_usd = 0.0
     for t in open_trades:
         price = (t.get("current_price") or t.get("entry_price")) or 0.0
         notional = _estimate_notional_per_lot(t["instrument"], price)
-        # If size_units not recorded, assume 0.01 lot (minimal)
         size_units = float(t.get("size_units") or 0.01)
-        pnl_usd += notional * size_units * (float(t.get("pnl_pct") or 0.0) / 100.0)
+        unrealised_pnl_usd += notional * size_units * (float(t.get("pnl_pct") or 0.0) / 100.0)
 
-    # Trailing drawdown: when no losses, full headroom. Approximation —
-    # FTMO's actual trailing DD is computed against the highest equity
-    # reached, not just current balance. Without realised-trade history
-    # plumbed in, this is a rough lower bound: assumes account at
-    # starting balance, deducts only losing unrealised P&L.
-    dd_consumed = -pnl_usd if pnl_usd < 0 else 0.0
+    # ── Trailing drawdown ──
+    # FTMO's trailing DD is calculated against the highest equity reached.
+    # Without per-day equity snapshots, the best approximation is:
+    #   peak_equity = max(starting_balance, starting_balance + realised_pnl + max_unrealised_seen)
+    # We don't track max-unrealised-ever, so use the simpler rule:
+    #   peak = starting_balance + realised_pnl (clamped at starting if negative)
+    #   current_equity = starting_balance + realised_pnl + unrealised_pnl
+    #   drawdown_consumed = max(0, peak - current_equity)
+    realised_clamped = max(0.0, realised_pnl_usd)  # only positive realised lifts the peak
+    peak_equity = account_size + realised_clamped
+    current_equity = account_size + realised_pnl_usd + unrealised_pnl_usd
+    dd_consumed = max(0.0, peak_equity - current_equity)
     dd_remaining_usd = (account_size * dd_pct / 100.0) - dd_consumed
     dd_remaining_pct = max(0.0, dd_remaining_usd / account_size * 100.0)
+    pnl_usd = unrealised_pnl_usd  # the dashboard's "open unrealised" metric
 
     # Correlation: if two open trades are in the same group AND in the
     # same direction, that's accidentally doubled exposure on one theme.

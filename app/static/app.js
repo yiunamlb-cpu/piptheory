@@ -96,6 +96,13 @@
     "stability_n/a": "<strong>Not enough history.</strong> Fewer than 3 runs recorded for this instrument so the trend pattern can't be classified yet.",
     "thesis_drivers": "<strong>Driver status.</strong> The reasons (themes from THEMES.md, specialist support) the Strategist gave for today's bias, compared against the most recent prior run. <em>Intact / modified</em> means the driver's still alive (modified = same theme, slightly rephrased). <em>New</em> means added today. <em>Dropped</em> means removed since yesterday — that's the signal that something has shifted in the macro picture, not just the integer score.",
 
+    // Delta-since-last-run chips
+    "delta_direction_flip": "<strong>Direction flipped.</strong> The bias direction (long ↔ short) has changed since the prior run. This is the strongest cross-run signal — the Bull and Bear cases have decisively reversed roles in the Council debate. If you have an open position in this instrument, the advisor's <em>Close</em> verdict is likely about to fire. Re-read the Judge's reasoning before you do anything.",
+    "delta_conviction_jump": "<strong>Conviction strengthened.</strong> Today's score is 2+ points higher than yesterday's. Either new data confirmed the existing thesis, or a previously-weak theme firmed up. Worth a Why? click to see what specifically changed.",
+    "delta_conviction_drop": "<strong>Conviction weakened.</strong> Today's score is 2+ points lower than yesterday's. The macro view is materially fading. If you have an open position with this direction, the advisor may be moving toward Trim. If you're considering a fresh entry, hold off and re-evaluate.",
+    "delta_minor": "<strong>Minor change.</strong> 1-point conviction wobble — the noise band. Don't act on it alone.",
+    "delta_stable": "<strong>Unchanged from last run.</strong>",
+
     // Regime anchor
     "regime_anchor": "<strong>Regime (data-classified).</strong> A code-computed regime tag from FRED indicators alone — Industrial Production, NFP, retail sales, claims, CPI, PCE, breakevens. Two axes: growth (rising/falling) and inflation (rising/falling). Updates only when data updates (monthly), so it doesn't drift run-to-run like LLM scores. Compare against the LLM's bias readings — disagreement is itself a signal that the LLM is confused or the macro is in transition.",
     "regime_reflation": "<strong>Reflation.</strong> Growth rising AND inflation rising. Risk-on regime: bullish equities (especially cyclicals), commodities, EM, weak dollar.",
@@ -827,13 +834,30 @@
       const avg = h.weighted_avg_3d != null ? `avg ${h.weighted_avg_3d}` : "";
       const stab = h.stability && h.stability !== "n/a" ? h.stability : "";
       const trendBits = [arrow, avg, stab].filter(Boolean).join(" · ");
+      // Highlight cross-run deltas — same logic as the desktop chip
+      const d = h.delta || {};
+      let deltaChip = "";
+      if (d.changed && d.kind !== "minor") {
+        const cls = d.kind === "direction_flip" ? "chip-bad"
+                  : d.kind === "conviction_drop" ? "chip-warn"
+                  : d.kind === "conviction_jump" ? "chip-good"
+                  : "chip-neutral";
+        const icon = d.kind === "direction_flip" ? "⚡ " : "";
+        deltaChip = `<span class="chip ${cls}" style="font-size: 10px; margin-top: 4px;">${icon}${d.summary}</span>`;
+      }
+      // Driver status from thesis tracker (already in r.thesis)
+      const t = r.thesis || {};
+      const driverNote = t.dropped_count > 0
+        ? ` · <span style="color: var(--warn-text); font-size: 11px;">${t.dropped_count} driver${t.dropped_count !== 1 ? "s" : ""} dropped</span>`
+        : "";
       return `
         <li class="${r.is_open_position ? "has-position" : ""}" data-symbol="${r.symbol}" data-action="why-instrument">
           <span class="symbol">${r.symbol}</span>
           <div class="meta">
             ${escapeHTML(r.direction_raw || "—")}<br>
-            <span class="muted">${escapeHTML(r.state)}</span>
+            <span class="muted">${escapeHTML(r.state)}</span>${driverNote}
             ${trendBits ? `<br><span class="muted" style="font-size: 11px;">${trendBits}</span>` : ""}
+            ${deltaChip ? `<br>${deltaChip}` : ""}
           </div>
           <span class="muted">${r.conviction}/10</span>
         </li>
