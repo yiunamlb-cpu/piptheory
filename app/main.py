@@ -915,16 +915,22 @@ def _get_regime() -> dict:
 # ─── HOME CONTEXT (the whole page) ──────────────────────────────────────────
 
 def _detect_surface(request: Request) -> str:
-    """Return 'mobile' or 'desktop'. Order of precedence:
-      1. ?view=mobile|desktop query param (manual override; sticky via cookie)
-      2. user-agent detection (mobile UAs → mobile)
-      3. desktop default
+    """Return 'mobile', 'desktop', or 'showcase'. Order of precedence:
+      1. ?view=... query param (sticky via cookie)
+      2. cookie
+      3. user-agent (mobile UAs → mobile)
+      4. desktop default
+
+    'showcase' is the visual / dark-canvas surface — same data, dramatically
+    different presentation. Toggleable via the sticky tab on the other
+    surfaces; see app/templates/dashboard_showcase.html.
     """
+    valid = ("mobile", "desktop", "showcase")
     override = request.query_params.get("view")
-    if override in ("mobile", "desktop"):
+    if override in valid:
         return override
     cookie = request.cookies.get("nam_view")
-    if cookie in ("mobile", "desktop"):
+    if cookie in valid:
         return cookie
     ua = (request.headers.get("user-agent") or "").lower()
     mobile_markers = ("iphone", "android", "ipod", "mobile safari", "windows phone")
@@ -1062,12 +1068,15 @@ async def run_page(request: Request, date: str):
 
     surface = _detect_surface(request)
     ctx = _build_home_context(run, runs, date, surface)
-    template = "dashboard_mobile.html" if surface == "mobile" else "dashboard_desktop.html"
+    template = {
+        "mobile": "dashboard_mobile.html",
+        "showcase": "dashboard_showcase.html",
+    }.get(surface, "dashboard_desktop.html")
 
     response = templates.TemplateResponse(request, template, ctx)
     # Sticky-set the override cookie so a manual ?view= choice persists.
     override = request.query_params.get("view")
-    if override in ("mobile", "desktop"):
+    if override in ("mobile", "desktop", "showcase"):
         response.set_cookie("nam_view", override, max_age=60 * 60 * 24 * 30, samesite="lax")
     return response
 

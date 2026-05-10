@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+{% block title %}{{ run_date }} — nam-hedgefund · Showcase{% endblock %}
+
+{% block content %}
+<main class="page">
+
+  {# ─── Top bar ────────────────────────────────────────────────────── #}
+  <header class="sc-top">
+    <div class="sc-brand">
+      <span class="sc-mark" aria-hidden="true"></span>
+      <span>nam-hedgefund</span>
+      <span style="color: var(--text-3); font-weight: 400; font-size: 13px; margin-left: 8px;">·  Showcase</span>
+    </div>
+    <div class="sc-meta">
+      <strong>{{ run_date }}</strong> · <span id="last-updated">…</span>
+    </div>
+    <div class="sc-actions">
+      <select id="run-picker" class="sc-select" aria-label="Run date">
+        {% for r in runs %}
+        <option value="{{ r }}" {% if r == run_date %}selected{% endif %}>{{ r }}</option>
+        {% endfor %}
+      </select>
+      <button id="run-now-btn" class="sc-btn sc-btn-primary">▶ Run again</button>
+    </div>
+  </header>
+
+  {# ─── Run-status banner ──────────────────────────────────────────── #}
+  <div id="run-status-banner" class="run-banner" hidden>
+    <div class="run-banner-row">
+      <div class="run-banner-spinner" aria-hidden="true"></div>
+      <div>
+        <div class="run-banner-stage" id="run-stage">Starting…</div>
+        <div class="run-banner-meta">
+          <span id="run-elapsed">00:00</span><span class="dot-sep">·</span><span id="run-pct">0%</span>
+        </div>
+      </div>
+    </div>
+    <div class="run-banner-progress"><div class="run-banner-bar" id="run-bar"></div></div>
+  </div>
+
+  {# ─── Hero: regime + macro picture ───────────────────────────────── #}
+  <div class="sc-hero">
+
+    <section class="sc-card">
+      <div class="sc-eyebrow">Today</div>
+
+      {% if regime and regime.label %}
+      <div class="sc-regime-tag {{ regime.label|lower }}">
+        <span class="sc-regime-dot"></span>{{ regime.label }}
+      </div>
+      {% endif %}
+
+      <h1 class="sc-hero-headline">
+        {% if today.actions %}
+          {{ today.actions|length }} open trade{{ "s" if today.actions|length != 1 }} need attention
+        {% elif today.ideas %}
+          {{ today.ideas|length }} setup{{ "s" if today.ideas|length != 1 }} on the table
+        {% else %}
+          Stand aside. Cash is a position.
+        {% endif %}
+      </h1>
+      <p class="sc-hero-subline">
+        {% if today.actions %}
+          The advisor has flagged actions on positions you're holding. Review below or open the desktop view to act.
+        {% elif today.ideas %}
+          Macro view supports {{ today.ideas[0].direction }} on {{ today.ideas[0].instrument }}{% if today.ideas|length > 1 %} and others{% endif %}. Click through for the full thesis.
+        {% else %}
+          No setup is at a clean structural location and the macro view isn't strong enough to force the issue. Most days will be like this.
+        {% endif %}
+      </p>
+
+      <div class="sc-hero-stats">
+        <div>
+          <div class="sc-hero-stat-num" data-counter="{{ instruments|length }}">{{ instruments|length }}</div>
+          <div class="sc-hero-stat-label">instruments</div>
+        </div>
+        <div>
+          <div class="sc-hero-stat-num" data-counter="{{ macro.themes|length }}">{{ macro.themes|length }}</div>
+          <div class="sc-hero-stat-label">active themes</div>
+        </div>
+        <div>
+          <div class="sc-hero-stat-num" data-counter="{{ trades|length }}">{{ trades|length }}</div>
+          <div class="sc-hero-stat-label">open trades</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sc-card">
+      <div class="sc-eyebrow">Macro themes</div>
+      {% if macro.themes %}
+      <ul class="sc-themes-list">
+        {% for t in macro.themes %}
+        <li class="sc-theme-row">
+          <span class="name">{{ t.name }}</span>
+          <span class="conv">{{ t.conviction }}/10</span>
+          <span class="sc-theme-bar"><span style="--bar-target: {{ t.pct }}%; animation-delay: {{ loop.index0 * 0.08 }}s;"></span></span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p style="color: var(--text-3); font-size: 13px;">No themes loaded.</p>
+      {% endif %}
+
+      {% if macro.next_catalyst %}
+      <div class="sc-catalyst">
+        <span class="lbl">Next</span>
+        <span>{{ macro.next_catalyst }}</span>
+        {% if macro.days_to_catalyst is not none %}
+        <span class="when">{{ macro.days_to_catalyst }}d</span>
+        {% endif %}
+      </div>
+      {% endif %}
+    </section>
+  </div>
+
+  {# ─── Open positions strip ───────────────────────────────────────── #}
+  {% if trades %}
+  <section class="sc-section">
+    <div class="sc-section-title">
+      Open trades <span class="count">{{ trades|length }}</span>
+    </div>
+    <div class="sc-positions">
+      {% for t in trades %}
+      <div class="sc-pos {{ t.action_class }}" data-position-id="{{ t.id }}" data-action="why-position" data-id="{{ t.id }}">
+        <div class="sc-pos-head">
+          <div>
+            <span class="sc-pos-symbol">{{ t.instrument }}</span>
+            <span class="sc-pos-dir {{ t.direction|lower }}">{{ t.direction|upper }}</span>
+          </div>
+          <div class="sc-pos-pnl {% if t.pnl_pct and t.pnl_pct >= 0 %}pos{% elif t.pnl_pct %}neg{% endif %}">
+            {{ "%+.2f"|format(t.pnl_pct or 0) }}%
+          </div>
+        </div>
+        <div class="sc-pos-action">
+          <span class="sc-pos-action-chip {{ t.action }}">{{ t.action_label }}</span>
+        </div>
+        <p class="sc-pos-reason">{{ t.reason|truncate(140, True) }}</p>
+        <div class="sc-pos-prices">
+          <span><strong>{{ "%g"|format(t.entry_price) }}</strong> entry</span>
+          <span>→ <strong>{{ "%g"|format(t.current_price or 0) if t.current_price else "—" }}</strong></span>
+          {% if t.emergency_stop %}<span>stop <strong>{{ "%g"|format(t.emergency_stop) }}</strong></span>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {# ─── Today's ideas ──────────────────────────────────────────────── #}
+  {% if today.ideas %}
+  <section class="sc-section">
+    <div class="sc-section-title">
+      Today's ideas <span class="count">{{ today.ideas|length }}</span>
+    </div>
+    <div class="sc-positions">
+      {% for i in today.ideas %}
+      <div class="sc-pos" data-action="why-instrument" data-symbol="{{ i.instrument }}">
+        <div class="sc-pos-head">
+          <div>
+            <span class="sc-pos-symbol">{{ i.instrument }}</span>
+            <span class="sc-pos-dir {{ i.direction }}">{{ i.direction|upper }}</span>
+          </div>
+          <div class="sc-pos-pnl" style="color: var(--brand-strong); text-shadow: 0 0 16px var(--brand-glow); font-size: 18px;">
+            {{ i.conviction }}/10
+          </div>
+        </div>
+        <div class="sc-pos-action">
+          <span class="sc-pos-action-chip {% if i.verdict == 'tradable_now' %}trail_stop{% else %}review{% endif %}">
+            {% if i.verdict == "tradable_now" %}Ready{% else %}Watch{% endif %}
+          </span>
+          <span style="font-size: 11px; color: var(--text-3); margin-left: auto;">{{ i.strength_label }}</span>
+        </div>
+        <p class="sc-pos-reason">{{ i.macro_summary|truncate(180, True) }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {# ─── Instrument matrix ──────────────────────────────────────────── #}
+  <section class="sc-section">
+    <div class="sc-section-title">
+      All instruments <span class="count">{{ instruments|length }}</span>
+    </div>
+    <div class="sc-matrix">
+      {% for r in instruments %}
+      {% set arrow_dir = "up" if r.direction == "long" else ("down" if r.direction == "short" else "flat") %}
+      <div class="sc-tile {{ 'has-position' if r.is_open_position }} dir-{{ arrow_dir }}"
+           data-action="why-instrument" data-symbol="{{ r.symbol }}">
+        <div class="sc-tile-head">
+          <span class="sc-tile-symbol">{{ r.symbol }}</span>
+          <span class="sc-tile-conv {{ r.strength_band }}">{{ r.conviction }}/10</span>
+        </div>
+        <div class="sc-tile-bias">{{ r.direction_raw or "—" }}</div>
+        {% if r.history.n_entries >= 2 %}
+        <svg class="sc-tile-spark" viewBox="0 0 100 32" preserveAspectRatio="none" data-convictions="{{ r.history.convictions|tojson }}">
+          <polyline class="line" />
+        </svg>
+        {% else %}
+        <div style="height: 32px;"></div>
+        {% endif %}
+        <div class="sc-tile-state">{{ r.state }}</div>
+        <div class="sc-tile-arrow">
+          {% if arrow_dir == "up" %}↗{% elif arrow_dir == "down" %}↘{% else %}→{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  {# ─── Today's brief inline (collapsed) ───────────────────────────── #}
+  {% if brief_md %}
+  <section class="sc-section">
+    <div class="sc-section-title">Today's brief</div>
+    <article class="sc-brief">{{ brief_md | markdown | safe }}</article>
+  </section>
+  {% endif %}
+
+  {# ─── Bottom tools ───────────────────────────────────────────────── #}
+  <div class="sc-tools">
+    <button class="sc-btn" data-action="open-new-trade">+ New trade</button>
+    <button class="sc-btn" data-action="open-ask">Ask</button>
+    <button class="sc-btn" data-action="open-journal">Journal</button>
+  </div>
+</main>
+
+{# ─── Sticky surface-toggle: switches to desktop ─────────────────── #}
+<a class="surface-toggle" href="?view=desktop" title="Switch to standard desktop view">
+  <span class="arrow">←</span>Exit Showcase
+</a>
+
+{# ─── Slide-over for instrument detail (same component as desktop) ─ #}
+<div id="overlay" class="overlay"></div>
+<aside id="slideover" class="slideover" aria-hidden="true">
+  <header class="slideover-head">
+    <span class="slideover-title" id="slideover-title">Detail</span>
+    <button class="slideover-close" data-action="close-slideover">×</button>
+  </header>
+  <div class="slideover-body" id="slideover-body">
+    <p class="muted">Loading…</p>
+  </div>
+</aside>
+
+{# ─── Modal: New trade (reused from desktop) ─────────────────────── #}
+<div id="modal-new-trade" class="modal" aria-hidden="true">
+  <div class="modal-card">
+    <header class="modal-head">
+      <span class="modal-title">Record a new trade</span>
+      <button class="slideover-close" data-action="close-modal" data-target="modal-new-trade">×</button>
+    </header>
+    <div class="modal-body">
+      <form id="new-trade-form">
+        <div class="field">
+          <label for="nt-instrument">Instrument</label>
+          <select id="nt-instrument" name="instrument" required>
+            {% for sym in active_universe %}<option value="{{ sym }}">{{ sym }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="nt-direction">Direction</label>
+            <select id="nt-direction" name="direction" required>
+              <option value="long">Long</option><option value="short">Short</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="nt-entry-date">Entry date</label>
+            <input type="date" id="nt-entry-date" name="entry_date" required>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="nt-entry-price">Entry price</label>
+            <input type="number" step="any" id="nt-entry-price" name="entry_price" required>
+          </div>
+          <div class="field">
+            <label for="nt-stop">Stop level</label>
+            <input type="number" step="any" id="nt-stop" name="emergency_stop">
+          </div>
+        </div>
+        <div class="field">
+          <label for="nt-notes">Notes</label>
+          <textarea id="nt-notes" name="notes" rows="2"></textarea>
+        </div>
+      </form>
+    </div>
+    <footer class="modal-foot">
+      <span class="muted" id="nt-status" style="margin-right: auto; font-size: 12px;"></span>
+      <button class="sc-btn" data-action="close-modal" data-target="modal-new-trade">Cancel</button>
+      <button class="sc-btn sc-btn-primary" data-action="submit-new-trade">Record</button>
+    </footer>
+  </div>
+</div>
+
+{# ─── Modal: Ask ──────────────────────────────────────────────────── #}
+<div id="modal-ask" class="modal" aria-hidden="true">
+  <div class="modal-card">
+    <header class="modal-head">
+      <span class="modal-title">Ask</span>
+      <button class="slideover-close" data-action="close-modal" data-target="modal-ask">×</button>
+    </header>
+    <div class="modal-body">
+      <div class="field">
+        <label for="ask-persona">Voice</label>
+        <select id="ask-persona">
+          {% for p in personas %}<option value="{{ p.key }}">{{ p.label }}</option>{% endfor %}
+        </select>
+      </div>
+      <div id="chat-history" class="chat-history" aria-live="polite"></div>
+      <form id="chat-form" class="chat-form">
+        <textarea id="chat-input" placeholder="Ask about today's brief or your open trades…" rows="2"></textarea>
+        <button type="submit" class="sc-btn sc-btn-primary" id="chat-send">Send</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{# ─── Modal: Journal ──────────────────────────────────────────────── #}
+<div id="modal-journal" class="modal" aria-hidden="true">
+  <div class="modal-card">
+    <header class="modal-head">
+      <span class="modal-title">Closed trades</span>
+      <button class="slideover-close" data-action="close-modal" data-target="modal-journal">×</button>
+    </header>
+    <div class="modal-body">
+      <ul id="closed-list" class="closed-list"></ul>
+      <p class="muted" id="closed-empty" style="text-align: center; padding: 20px 0;">No closed trades yet.</p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.__APP_CONFIG__ = {
+    runDate: {{ run_date | tojson }},
+    runs: {{ runs | tojson }},
+    surface: "showcase",
+    instruments: {{ instruments | tojson }},
+    activeUniverse: {{ active_universe | tojson }},
+    personas: {{ personas | tojson }}
+  };
+</script>
+<script src="/static/app.js?v={{ static_version }}"></script>
+<script src="/static/showcase.js?v={{ static_version }}"></script>
+{% endblock %}
