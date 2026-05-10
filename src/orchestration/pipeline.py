@@ -31,6 +31,7 @@ from src.orchestration.context import (
     bull_advocate_input,
     contrarian_input,
     fed_watcher_input,
+    geopolitical_risk_input,
     inflation_tracker_input,
     judge_input,
     load_themes,
@@ -133,19 +134,38 @@ class BiasEngine:
         result = run_agent("layer1_specialists/fed_watcher", user_msg, client=self.client)
         return result.content
 
-    def run_layer1_parallel(self) -> dict[str, str]:
-        """Run the three Layer 1 specialists concurrently.
+    def run_geopolitical_risk(self, themes: str) -> str:
+        """Run the Geopolitical Risk specialist.
+
+        Audit feedback (May 2026): the prompt file existed but was never
+        wired into the pipeline. Now part of Layer 1 parallel run.
+        Operates from THEMES.md + recent_events.yaml (user-maintained
+        news log) since there's no structured geopolitical data API
+        plumbed in yet.
+        """
+        log.info("layer1_geopolitical_start")
+        user_msg = geopolitical_risk_input(themes)
+        result = run_agent("layer1_specialists/geopolitical_risk", user_msg, client=self.client)
+        return result.content
+
+    def run_layer1_parallel(self, themes: str | None = None) -> dict[str, str]:
+        """Run the four Layer 1 specialists concurrently.
 
         Each reads its own data sources and produces an independent output;
-        no cross-specialist dependencies. Three threads, OpenRouter calls
+        no cross-specialist dependencies. Four threads, OpenRouter calls
         block on network I/O, GIL-friendly.
+
+        themes is optional and only consumed by the Geopolitical Risk
+        specialist; the others pull their own data.
         """
         log.info("layer1_parallel_start")
-        with ThreadPoolExecutor(max_workers=3, thread_name_prefix="L1") as ex:
+        themes_text = themes if themes is not None else load_themes()
+        with ThreadPoolExecutor(max_workers=4, thread_name_prefix="L1") as ex:
             futures = {
                 "inflation": ex.submit(self.run_inflation_tracker),
                 "positioning": ex.submit(self.run_positioning_analyst),
                 "fed": ex.submit(self.run_fed_watcher),
+                "geopolitical": ex.submit(self.run_geopolitical_risk, themes_text),
             }
             outputs: dict[str, str] = {}
             for key, fut in futures.items():
@@ -193,15 +213,66 @@ class BiasEngine:
         return output  # fallback — agent gets the full strategist/contrarian doc
 
     def _extract_conviction(self, instrument_section: str) -> int:
-        """Extract conviction score from a strategist bias card. Returns 0 if unparseable.
+        """Extract conviction score from a strategist bias card.
 
-        Tolerates markdown-formatted lines like ``**CONVICTION:** 8/10``.
+        Tries multiple patterns to tolerate variation in LLM output:
+          - ``CONVICTION: 6/10``        (canonical)
+          - ``**CONVICTION:** 6/10``    (markdown emphasis)
+          - ``CONVICTION: 6 out of 10`` (spelled out)
+          - ``CONVICTION: 6 / 10``      (extra spaces)
+          - ``Conviction level: 6.5/10`` (decimal — rounds down)
+          - ``CONVICTION SCORE: 6``     (no /10 suffix)
+
+        The previous single-pattern version silently returned 0 if the LLM
+        wrote the score in a slightly different shape — which then caused
+        the pipeline to skip the council for that instrument. Audit
+        flagged this as a bug. Now logs a WARNING when extraction has to
+        fall back so we can see how often it's needed.
+
+        Returns 0 only if every pattern fails AND the section has no
+        plausible conviction-like number nearby.
         """
-        # Permissive: any non-digit chars between "CONVICTION" and the digit
-        # (covers `:`, `**`, whitespace, smart quotes, etc.). Cap to 30 chars
-        # of slack so we don't eat past the line.
-        m = re.search(r"CONVICTION[^\d]{0,30}(\d+)\s*/\s*10", instrument_section, re.IGNORECASE)
-        return int(m.group(1)) if m else 0
+        if not instrument_section:
+            return 0
+
+        # Patterns ordered most-specific to most-permissive. First match wins.
+        patterns = [
+            # 6/10, 6 / 10, 6.5/10
+            (r"CONVICTION[^\d\n]{0,30}(\d+(?:\.\d+)?)\s*/\s*10",
+             "canonical-fraction"),
+            # 6 out of 10
+            (r"CONVICTION[^\d\n]{0,30}(\d+(?:\.\d+)?)\s+out\s+of\s+10",
+             "spelled-out"),
+            # 6/10 written as a separate token (e.g. "level: 6/10")
+            (r"\bCONVICTION\b[^\n]*?\b(\d+(?:\.\d+)?)\s*/\s*10",
+             "loose-line"),
+            # Just a number 1-10 in the same line as CONVICTION
+            (r"\bCONVICTION[^\n]*?\b([1-9]|10)\b(?!\s*(?:%|percent))",
+             "bare-number"),
+        ]
+        for pat, label in patterns:
+            m = re.search(pat, instrument_section, re.IGNORECASE)
+            if m:
+                try:
+                    val = int(float(m.group(1)))
+                except (ValueError, TypeError):
+                    continue
+                if 0 <= val <= 10:
+                    if label != "canonical-fraction":
+                        log.warning(
+                            "conviction_extraction_fallback",
+                            pattern=label,
+                            value=val,
+                            preview=instrument_section[:200].replace("\n", " ")[:120],
+                        )
+                    return val
+        # Total failure — log loudly. The pipeline will treat this
+        # as below-threshold and skip the council for this instrument.
+        log.warning(
+            "conviction_extraction_failed",
+            preview=instrument_section[:200].replace("\n", " ")[:120],
+        )
+        return 0
 
     def run_council_for_instrument(
         self,
@@ -386,12 +457,15 @@ class BiasEngine:
         result = PipelineResult(run_date=run_date)
         themes = load_themes()
 
-        # Layer 1 — three specialists run in parallel (independent data sources)
-        layer1 = self.run_layer1_parallel()
+        # Layer 1 — four specialists run in parallel (Geopolitical Risk
+        # added May 2026 after audit; the prompt existed but had never
+        # been wired in)
+        layer1 = self.run_layer1_parallel(themes=themes)
         result.layer1 = layer1
         (out_dir / "01_layer1_inflation.md").write_text(layer1.get("inflation", ""), encoding="utf-8")
         (out_dir / "01_layer1_positioning.md").write_text(layer1.get("positioning", ""), encoding="utf-8")
         (out_dir / "01_layer1_fed.md").write_text(layer1.get("fed", ""), encoding="utf-8")
+        (out_dir / "01_layer1_geopolitical.md").write_text(layer1.get("geopolitical", ""), encoding="utf-8")
 
         # Layer 2
         result.layer2_strategist = self.run_strategist(result.layer1, themes)

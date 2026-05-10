@@ -1,0 +1,24 @@
+# FOMC latest statement / minutes — manually maintained.
+#
+# Paste the most recent FOMC statement (or relevant minutes excerpt)
+# below the marker line. The Fed-Watcher specialist reads this on each
+# pipeline run alongside FRED rate data. If this file is empty or missing,
+# the Fed-Watcher reasons from rate path data alone (its previous mode).
+#
+# Update cadence:
+#   - After each FOMC meeting (~8x/year): replace the body with the
+#     full statement text from federalreserve.gov
+#   - When FOMC minutes are released (~3 weeks after each meeting):
+#     paste the most actionable section (usually the staff economic
+#     and financial outlook + Committee policy actions)
+#   - Mid-cycle: paste any high-impact Fed-speaker prepared remarks
+#     (Powell at Jackson Hole, semi-annual testimony, etc.)
+#
+# Format: don't worry about it. The agent will parse whatever's here.
+# Free-form prose is fine. Including the date at the top helps the
+# agent know the freshness.
+#
+# ─── PASTE BELOW THIS LINE ─────────────────────────────────────────
+
+(No FOMC statement text loaded. Update this file after the next FOMC
+meeting or when minutes are released. Paste the full statement, dated.)

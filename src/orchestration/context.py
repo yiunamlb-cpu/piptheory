@@ -6,7 +6,7 @@ from datetime import datetime
 
 import pandas as pd
 
-from src.config import DOCS_DIR
+from src.config import DOCS_DIR, ROOT
 
 
 def load_themes() -> str:
@@ -84,17 +84,94 @@ def positioning_analyst_input(summaries: list[dict]) -> str:
     )
 
 
+def geopolitical_risk_input(themes: str) -> str:
+    """Build the Geopolitical Risk specialist's user message.
+
+    This agent operates without structured data inputs — its work is to
+    read the user-maintained recent events log alongside the THEMES.md
+    regime tracker and identify which active conflicts / sanctions /
+    elections are amplifying or invalidating those themes. We pass it
+    THEMES.md and the rendered events block so it has the same news
+    context the Strategist sees, plus its own prompt directs it toward
+    geopolitical-specific reasoning.
+    """
+    today = datetime.now().date().isoformat()
+    try:
+        from src.data import render_recent_events_block
+        events_text = render_recent_events_block()
+    except Exception as e:
+        events_text = f"(recent_events.yaml unavailable: {e})"
+    return (
+        f"# Geopolitical Risk — Daily Read, {today}\n\n"
+        f"{FRESHNESS_INSTRUCTION}\n\n"
+        f"Produce your structured output schema. Focus on geopolitical "
+        f"risk amplifiers/invalidators of the active themes. The recent "
+        f"events log below is the user-maintained news input — treat "
+        f"HIGH-relevance entries as authoritative.\n\n"
+        f"## Active themes (from docs/THEMES.md)\n\n{themes}\n\n"
+        f"## Recent events log (from data/recent_events.yaml)\n\n{events_text}\n"
+    )
+
+
+def _load_fomc_text() -> str:
+    """Read user-maintained FOMC statement / minutes text from
+    data/fomc_latest.txt. Strips leading comment block (lines starting
+    with #). Returns empty string if file missing or has only comments.
+    """
+    path = ROOT / "data" / "fomc_latest.txt"
+    if not path.exists():
+        return ""
+    raw = path.read_text(encoding="utf-8")
+    # Strip leading comment-only block; keep everything after the first
+    # non-comment, non-blank line.
+    lines = raw.splitlines()
+    body_start = 0
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped and not stripped.startswith("#"):
+            body_start = i
+            break
+    body = "\n".join(lines[body_start:]).strip()
+    # Heuristic: ignore the placeholder text shipped with the starter file
+    if body.startswith("(No FOMC statement text loaded."):
+        return ""
+    return body
+
+
 def fed_watcher_input(rate_snapshot: pd.DataFrame) -> str:
     today = datetime.now().date().isoformat()
-    return (
-        f"# Fed-Watcher — Live Rate Data, {today}\n\n"
-        f"{FRESHNESS_INSTRUCTION}\n\n"
-        f"NOTE: FOMC statement text is not yet wired in (Phase B). For this run, "
-        f"reason from rate path data alone — Fed funds target, market pricing "
-        f"via Treasury yields, breakevens. Produce your structured output schema, "
-        f"explicitly noting where you'd refine if statement text were available.\n\n"
-        f"## Rate snapshot\n\n{fred_snapshot_to_text(rate_snapshot)}\n"
-    )
+    fomc_text = _load_fomc_text()
+    parts = [
+        f"# Fed-Watcher — Daily Read, {today}",
+        "",
+        FRESHNESS_INSTRUCTION,
+        "",
+    ]
+    if fomc_text:
+        parts.extend([
+            "## Latest FOMC statement / minutes (user-maintained)",
+            "",
+            fomc_text,
+            "",
+            "Read the FOMC text above as authoritative for current Fed stance. "
+            "Combine with the rate snapshot below to assess whether market pricing "
+            "matches the Committee's communicated path, and whether dot-plot or "
+            "language shifts are priced in.",
+            "",
+        ])
+    else:
+        parts.append(
+            "NOTE: data/fomc_latest.txt has no current FOMC text loaded. Reason "
+            "from rate path data alone — Fed funds target, market pricing via "
+            "Treasury yields, breakevens. Note in your output that you'd refine "
+            "if statement text were available.\n",
+        )
+    parts.extend([
+        "## Rate snapshot",
+        "",
+        fred_snapshot_to_text(rate_snapshot),
+    ])
+    return "\n".join(parts)
 
 
 def strategist_input(layer1_outputs: dict[str, str], themes: str) -> str:

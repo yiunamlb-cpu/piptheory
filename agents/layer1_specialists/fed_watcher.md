@@ -48,8 +48,12 @@ On every run, produce an updated read of Fed policy stance and market pricing.
 
 ### Required (every run)
 
-- Latest FOMC statement (full text)
-- Previous FOMC statement (full text) — for diff
+- Latest FOMC statement (full text) — sourced from `data/fomc_latest.txt`,
+  user-maintained. If the file is empty or absent, the user message will
+  say so explicitly; in that case reason from rate path data alone and
+  flag in your output that statement text was unavailable.
+- Previous FOMC statement (full text) — for diff. Phase B; if not
+  provided, do prose-level analysis of the current statement only.
 - Current Fed funds futures pricing (next meeting, 6m, 12m forward)
 - Current OIS curve
 - Most recent dot plot (if released within last 90 days)
