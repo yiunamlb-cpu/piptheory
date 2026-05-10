@@ -499,12 +499,17 @@
         <h4>${p.instrument} ${p.direction.toUpperCase()}</h4>
         <p><strong>Recommendation:</strong> ${escapeHTML(adv.action || "—")}.<br>
            ${escapeHTML(adv.reason || "—")}</p>
+        <p>
+          <button class="btn btn-sm" data-action="edit-position" data-id="${p.id}">Edit trade</button>
+          <button class="btn btn-sm" data-action="close-position" data-id="${p.id}">Mark closed</button>
+        </p>
         <h4>The numbers</h4>
         <ul>
           <li>Entry: ${p.entry_price} on ${p.entry_date}</li>
           <li>Current: ${item.current_price ?? "—"}</li>
+          <li>Size: ${p.size_units ?? "—"}</li>
           <li>P&amp;L: ${fmtPnl(adv.pnl_pct)}</li>
-          ${p.emergency_stop ? `<li>Stop: ${p.emergency_stop} (${adv.stop_distance_pct ? adv.stop_distance_pct.toFixed(1) + "% away" : "—"})</li>` : ""}
+          ${p.emergency_stop ? `<li>Stop: ${p.emergency_stop} (${adv.stop_distance_pct ? adv.stop_distance_pct.toFixed(1) + "% away" : "—"})</li>` : `<li>Stop: <em>not set</em></li>`}
         </ul>
         <h4>Macro since you opened</h4>
         <ul>
@@ -620,6 +625,117 @@
       }
     } catch (e) {
       alert("Failed: " + e.message);
+    }
+  }
+
+  // ─── Edit-position flow ────────────────────────────────────────────
+
+  async function openEditTrade(positionId) {
+    // Pull the current position data so the form can be pre-filled
+    let data;
+    try {
+      const r = await fetch("/api/positions");
+      const json = await r.json();
+      const item = (json.active || []).find((it) => it.position && it.position.id === positionId);
+      if (!item) {
+        alert("Position not found.");
+        return;
+      }
+      data = item.position;
+    } catch (e) {
+      alert("Couldn't load position: " + e.message);
+      return;
+    }
+
+    if (surface === "mobile") {
+      const html = `
+        <p class="muted" style="margin-top: 0; font-size: 13px;">
+          Correct typos or update size, stop, or notes. The bias and
+          thesis snapshot from when you opened stay frozen.
+        </p>
+        <input type="hidden" id="etm-id" value="${data.id}">
+        <div class="field-row">
+          <div class="field">
+            <label for="etm-date">Entry date</label>
+            <input type="date" id="etm-date" value="${data.entry_date || ""}">
+          </div>
+          <div class="field">
+            <label for="etm-price">Entry price</label>
+            <input type="number" step="any" id="etm-price" value="${data.entry_price ?? ""}">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="etm-size">Size</label>
+            <input type="number" step="any" id="etm-size" value="${data.size_units ?? ""}">
+          </div>
+          <div class="field">
+            <label for="etm-stop">Stop level</label>
+            <input type="number" step="any" id="etm-stop" value="${data.emergency_stop ?? ""}">
+          </div>
+        </div>
+        <div class="field">
+          <label for="etm-notes">Notes (replaces existing)</label>
+          <textarea id="etm-notes" rows="3">${escapeHTML(data.notes || "")}</textarea>
+        </div>
+      `;
+      const foot = `
+        <button class="btn btn-ghost" data-action="close-sheet">Cancel</button>
+        <button class="btn btn-primary" data-action="submit-edit-trade-mobile">Save</button>
+      `;
+      openSheet(`Edit ${data.instrument} ${data.direction.toUpperCase()}`, html, foot);
+    } else {
+      $("#et-id").value = data.id;
+      $("#et-symbol-label").textContent = `${data.instrument} ${data.direction.toUpperCase()}`;
+      $("#et-entry-date").value = data.entry_date || "";
+      $("#et-entry-price").value = data.entry_price ?? "";
+      $("#et-size").value = data.size_units ?? "";
+      $("#et-stop").value = data.emergency_stop ?? "";
+      $("#et-notes").value = data.notes || "";
+      $("#et-status").textContent = "";
+      openModal("modal-edit-trade");
+    }
+  }
+
+  async function submitEditTrade(form) {
+    const fd = (form === "mobile")
+      ? {
+          id: $("#etm-id").value,
+          entry_date: $("#etm-date").value || null,
+          entry_price: $("#etm-price").value ? parseFloat($("#etm-price").value) : null,
+          size_units: $("#etm-size").value ? parseFloat($("#etm-size").value) : null,
+          emergency_stop: $("#etm-stop").value ? parseFloat($("#etm-stop").value) : null,
+          notes: $("#etm-notes").value,
+        }
+      : {
+          id: $("#et-id").value,
+          entry_date: $("#et-entry-date").value || null,
+          entry_price: $("#et-entry-price").value ? parseFloat($("#et-entry-price").value) : null,
+          size_units: $("#et-size").value ? parseFloat($("#et-size").value) : null,
+          emergency_stop: $("#et-stop").value ? parseFloat($("#et-stop").value) : null,
+          notes: $("#et-notes").value,
+        };
+    if (!fd.id) return;
+    const id = fd.id;
+    delete fd.id;
+    // Strip empty/null fields so the server only updates what changed
+    Object.keys(fd).forEach((k) => { if (fd[k] === null || fd[k] === "" || (typeof fd[k] === "number" && Number.isNaN(fd[k]))) delete fd[k]; });
+    try {
+      const r = await fetch(`/api/positions/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(fd),
+      });
+      if (r.ok) {
+        closeAll();
+        setTimeout(() => location.reload(), 200);
+      } else {
+        const err = await r.text();
+        if (form === "mobile") alert("Edit failed: " + err);
+        else $("#et-status").textContent = "Failed: " + err;
+      }
+    } catch (e) {
+      alert("Edit failed: " + e.message);
     }
   }
 
@@ -1059,6 +1175,9 @@
 
     switch (action) {
       case "close-position":      e.preventDefault(); closePosition(id); break;
+      case "edit-position":       e.preventDefault(); openEditTrade(id); break;
+      case "submit-edit-trade":   e.preventDefault(); submitEditTrade("desktop"); break;
+      case "submit-edit-trade-mobile": e.preventDefault(); submitEditTrade("mobile"); break;
       case "why-position":        e.preventDefault(); showPositionWhy(id); break;
       case "why-instrument":      e.preventDefault(); showInstrumentReasoning(sym); break;
       case "open-new-trade":      e.preventDefault(); openNewTrade(); break;

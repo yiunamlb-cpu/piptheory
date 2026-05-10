@@ -1502,6 +1502,34 @@ async def api_positions_add_note(position_id: str, req: NoteRequest):
     return JSONResponse({"position": pos.to_dict()})
 
 
+class EditPositionRequest(BaseModel):
+    """Partial-update for an active position. Any field can be omitted;
+    only the ones supplied are updated. Bias / conviction / thesis at
+    open are deliberately not editable — those are frozen snapshots
+    (mutating them would invalidate the cross-run advisor logic).
+    """
+    entry_price: float | None = None
+    size_units: float | None = None
+    emergency_stop: float | None = None
+    notes: str | None = None
+    entry_date: str | None = None
+
+
+@app.patch("/api/positions/{position_id}")
+async def api_positions_edit(position_id: str, req: EditPositionRequest):
+    """Edit an active position's mutable fields. The user can correct
+    typos in entry price, adjust size, set/move the stop, replace notes,
+    or fix the entry date. Frozen-at-open fields (bias, conviction,
+    thesis) stay frozen by design — they're the baseline the advisor
+    uses for cross-run comparison.
+    """
+    payload = req.model_dump(exclude_unset=True, exclude_none=True)
+    pos = _positions.update_fields(position_id, **payload)
+    if pos is None:
+        raise HTTPException(404, f"No active position with id {position_id!r}")
+    return JSONResponse({"position": pos.to_dict()})
+
+
 @app.post("/api/positions/{position_id}/stop")
 async def api_positions_update_stop(position_id: str, req: StopRequest):
     pos = _positions.update_emergency_stop(position_id, req.emergency_stop)

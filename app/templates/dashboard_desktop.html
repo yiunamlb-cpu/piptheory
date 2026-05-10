@@ -261,6 +261,7 @@
         </div>
         <div class="trade-row-buttons">
           <button class="btn btn-sm" data-action="close-position" data-id="{{ t.id }}">Close</button>
+          <button class="btn btn-sm btn-ghost" data-action="edit-position" data-id="{{ t.id }}">Edit</button>
           <button class="btn btn-sm btn-ghost" data-action="why-position" data-id="{{ t.id }}">Why?</button>
         </div>
       </div>
@@ -513,6 +514,53 @@
         <button type="submit" class="btn btn-primary" id="chat-send">Send</button>
       </form>
     </div>
+  </div>
+</div>
+
+{# ─── Modal: Edit an open position ──────────────────────────────── #}
+<div id="modal-edit-trade" class="modal" aria-hidden="true">
+  <div class="modal-card">
+    <header class="modal-head">
+      <span class="modal-title">Edit trade <span class="muted" id="et-symbol-label" style="font-weight: 400;"></span></span>
+      <button class="slideover-close" data-action="close-modal" data-target="modal-edit-trade">×</button>
+    </header>
+    <div class="modal-body">
+      <p class="muted" style="margin-top: 0; font-size: 13px;">
+        Correct typos or update size, stop, or notes. The bias / conviction /
+        thesis snapshot from when you opened the trade stays frozen — that's
+        the baseline the advisor uses to detect "thesis weakened" later.
+      </p>
+      <input type="hidden" id="et-id">
+      <div class="field-row">
+        <div class="field">
+          <label for="et-entry-date">Entry date</label>
+          <input type="date" id="et-entry-date">
+        </div>
+        <div class="field">
+          <label for="et-entry-price">Entry price</label>
+          <input type="number" step="any" id="et-entry-price">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="et-size">Size (units / lots)</label>
+          <input type="number" step="any" id="et-size">
+        </div>
+        <div class="field">
+          <label for="et-stop">Stop level</label>
+          <input type="number" step="any" id="et-stop">
+        </div>
+      </div>
+      <div class="field">
+        <label for="et-notes">Notes <span class="muted">(replaces existing — to append a dated entry, use Add note instead)</span></label>
+        <textarea id="et-notes" rows="3"></textarea>
+      </div>
+    </div>
+    <footer class="modal-foot">
+      <span class="muted" id="et-status" style="margin-right: auto; font-size: 12px;"></span>
+      <button class="btn btn-ghost" data-action="close-modal" data-target="modal-edit-trade">Cancel</button>
+      <button class="btn btn-primary" data-action="submit-edit-trade">Save changes</button>
+    </footer>
   </div>
 </div>
 

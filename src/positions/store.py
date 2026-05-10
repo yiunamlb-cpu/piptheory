@@ -270,3 +270,60 @@ class PositionStore:
                     self._write_all(data)
                     return Position.from_dict(d)
         return None
+
+    # Whitelist of fields the user can edit on an already-recorded
+    # active position. Bias / conviction / thesis snapshots are
+    # deliberately excluded — those are frozen at open by design (they're
+    # the baseline the advisor compares "today" against; mutating them
+    # would invalidate the cross-run continuity logic).
+    _EDITABLE_FIELDS = (
+        "entry_price",
+        "size_units",
+        "emergency_stop",
+        "notes",
+        "entry_date",
+    )
+
+    def update_fields(
+        self,
+        position_id: str,
+        **fields,
+    ) -> Optional[Position]:
+        """Patch arbitrary editable fields on an active position.
+
+        Used by the dashboard's Edit-trade flow. Type-coerces numeric
+        fields. Pass any number of keyword args from _EDITABLE_FIELDS;
+        keys outside the whitelist are silently ignored to keep the
+        bias_at_open / conviction_at_open snapshot frozen.
+
+        Returns the updated Position or None if the id doesn't match
+        an active position.
+        """
+        coerced: dict[str, object] = {}
+        for k, v in fields.items():
+            if k not in self._EDITABLE_FIELDS:
+                continue
+            if v is None or v == "":
+                continue
+            if k in ("entry_price", "size_units", "emergency_stop"):
+                try:
+                    coerced[k] = float(v)
+                except (TypeError, ValueError):
+                    continue
+            elif k == "notes":
+                # `notes` here REPLACES — to append, use add_note().
+                # The Edit flow uses replace because the user is editing
+                # a single text area, not adding a timestamped log entry.
+                coerced[k] = str(v)
+            else:
+                coerced[k] = str(v)
+        if not coerced:
+            return self.get(position_id)
+        with self._lock:
+            data = self._read_all()
+            for d in data["active"]:
+                if d.get("id") == position_id:
+                    d.update(coerced)
+                    self._write_all(data)
+                    return Position.from_dict(d)
+        return None
