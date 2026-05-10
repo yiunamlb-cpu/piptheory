@@ -17,6 +17,7 @@ from src.data.recent_events import (
     recent_events_for_prompt,
     render_recent_events_block,
 )
+from src.data import regime, score_history, thesis_tracker  # noqa: F401
 
 __all__ = [
     "FredClient", "MACRO_SERIES",

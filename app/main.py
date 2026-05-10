@@ -45,7 +45,9 @@ from src.data import (  # noqa: E402
     add_recent_event,
     delete_recent_event,
     load_recent_events,
+    regime as regime_mod,
     score_history,
+    thesis_tracker,
     upcoming_events,
 )
 from src.data.prices import INSTRUMENT_TO_TICKER, PriceClient  # noqa: E402
@@ -745,15 +747,24 @@ def _build_macro_block() -> dict:
 # ─── OPEN TRADES STRIP ──────────────────────────────────────────────────────
 
 def _build_open_trades_block(run: Run) -> list[dict]:
-    """One row per open position. Includes pnl, current price, advisor verdict."""
+    """One row per open position. Includes pnl, current price, advisor verdict,
+    and trend-health verdict (from src/positions/trend_health.py — for
+    swing-trader 'is my held trend still alive' question)."""
     try:
         positions = _positions.list_active()
     except Exception:
         return []
+    from src.positions.trend_health import assess_trend_health
     rows: list[dict] = []
     for pos in positions:
         cur = _prices.get_latest_close(pos.instrument)
         adv = advise_position(pos, cur or pos.entry_price, run)
+        # Pull setup context (price action) for trend health
+        try:
+            ctx = _prices.get_setup_context(pos.instrument).to_dict()
+        except Exception:
+            ctx = None
+        th = assess_trend_health(pos.direction, ctx)
         rows.append({
             "id": pos.id,
             "instrument": pos.instrument,
@@ -775,6 +786,8 @@ def _build_open_trades_block(run: Run) -> list[dict]:
             "stop_distance_pct": adv.stop_distance_pct,
             "filter_verdict_now": adv.filter_verdict_now,
             "notes": pos.notes,
+            "trend_health": th.verdict,
+            "trend_health_reason": th.reason,
         })
     return rows
 
@@ -816,6 +829,7 @@ def _build_instruments_table(run: Run, open_instruments: set[str]) -> list[dict]
             state, state_class = "—", "neutral"
 
         hist = score_history.summary_for(b.instrument, n=7)
+        thesis = thesis_tracker.status_for(b.instrument)
         rows.append({
             "symbol": b.instrument,
             "name": display_label(b.instrument),
@@ -829,6 +843,7 @@ def _build_instruments_table(run: Run, open_instruments: set[str]) -> list[dict]
             "verdict": verdict,
             "is_open_position": b.instrument in open_instruments,
             "history": hist,
+            "thesis": thesis,
         })
     # Add any instruments that have a Filter card but no Strategist bias
     # card (this run was truncated). Show them with a "Strategist output
@@ -860,6 +875,43 @@ def _build_instruments_table(run: Run, open_instruments: set[str]) -> list[dict]
     return rows
 
 
+# ─── Regime cache ──────────────────────────────────────────────────────────
+# Regime classification requires several FRED calls (industrial production,
+# NFP, retail sales, claims, CPI, PCE, breakevens). Don't re-fetch on every
+# page load. Cache for 6 hours — macro data updates monthly anyway, so
+# refreshing 4x/day is more than enough.
+_REGIME_CACHE: dict = {"read": None, "fetched_at": None}
+
+
+def _get_regime() -> dict:
+    from datetime import timedelta
+    now = datetime.now()
+    cached = _REGIME_CACHE.get("read")
+    fetched = _REGIME_CACHE.get("fetched_at")
+    if cached is not None and fetched is not None:
+        if now - fetched < timedelta(hours=6):
+            return cached
+    try:
+        read = regime_mod.classify_regime().to_dict()
+        _REGIME_CACHE["read"] = read
+        _REGIME_CACHE["fetched_at"] = now
+        return read
+    except Exception as e:
+        # If FRED is down, fall back to cached if any, else return a
+        # safe TRANSITION read so the dashboard still renders.
+        if cached is not None:
+            return cached
+        return {
+            "label": "TRANSITION",
+            "growth_score": 0,
+            "inflation_score": 0,
+            "growth_indicators": [],
+            "inflation_indicators": [],
+            "implications": {},
+            "error": str(e),
+        }
+
+
 # ─── HOME CONTEXT (the whole page) ──────────────────────────────────────────
 
 def _detect_surface(request: Request) -> str:
@@ -887,6 +939,26 @@ def _build_home_context(run: Run, runs: list[str], date: str, surface: str) -> d
     trades = _build_open_trades_block(run)
     open_instruments = {t["instrument"] for t in trades}
     instruments = _build_instruments_table(run, open_instruments)
+    regime = _get_regime()
+
+    # FTMO informational summary — drawdown headroom, correlation
+    # warnings, weekend gap risk, swap costs. Pure information; no
+    # enforcement of sizing.
+    from src.positions.ftmo import compute_ftmo_status
+    try:
+        ftmo = compute_ftmo_status(trades)
+        ftmo_dict = {
+            "account_size": ftmo.account_size,
+            "trailing_dd_remaining_usd": round(ftmo.trailing_dd_remaining_usd, 2),
+            "trailing_dd_remaining_pct": round(ftmo.trailing_dd_remaining_pct, 2),
+            "open_unrealised_pnl_usd": round(ftmo.open_unrealised_pnl_usd, 2),
+            "correlation_warnings": ftmo.correlation_warnings,
+            "weekend_gap_warning": ftmo.weekend_gap_warning,
+            "estimated_daily_swap_usd": round(ftmo.estimated_daily_swap_usd, 2),
+            "open_position_count": ftmo.open_position_count,
+        }
+    except Exception as e:
+        ftmo_dict = {"error": str(e)}
 
     # Recent events log (user-maintained news input)
     try:
@@ -921,6 +993,8 @@ def _build_home_context(run: Run, runs: list[str], date: str, surface: str) -> d
         "runs": runs,
         "today": today,
         "macro": macro,
+        "regime": regime,
+        "ftmo": ftmo_dict,
         "trades": trades,
         "instruments": instruments,
         "recent_events": recent_events,
@@ -1077,9 +1151,13 @@ async def api_reasoning(symbol: str, date: str | None = None):
     bias_obj = next((b for b in run.instrument_biases if b.instrument == sym), None)
     co = run.council.get(sym)
     fc = run.tradability.get(sym)
+    thesis = thesis_tracker.status_for(sym)
+    history = score_history.summary_for(sym, n=14)
     return JSONResponse({
         "symbol": sym,
         "name": display_label(sym),
+        "thesis": thesis,
+        "history": history,
         "strategist_md": bias_obj.raw_section if bias_obj else "",
         "strategist_md_rendered": _render_markdown(bias_obj.raw_section) if bias_obj else "",
         "judge_md": co.judge if co else "",

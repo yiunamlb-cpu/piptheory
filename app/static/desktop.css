@@ -508,6 +508,19 @@ body {
 .chat-form { display: flex; gap: 8px; }
 .chat-form textarea { flex: 1; min-height: 44px; }
 
+/* Deterministic regime anchor block in the Macro panel */
+.regime-anchor {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.regime-anchor-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
 /* Per-instrument 7-day conviction sparkline + trend indicators in the
    instrument table. The sparkline itself is rendered as inline SVG by JS
    from the data-convictions attribute — see app.js renderSparklines(). */
@@ -533,6 +546,47 @@ body {
 .trend-arrow.trend-trending { color: var(--warn); }
 .trend-arrow.trend-oscillating { color: var(--text-3); }
 .trend-arrow.trend-n\/a { color: var(--text-3); }
+
+/* FTMO status panel */
+.ftmo-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+}
+.ftmo-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+.ftmo-stat { display: flex; flex-direction: column; gap: 2px; }
+.ftmo-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-2);
+}
+.ftmo-value {
+  font-size: 18px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.ftmo-warnings {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ftmo-warn {
+  background: var(--warn-tint);
+  border: 1px solid var(--warn-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--warn-text);
+}
 
 /* Recent events log */
 .events-list {

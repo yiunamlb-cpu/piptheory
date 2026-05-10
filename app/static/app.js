@@ -94,6 +94,24 @@
     "stability_oscillating": "<strong>Oscillating.</strong> Readings span 2+ points but no clear direction. Could be LLM noise on a thin macro signal, or genuine ambivalence in the data. Don't act on individual prints; wait for the band to consolidate.",
     "stability_trending": "<strong>Trending.</strong> Readings show a sustained directional drift — conviction is firming or fading. This is actual signal, not noise. If you're holding a position, the thesis is materially shifting; re-read the Judge's reasoning to confirm whether to stay in.",
     "stability_n/a": "<strong>Not enough history.</strong> Fewer than 3 runs recorded for this instrument so the trend pattern can't be classified yet.",
+    "thesis_drivers": "<strong>Driver status.</strong> The reasons (themes from THEMES.md, specialist support) the Strategist gave for today's bias, compared against the most recent prior run. <em>Intact / modified</em> means the driver's still alive (modified = same theme, slightly rephrased). <em>New</em> means added today. <em>Dropped</em> means removed since yesterday — that's the signal that something has shifted in the macro picture, not just the integer score.",
+
+    // Regime anchor
+    "regime_anchor": "<strong>Regime (data-classified).</strong> A code-computed regime tag from FRED indicators alone — Industrial Production, NFP, retail sales, claims, CPI, PCE, breakevens. Two axes: growth (rising/falling) and inflation (rising/falling). Updates only when data updates (monthly), so it doesn't drift run-to-run like LLM scores. Compare against the LLM's bias readings — disagreement is itself a signal that the LLM is confused or the macro is in transition.",
+    "regime_reflation": "<strong>Reflation.</strong> Growth rising AND inflation rising. Risk-on regime: bullish equities (especially cyclicals), commodities, EM, weak dollar.",
+    "regime_goldilocks": "<strong>Goldilocks.</strong> Growth rising AND inflation falling. The best regime for risk assets — bullish equities (especially long-duration tech), neutral dollar, soft gold.",
+    "regime_stagflation": "<strong>Stagflation.</strong> Growth falling AND inflation rising. Bullish gold, bullish dollar (safe haven), bearish equities, supply-driven oil. Hardest regime to trade.",
+    "regime_deflation": "<strong>Deflation.</strong> Growth falling AND inflation falling. Bullish bonds and gold (Fed-cut response), bullish dollar, bearish equities and commodities.",
+    "regime_transition": "<strong>Transition.</strong> Growth or inflation indicators are mixed, no clear regime. The system has no strong directional bias from data alone.",
+
+    // Trend health (for held positions)
+    "trend_trend_healthy": "<strong>Trend healthy.</strong> Chart structure is intact and aligned with your position direction — recent and longer-term moves both support the trade. The trend you opened on is still alive.",
+    "trend_fading": "<strong>Trend fading.</strong> The longer-term trend still favours your position but recent action is mixed or going against you. Momentum is slowing — watch for confirmation that the trend is still alive vs. about to reverse.",
+    "trend_reversal_risk": "<strong>Reversal risk.</strong> Chart structure has flipped against your position. The trend you opened on is breaking down. Re-evaluate the thesis seriously — the chart is no longer supporting you.",
+    "trend_unknown": "<strong>Trend health unknown.</strong> No fresh price context for this instrument right now.",
+
+    // FTMO
+    "ftmo_status": "<strong>FTMO status.</strong> Informational summary of trailing drawdown headroom, open unrealised P&amp;L, correlation warnings (when multiple positions express the same theme), weekend gap risk (Friday + commodity/USD positions), and estimated daily swap costs across held positions. The system never enforces sizing — these numbers help you exercise discipline.",
 
     // Architecture
     "macro_picture": "<strong>Macro picture.</strong> The current regime — what big-picture themes are in force, ranked by conviction. Updated by the user in <code>THEMES.md</code> based on observed data and central-bank communication. The agents reason from these themes downstream.",
@@ -416,6 +434,28 @@
   function renderReasoningHtml(data) {
     if (!data) return "<p class='muted'>No data.</p>";
     let out = "";
+    // Drivers up top — most actionable view
+    if (data.thesis && data.thesis.drivers && data.thesis.drivers.length) {
+      const items = data.thesis.drivers.map(d => {
+        const cls = d.status === "intact" ? "chip-good"
+                  : d.status === "modified" ? "chip-good"
+                  : d.status === "new" ? "chip-brand"
+                  : d.status === "dropped" ? "chip-warn"
+                  : "chip-neutral";
+        return `<li style="margin-bottom: 6px;"><span class="chip ${cls}" style="font-size: 10px; margin-right: 8px;">${d.status.toUpperCase()}</span>${escapeHTML(d.driver)}</li>`;
+      }).join("");
+      out += `<h4>Drivers <span class="muted" style="font-weight: 400; font-size: 12px;">(${escapeHTML(data.thesis.summary_label || "")})</span></h4><ul style="list-style: none; padding: 0;">${items}</ul>`;
+    }
+    // Score history
+    if (data.history && data.history.entries && data.history.entries.length >= 2) {
+      const e = data.history;
+      out += `<h4>Conviction history</h4>
+        <p>Last ${e.entries.length} runs: <strong>${e.convictions.join(" → ")}</strong>
+        ${e.trend_arrow ? ` ${e.trend_arrow}` : ""}
+        ${e.weighted_avg_3d != null ? ` &nbsp; <span class="muted">3-day avg ${e.weighted_avg_3d}</span>` : ""}
+        ${e.stability && e.stability !== "n/a" ? ` &nbsp; <span class="chip ${e.stability === "stable" ? "chip-good" : e.stability === "trending" ? "chip-warn" : "chip-neutral"}" style="font-size: 11px;">${e.stability}</span>` : ""}
+        </p>`;
+    }
     if (data.strategist_md) {
       out += `<h4>Macro view (Strategist)</h4><div class="prose">${data.strategist_md_rendered || lightFormat(data.strategist_md)}</div>`;
     }

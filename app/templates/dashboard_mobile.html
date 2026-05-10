@@ -121,6 +121,13 @@
     {% if macro.regime %}
     <div class="macro-regime">{{ macro.regime }}</div>
     {% endif %}
+    {% if regime and regime.label %}
+    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;">
+      <span class="muted" style="font-size: 11px; text-transform: uppercase;">Regime (data):</span>
+      <span class="chip chip-{{ 'good' if regime.label == 'GOLDILOCKS' else 'warn' if regime.label == 'STAGFLATION' else 'bad' if regime.label == 'DEFLATION' else 'brand' if regime.label == 'REFLATION' else 'neutral' }}"
+            data-term="regime_{{ regime.label|lower }}">{{ regime.label }}</span>
+    </div>
+    {% endif %}
     {% if macro.themes %}
     <ul class="macro-themes">
       {% for t in macro.themes[:5] %}
@@ -138,6 +145,30 @@
     {% endif %}
     <a class="macro-link" data-action="open-brief">Read full brief →</a>
   </div>
+
+  {% if ftmo and not ftmo.error and ftmo.open_position_count > 0 %}
+  <div class="section-label">FTMO status</div>
+  <div class="macro-card" style="font-size: 14px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+      <div>
+        <div class="muted" style="font-size: 11px;">Trailing DD left</div>
+        <div style="font-weight: 600;">${{ "{:,.0f}".format(ftmo.trailing_dd_remaining_usd) }} ({{ "%.1f"|format(ftmo.trailing_dd_remaining_pct) }}%)</div>
+      </div>
+      <div>
+        <div class="muted" style="font-size: 11px;">Unrealised P&amp;L</div>
+        <div style="font-weight: 600;" class="{% if ftmo.open_unrealised_pnl_usd > 0 %}pnl-pos{% elif ftmo.open_unrealised_pnl_usd < 0 %}pnl-neg{% endif %}">
+          {% if ftmo.open_unrealised_pnl_usd >= 0 %}+{% endif %}${{ "{:,.0f}".format(ftmo.open_unrealised_pnl_usd) }}
+        </div>
+      </div>
+    </div>
+    {% if ftmo.weekend_gap_warning %}
+    <div class="macro-catalyst" style="background: var(--warn-tint);">⚠ {{ ftmo.weekend_gap_warning }}</div>
+    {% endif %}
+    {% for w in ftmo.correlation_warnings %}
+    <div class="macro-catalyst" style="background: var(--warn-tint);">⚠ {{ w }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
 
   {# ─── Recent events log (compact preview) ───────────────────────── #}
   <div class="section-label">News log

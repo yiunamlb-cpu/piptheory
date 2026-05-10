@@ -1,0 +1,21 @@
+# ECB latest statement / monetary policy account / key speech.
+#
+# Manually maintained, same pattern as data/fomc_latest.txt. Paste the
+# most recent ECB Governing Council statement, the latest monetary
+# policy account, or a high-impact Lagarde / Schnabel / Lane prepared
+# remarks. The ECB-Watcher specialist reads this on each pipeline run.
+# If empty, ECB-Watcher reasons from rate path data alone.
+#
+# Update cadence:
+#   - After each Governing Council meeting (~8/year): paste the press
+#     statement from ecb.europa.eu
+#   - When monetary policy account is published (~4 weeks after the
+#     meeting): paste the most actionable section
+#   - Mid-cycle: paste prepared remarks from key Council members when
+#     they're explicitly forward-guiding
+#
+# ─── PASTE BELOW THIS LINE ─────────────────────────────────────────
+
+(No ECB statement text loaded. Update this file after the next ECB
+Governing Council meeting or when the account is released. Paste the
+full statement, dated.)

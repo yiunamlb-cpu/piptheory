@@ -25,12 +25,13 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from src.agents import run_agent
 from src.config import BIAS_CARDS_DIR
 from src.data import CotClient, FredClient, PriceClient, render_event_block, upcoming_events
-from src.data import score_history
+from src.data import score_history, thesis_tracker
 from src.llm import OpenRouterClient
 from src.orchestration.context import (
     bear_advocate_input,
     bull_advocate_input,
     contrarian_input,
+    ecb_watcher_input,
     fed_watcher_input,
     geopolitical_risk_input,
     inflation_tracker_input,
@@ -135,6 +136,26 @@ class BiasEngine:
         result = run_agent("layer1_specialists/fed_watcher", user_msg, client=self.client)
         return result.content
 
+    def run_ecb_watcher(self) -> str:
+        """Run the ECB-Watcher specialist. Reads data/ecb_latest.txt (user-
+        maintained ECB statement / account text) plus the US rate snapshot
+        as cross-asset context. Audit feedback (May 2026): EURUSD analysis
+        was thin without a dedicated ECB lens — Fed-Watcher is the same
+        pattern, just for the ECB.
+        """
+        log.info("layer1_ecb_start")
+        # Same FRED snapshot the Fed-Watcher uses — relevant as cross-asset
+        # context (US rates ≈ EUR-USD differential signal). Eurozone-native
+        # FRED series can be added later.
+        snapshot = self.fred.snapshot([
+            "ffr_effective", "ffr_target_upper",
+            "ust_2y", "ust_10y", "ust_30y", "real_10y",
+            "breakeven_5y5y", "breakeven_10y",
+        ])
+        user_msg = ecb_watcher_input(snapshot)
+        result = run_agent("layer1_specialists/ecb_watcher", user_msg, client=self.client)
+        return result.content
+
     def run_geopolitical_risk(self, themes: str) -> str:
         """Run the Geopolitical Risk specialist.
 
@@ -150,10 +171,10 @@ class BiasEngine:
         return result.content
 
     def run_layer1_parallel(self, themes: str | None = None) -> dict[str, str]:
-        """Run the four Layer 1 specialists concurrently.
+        """Run the five Layer 1 specialists concurrently.
 
         Each reads its own data sources and produces an independent output;
-        no cross-specialist dependencies. Four threads, OpenRouter calls
+        no cross-specialist dependencies. Five threads, OpenRouter calls
         block on network I/O, GIL-friendly.
 
         themes is optional and only consumed by the Geopolitical Risk
@@ -161,11 +182,12 @@ class BiasEngine:
         """
         log.info("layer1_parallel_start")
         themes_text = themes if themes is not None else load_themes()
-        with ThreadPoolExecutor(max_workers=4, thread_name_prefix="L1") as ex:
+        with ThreadPoolExecutor(max_workers=5, thread_name_prefix="L1") as ex:
             futures = {
                 "inflation": ex.submit(self.run_inflation_tracker),
                 "positioning": ex.submit(self.run_positioning_analyst),
                 "fed": ex.submit(self.run_fed_watcher),
+                "ecb": ex.submit(self.run_ecb_watcher),
                 "geopolitical": ex.submit(self.run_geopolitical_risk, themes_text),
             }
             outputs: dict[str, str] = {}
@@ -475,6 +497,7 @@ class BiasEngine:
         (out_dir / "01_layer1_inflation.md").write_text(layer1.get("inflation", ""), encoding="utf-8")
         (out_dir / "01_layer1_positioning.md").write_text(layer1.get("positioning", ""), encoding="utf-8")
         (out_dir / "01_layer1_fed.md").write_text(layer1.get("fed", ""), encoding="utf-8")
+        (out_dir / "01_layer1_ecb.md").write_text(layer1.get("ecb", ""), encoding="utf-8")
         (out_dir / "01_layer1_geopolitical.md").write_text(layer1.get("geopolitical", ""), encoding="utf-8")
 
         # Layer 2
@@ -572,6 +595,25 @@ class BiasEngine:
                     log.warning("score_history_record_failed", instrument=inst, error=str(e))
 
         log.info("layer4_parallel_complete", completed=len(filter_results))
+
+        # Driver snapshots for the thesis tracker. Extract from each
+        # Strategist bias card — same pattern as conviction extraction
+        # but pulling the DRIVING THEMES block. Records once per
+        # instrument per day so the dashboard can compare today's
+        # drivers to yesterday's and flag intact / new / dropped.
+        for inst in ACTIVE_UNIVERSE:
+            section = self._extract_per_instrument_section(result.layer2_strategist, inst)
+            drivers = thesis_tracker.extract_drivers(section)
+            if drivers:
+                try:
+                    thesis_tracker.record_snapshot(
+                        run_date=run_date,
+                        instrument=inst,
+                        drivers=drivers,
+                    )
+                except Exception as e:
+                    log.warning("thesis_tracker_record_failed",
+                                instrument=inst, error=str(e))
 
         # Score history for instruments where the council DIDN'T run
         # (Strategist conviction below threshold). The dashboard's

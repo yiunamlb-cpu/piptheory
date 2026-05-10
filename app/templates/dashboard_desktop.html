@@ -165,6 +165,19 @@
         {% endif %}
       </div>
       {% endif %}
+
+      {# Deterministic regime anchor — code-classified from FRED, doesn't drift run-to-run #}
+      {% if regime %}
+      <div class="regime-anchor">
+        <div class="regime-anchor-row">
+          <span class="muted" data-term="regime_anchor" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">Regime (data-classified)</span>
+          <span class="chip chip-{{ 'good' if regime.label == 'GOLDILOCKS' else 'warn' if regime.label == 'STAGFLATION' else 'bad' if regime.label == 'DEFLATION' else 'brand' if regime.label == 'REFLATION' else 'neutral' }}"
+                data-term="regime_{{ regime.label|lower }}"
+                style="margin-left: 6px;">{{ regime.label }}</span>
+          <span class="muted" style="font-size: 11px; margin-left: 6px;">G:{{ regime.growth_score|string if regime.growth_score >= 0 else regime.growth_score }} · I:{{ regime.inflation_score|string if regime.inflation_score >= 0 else regime.inflation_score }}</span>
+        </div>
+      </div>
+      {% endif %}
     </section>
   </div>
 
@@ -235,6 +248,16 @@
         </div>
         <div class="trade-action">
           <strong class="term" data-term="advisor_{{ t.action }}">{{ t.action_label }}.</strong> {{ t.reason }}
+          {% if t.trend_health and t.trend_health != "unknown" %}
+          <div style="margin-top: 4px;">
+            <span class="chip chip-{% if t.trend_health == 'trend_healthy' %}good{% elif t.trend_health == 'fading' %}warn{% elif t.trend_health == 'reversal_risk' %}bad{% else %}neutral{% endif %}"
+                  data-term="trend_{{ t.trend_health }}"
+                  style="font-size: 10px;">
+              Trend: {{ t.trend_health|replace("_", " ") }}
+            </span>
+            <span class="muted" style="font-size: 11px; margin-left: 6px;">{{ t.trend_health_reason|truncate(80, True) }}</span>
+          </div>
+          {% endif %}
         </div>
         <div class="trade-row-buttons">
           <button class="btn btn-sm" data-action="close-position" data-id="{{ t.id }}">Close</button>
@@ -312,7 +335,17 @@
                 <span class="muted" style="font-size: 12px;">—</span>
               {% endif %}
             </td>
-            <td class="instr-state">{{ r.state }}</td>
+            <td class="instr-state">
+              {{ r.state }}
+              {% if r.thesis.drivers %}
+                <div class="driver-summary" data-term="thesis_drivers">
+                  <span class="muted" style="font-size: 11px;">{{ r.thesis.summary_label }}</span>
+                  {% if r.thesis.dropped_count > 0 %}
+                    <span class="chip chip-warn" style="margin-left: 4px; font-size: 10px;">−{{ r.thesis.dropped_count }} dropped</span>
+                  {% endif %}
+                </div>
+              {% endif %}
+            </td>
             <td><a class="why-link" data-action="why-instrument" data-symbol="{{ r.symbol }}">Why? →</a></td>
           </tr>
           {% endfor %}
@@ -320,6 +353,53 @@
       </table>
     </div>
   </section>
+
+  {# ─── FTMO informational widget ──────────────────────────────────── #}
+  {% if ftmo and not ftmo.error %}
+  <section class="section">
+    <div class="section-head">
+      <h2 class="section-title"><span class="term" data-term="ftmo_status">FTMO status</span></h2>
+      <div class="section-aside muted">Informational. Sizing is your call.</div>
+    </div>
+    <div class="ftmo-panel">
+      <div class="ftmo-row">
+        <div class="ftmo-stat">
+          <div class="ftmo-label">Trailing DD remaining</div>
+          <div class="ftmo-value {% if ftmo.trailing_dd_remaining_pct < 1.5 %}pnl-neg{% elif ftmo.trailing_dd_remaining_pct < 3 %}pnl-flat{% else %}pnl-pos{% endif %}">
+            ${{ "{:,.0f}".format(ftmo.trailing_dd_remaining_usd) }}
+            <span class="muted" style="font-size: 12px;">({{ "%.2f"|format(ftmo.trailing_dd_remaining_pct) }}%)</span>
+          </div>
+        </div>
+        <div class="ftmo-stat">
+          <div class="ftmo-label">Open unrealised P&amp;L</div>
+          <div class="ftmo-value {% if ftmo.open_unrealised_pnl_usd > 0 %}pnl-pos{% elif ftmo.open_unrealised_pnl_usd < 0 %}pnl-neg{% else %}pnl-flat{% endif %}">
+            {% if ftmo.open_unrealised_pnl_usd >= 0 %}+{% endif %}${{ "{:,.0f}".format(ftmo.open_unrealised_pnl_usd) }}
+          </div>
+        </div>
+        <div class="ftmo-stat">
+          <div class="ftmo-label">Open positions</div>
+          <div class="ftmo-value">{{ ftmo.open_position_count }}</div>
+        </div>
+        <div class="ftmo-stat">
+          <div class="ftmo-label">Est. daily swap</div>
+          <div class="ftmo-value {% if ftmo.estimated_daily_swap_usd < 0 %}pnl-neg{% elif ftmo.estimated_daily_swap_usd > 0 %}pnl-pos{% else %}pnl-flat{% endif %}">
+            {% if ftmo.estimated_daily_swap_usd >= 0 %}+{% endif %}${{ "%.2f"|format(ftmo.estimated_daily_swap_usd) }}
+          </div>
+        </div>
+      </div>
+      {% if ftmo.correlation_warnings or ftmo.weekend_gap_warning %}
+      <div class="ftmo-warnings">
+        {% if ftmo.weekend_gap_warning %}
+        <div class="ftmo-warn"><strong>⚠ Weekend gap risk:</strong> {{ ftmo.weekend_gap_warning }}</div>
+        {% endif %}
+        {% for w in ftmo.correlation_warnings %}
+        <div class="ftmo-warn"><strong>⚠ Correlation:</strong> {{ w }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </section>
+  {% endif %}
 
   {# ─── Tools footer ────────────────────────────────────────────────── #}
   <footer class="tools-footer">

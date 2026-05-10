@@ -18,7 +18,7 @@ REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
 from src.config import BIAS_CARDS_DIR
-from src.data import score_history
+from src.data import score_history, thesis_tracker
 from dashboard.loader import list_runs, load_run
 
 
@@ -62,6 +62,15 @@ def main() -> None:
                 source="strategist",
             )
             n_recorded += 1
+        # Thesis tracker — extract drivers from each Strategist section
+        for b in run.instrument_biases:
+            drivers = thesis_tracker.extract_drivers(b.raw_section)
+            if drivers:
+                thesis_tracker.record_snapshot(
+                    run_date=run_date,
+                    instrument=b.instrument,
+                    drivers=drivers,
+                )
         print(f"Backfilled {run_date}")
     print(f"\nDone. {n_recorded} entries recorded across {len(runs_chrono)} runs.")
     print(f"State file: {REPO / 'state' / 'score_history.json'}")

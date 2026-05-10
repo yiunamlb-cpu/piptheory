@@ -113,17 +113,19 @@ def geopolitical_risk_input(themes: str) -> str:
     )
 
 
-def _load_fomc_text() -> str:
-    """Read user-maintained FOMC statement / minutes text from
-    data/fomc_latest.txt. Strips leading comment block (lines starting
-    with #). Returns empty string if file missing or has only comments.
+def _load_central_bank_text(filename: str, placeholder_prefix: str) -> str:
+    """Read user-maintained central-bank statement text from data/{filename}.
+
+    Strips the leading comment block (lines starting with #) and detects
+    the placeholder text shipped with the starter file (so a fresh repo
+    with no real text loaded routes the agent to rates-only mode).
+
+    Used for both FOMC and ECB text inputs.
     """
-    path = ROOT / "data" / "fomc_latest.txt"
+    path = ROOT / "data" / filename
     if not path.exists():
         return ""
     raw = path.read_text(encoding="utf-8")
-    # Strip leading comment-only block; keep everything after the first
-    # non-comment, non-blank line.
     lines = raw.splitlines()
     body_start = 0
     for i, line in enumerate(lines):
@@ -132,10 +134,17 @@ def _load_fomc_text() -> str:
             body_start = i
             break
     body = "\n".join(lines[body_start:]).strip()
-    # Heuristic: ignore the placeholder text shipped with the starter file
-    if body.startswith("(No FOMC statement text loaded."):
+    if body.startswith(placeholder_prefix):
         return ""
     return body
+
+
+def _load_fomc_text() -> str:
+    return _load_central_bank_text("fomc_latest.txt", "(No FOMC statement text loaded.")
+
+
+def _load_ecb_text() -> str:
+    return _load_central_bank_text("ecb_latest.txt", "(No ECB statement text loaded.")
 
 
 def fed_watcher_input(rate_snapshot: pd.DataFrame) -> str:
@@ -168,6 +177,53 @@ def fed_watcher_input(rate_snapshot: pd.DataFrame) -> str:
         )
     parts.extend([
         "## Rate snapshot",
+        "",
+        fred_snapshot_to_text(rate_snapshot),
+    ])
+    return "\n".join(parts)
+
+
+def ecb_watcher_input(rate_snapshot: pd.DataFrame) -> str:
+    """Build the ECB-Watcher specialist's user message.
+
+    Same shape as fed_watcher_input but ECB-flavoured. The rate snapshot
+    is FRED-sourced US data (since the project's FRED wrapper doesn't
+    currently pull eurozone series) — the agent's prompt directs it to
+    treat US data as cross-asset context and reason about ECB stance
+    primarily from the user-loaded ECB statement text + recent_events
+    log entries about Lagarde/Schnabel/Lane.
+    """
+    today = datetime.now().date().isoformat()
+    ecb_text = _load_ecb_text()
+    parts = [
+        f"# ECB-Watcher — Daily Read, {today}",
+        "",
+        FRESHNESS_INSTRUCTION,
+        "",
+    ]
+    if ecb_text:
+        parts.extend([
+            "## Latest ECB Governing Council statement / account / key speech (user-maintained)",
+            "",
+            ecb_text,
+            "",
+            "Read the ECB text above as authoritative for current Council "
+            "stance. Look for language drift vs the prior statement (if you "
+            "have one in memory), specific policy phrases (\"in a timely "
+            "manner\", \"sufficiently restrictive\", \"data-dependent\"), and "
+            "internal divisions hinted at in the account text.",
+            "",
+        ])
+    else:
+        parts.append(
+            "NOTE: data/ecb_latest.txt has no current ECB text loaded. "
+            "Reason from the rate snapshot below as cross-asset context only "
+            "and rely on the recent_events log for any Lagarde / Schnabel / "
+            "Lane signals. Note in your output that statement text was "
+            "unavailable.\n",
+        )
+    parts.extend([
+        "## Cross-asset rate snapshot (US, for context)",
         "",
         fred_snapshot_to_text(rate_snapshot),
     ])
