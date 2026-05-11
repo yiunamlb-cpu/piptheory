@@ -45,11 +45,14 @@
   if (!svg || !graphData.nodes.length) return;
 
   // Color helpers
+  const cssVar = (name, fallback) =>
+    (getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback);
   const nodeColor = (n) => {
-    if (n.type === "theme") return getComputedStyle(document.documentElement).getPropertyValue("--node-theme").trim() || "#c2410c";
-    if (n.kind === "long")  return getComputedStyle(document.documentElement).getPropertyValue("--node-long").trim()  || "#0d9488";
-    if (n.kind === "short") return getComputedStyle(document.documentElement).getPropertyValue("--node-short").trim() || "#dc2626";
-    return getComputedStyle(document.documentElement).getPropertyValue("--node-neutral").trim() || "#78716c";
+    if (n.type === "specialist") return cssVar("--node-specialist", "#6366f1");
+    if (n.type === "theme")     return cssVar("--node-theme", "#c2410c");
+    if (n.kind === "long")      return cssVar("--node-long", "#0d9488");
+    if (n.kind === "short")     return cssVar("--node-short", "#dc2626");
+    return cssVar("--node-neutral", "#78716c");
   };
 
   // Initialise positions in a spiral so simulation starts in a non-degenerate state
@@ -85,15 +88,16 @@
   });
 
   // ─── Force simulation ────────────────────────────────────────────
-  // Tunable parameters — keep gentle so the graph drifts slowly.
-  const REPULSION = 1800;          // pairwise inverse-square
-  const SPRING_K = 0.025;          // edge spring stiffness
-  const SPRING_REST = 110;         // rest length per edge
-  const GRAVITY = 0.018;           // pull toward center
-  const FRICTION_HOT = 0.78;       // drag during settling
-  const FRICTION_COOL = 0.92;      // drag after settling
-  const HOT_FRAMES = 200;          // initial settling frames
-  const MAX_VEL = 12;
+  // Tuned for a dense, well-spread 21-ish node graph filling the panel
+  // without clipping the labels.
+  const REPULSION = 6500;          // pairwise inverse-square — high so nodes spread
+  const SPRING_K = 0.018;          // edge spring stiffness
+  const SPRING_REST = 180;         // rest length per edge — generous
+  const GRAVITY = 0.008;           // pull toward center — gentle (let repulsion spread)
+  const FRICTION_HOT = 0.78;
+  const FRICTION_COOL = 0.94;
+  const HOT_FRAMES = 220;
+  const MAX_VEL = 14;
 
   let frame = 0;
 
@@ -156,10 +160,11 @@
   }
 
   // ─── DOM construction ───────────────────────────────────────────
-  // Edges as quadratic-bezier paths (curved) for the MiroFish look
+  // Edges with kind-specific styling (color-coded by edge type)
   const edgeEls = edges.map((e) => {
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    path.setAttribute("class", "gn-edge");
+    const kindCls = e.weight > 1 ? "" : ""; // reserved
+    path.setAttribute("class", `gn-edge kind-${(e.kind || "theme-instrument")}`);
     edgesG.appendChild(path);
     return { e, path };
   });
@@ -169,28 +174,34 @@
     g.setAttribute("class", `gn-node-group ${n.type}${n.is_open_position ? " position" : ""}`);
     g.setAttribute("data-id", n.id);
 
+    // Pulsing outer ring on open-position nodes — visual emphasis
+    if (n.is_open_position) {
+      const pulse = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      pulse.setAttribute("class", "gn-node-pulse");
+      pulse.setAttribute("r", n.size);
+      g.appendChild(pulse);
+    }
+
     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     circle.setAttribute("class", "gn-node-circle");
     circle.setAttribute("r", n.size);
     circle.setAttribute("fill", nodeColor(n));
     g.appendChild(circle);
 
-    // Label only for instrument nodes (themes are too verbose)
+    // Label below every node
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("class", "gn-node-label");
+    text.setAttribute("dy", n.size + 14);
     if (n.type === "instrument") {
-      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      text.setAttribute("class", "gn-node-label");
-      text.setAttribute("dy", n.size + 14);
       text.textContent = n.label;
-      g.appendChild(text);
+    } else if (n.type === "theme") {
+      // Truncate verbose theme labels
+      text.textContent = n.label.length > 28 ? n.label.slice(0, 26) + "…" : n.label;
     } else {
-      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      text.setAttribute("class", "gn-node-label");
-      text.setAttribute("dy", n.size + 14);
-      // Truncate theme labels
-      text.textContent = n.label.length > 30 ? n.label.slice(0, 28) + "…" : n.label;
-      text.style.fontSize = "9px";
-      g.appendChild(text);
+      // Specialist — keep the full name
+      text.textContent = n.label;
     }
+    g.appendChild(text);
 
     nodesG.appendChild(g);
     return { n, g, circle };
@@ -240,7 +251,7 @@
     const active = hoveredId || selectedId;
     if (!active) {
       nodeEls.forEach(({ g }) => g.classList.remove("dimmed", "active"));
-      edgeEls.forEach(({ path }) => path.classList.remove("active"));
+      edgeEls.forEach(({ path }) => path.classList.remove("active", "dimmed"));
       return;
     }
     const nbr = neighbours.get(active) || new Set();
@@ -251,6 +262,7 @@
     edgeEls.forEach(({ e, path }) => {
       const involved = e.source.id === active || e.target.id === active;
       path.classList.toggle("active", involved);
+      path.classList.toggle("dimmed", !involved);
     });
   }
 

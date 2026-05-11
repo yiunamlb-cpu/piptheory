@@ -939,34 +939,55 @@ def _detect_surface(request: Request) -> str:
     return "desktop"
 
 
+_SPECIALIST_DEFS = [
+    # label, themes-it-informs (keyword), instruments-it-affects (FRED/USD axis)
+    ("Fed-Watcher",        ["fed", "stuck", "hawkish"],        ["DXY", "USDJPY", "ES", "NQ", "GC"]),
+    ("ECB-Watcher",        ["ecb", "hawkish", "euro"],         ["EURUSD", "DXY"]),
+    ("BoE-Watcher",        [],                                  ["GBPUSD"]),
+    ("BoJ-Watcher",        [],                                  ["USDJPY"]),
+    ("Inflation Tracker",  ["reflation", "energy", "inflation"], ["GC", "CL", "ES", "NQ"]),
+    ("Positioning Analyst",["china", "ecb", "fed", "ai"],       ["EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "GC", "CL"]),
+    ("Geopolitical Risk",  ["energy", "china"],                ["CL", "GC", "DXY"]),
+]
+
+
 def _build_graph(
     instruments: list[dict],
     macro_themes: list[dict],
 ) -> dict:
-    """Produce a graph spec for the showcase surface — nodes for each
-    instrument + each macro theme, edges where an instrument's drivers
-    reference a theme.
+    """Produce a graph spec for the showcase surface.
 
-    Driver-to-theme matching: each Strategist driver line typically
-    contains the theme name (e.g. "Theme 2 – ECB Hawkish Pivot").
-    We do a simple keyword overlap between the theme name and the
-    driver string. Loose heuristic — over-links rather than under-links
-    so the graph has visual density.
+    Three node layers:
+      - Layer 1 specialists (7 agents that read data each morning)
+      - Macro themes (curated regime tracker)
+      - Instruments (FTMO-tradable universe)
+
+    Three edge classes:
+      - specialist → theme       (data-to-narrative)
+      - theme → instrument       (narrative-to-bias)  — built from
+        Strategist drivers via thesis_tracker
+      - specialist → instrument  (direct rate/data pull, e.g. ECB
+        watcher → EURUSD)
+
+    This dense tri-layer structure mirrors how the pipeline actually
+    flows: specialists ingest data → themes encode regime → instruments
+    inherit bias. The graph visualises the whole information path.
     """
     # Lowercased theme name → tokens, for matching against driver text
     def _tokens(s: str) -> set[str]:
         words = re.findall(r"[a-zA-Z]{3,}", s.lower())
-        # Drop generic words
         stop = {"the", "and", "for", "with", "from", "into", "via",
                 "theme", "themes", "primary", "secondary"}
         return {w for w in words if w not in stop}
 
     theme_tokens = [(t["name"], _tokens(t["name"])) for t in macro_themes]
+    theme_ids = {t["name"] for t in macro_themes}
+    instr_ids = {r["symbol"] for r in instruments}
 
     nodes: list[dict] = []
     edges: list[dict] = []
 
-    # Instrument nodes
+    # ── Instrument nodes ──
     for r in instruments:
         bias = (r.get("direction") or "no view")
         kind = "long" if bias == "long" else ("short" if bias == "short" else "neutral")
@@ -974,14 +995,14 @@ def _build_graph(
             "id": f"i:{r['symbol']}",
             "type": "instrument",
             "label": r["symbol"],
-            "kind": kind,                 # long / short / neutral
+            "kind": kind,
             "conviction": r["conviction"],
             "is_open_position": r.get("is_open_position", False),
             "subtitle": r.get("name", ""),
-            "size": 9 + min(8, max(0, (r["conviction"] - 4) * 2)),  # bigger dot for higher conviction
+            "size": 12 + min(10, max(0, (r["conviction"] - 4) * 2)),
         })
 
-    # Theme nodes
+    # ── Theme nodes ──
     for t in macro_themes:
         nodes.append({
             "id": f"t:{t['name']}",
@@ -989,10 +1010,21 @@ def _build_graph(
             "label": t["name"],
             "kind": "theme",
             "conviction": t["conviction"],
-            "size": 7 + t["conviction"] // 2,
+            "size": 10 + t["conviction"] // 2,
         })
 
-    # Edges from each instrument to each matching theme
+    # ── Specialist nodes ──
+    for label, _, _ in _SPECIALIST_DEFS:
+        nodes.append({
+            "id": f"s:{label}",
+            "type": "specialist",
+            "label": label,
+            "kind": "specialist",
+            "conviction": 0,
+            "size": 11,
+        })
+
+    # ── Edges: theme → instrument (driver-derived) ──
     for r in instruments:
         thesis = r.get("thesis") or {}
         drivers = thesis.get("drivers") or []
@@ -1003,13 +1035,38 @@ def _build_graph(
         for theme_name, t_tokens in theme_tokens:
             if not t_tokens:
                 continue
-            # Match if any salient theme word appears in driver text
             overlap = t_tokens & d_tokens
             if overlap:
                 edges.append({
-                    "source": f"i:{r['symbol']}",
-                    "target": f"t:{theme_name}",
+                    "source": f"t:{theme_name}",
+                    "target": f"i:{r['symbol']}",
                     "weight": len(overlap),
+                    "kind": "theme-instrument",
+                })
+
+    # ── Edges: specialist → theme (which themes each specialist informs) ──
+    for label, theme_keywords, _ in _SPECIALIST_DEFS:
+        if not theme_keywords:
+            continue
+        for theme in macro_themes:
+            theme_tokens_l = _tokens(theme["name"])
+            if any(kw in tok for kw in theme_keywords for tok in theme_tokens_l):
+                edges.append({
+                    "source": f"s:{label}",
+                    "target": f"t:{theme['name']}",
+                    "weight": 1,
+                    "kind": "specialist-theme",
+                })
+
+    # ── Edges: specialist → instrument (which instruments it directly affects) ──
+    for label, _, instr_list in _SPECIALIST_DEFS:
+        for sym in instr_list:
+            if sym in instr_ids:
+                edges.append({
+                    "source": f"s:{label}",
+                    "target": f"i:{sym}",
+                    "weight": 1,
+                    "kind": "specialist-instrument",
                 })
 
     return {"nodes": nodes, "edges": edges}
