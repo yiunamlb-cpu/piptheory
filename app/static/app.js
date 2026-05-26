@@ -1,4 +1,4 @@
-/* nam-hedgefund dashboard JS — single file, branches by surface.
+/* piptheory dashboard JS — single file, branches by surface.
 
    The desktop and mobile templates share API surface (run, positions, chat)
    and a small set of common widgets (run-status banner, run-now button,
@@ -46,6 +46,18 @@
     return diffDays + " day" + (diffDays !== 1 ? "s" : "") + " ago";
   }
 
+  // Auto-update any element with data-relative-time="<iso>" to show a
+  // human-readable relative time. Used by the public-site sync badge +
+  // footer.
+  function updateRelativeTimes() {
+    document.querySelectorAll("[data-relative-time]").forEach((el) => {
+      const iso = el.getAttribute("data-relative-time");
+      if (iso) el.textContent = fmtRelativeTime(iso);
+    });
+  }
+  updateRelativeTimes();
+  setInterval(updateRelativeTimes, 60000);
+
   // ─── Glossary tooltips ──────────────────────────────────────────────
   // One floating tooltip element shared across the page. Triggered by
   // hover on desktop and tap on mobile. Source of truth for definitions
@@ -61,7 +73,7 @@
     "no_view": "<strong>No view.</strong> The system has no clear directional read on this instrument today.",
 
     // Strength bands
-    "strength": "<strong>Strength</strong> is how strongly the system thinks the bias direction is right. 1-10 scale. <strong>8+</strong> rare/strong, <strong>6-7</strong> solid, <strong>5</strong> weak, under 5 is noise. Wobbles 1 point day-to-day from LLM noise — only worry on 3+ point drops or direction flips.",
+    "strength": "<strong>Strength</strong> is how strongly the research panel thinks the directional read is right. 1-10 scale. <strong>8+</strong> rare/strong, <strong>6-7</strong> solid, <strong>5</strong> weak, under 5 is noise. Wobbles 1 point day-to-day from natural variance in the analytical process — only worry on 3+ point drops or direction flips.",
     "direction": "<strong>Direction.</strong> The system's view on which way this instrument is biased — long, short, or no view. Comes from the Council's Judge after the Bull and Bear cases are debated.",
     "state": "<strong>State.</strong> What the system thinks you should do with this instrument right now: Ready (green-lit), Wait (chart not ready), Skip (chart against), or Low conviction (macro too weak).",
 
@@ -89,9 +101,9 @@
     "chart_now": "<strong>Chart check today.</strong> The Tradability Filter's structural read on the chart right now: green-lit (clean spot), watch (wait for pullback), ugly (chart against the macro view), or no chart check (macro too weak to gate on).",
 
     // History / trend
-    "trend_history": "<strong>7-day trend.</strong> The conviction reading on this instrument across the last seven runs. Read in bands, not digits — wobble of ±1 is LLM noise. A sustained drift of 2-3 points is a real macro shift. The arrow shows ↑ rising, ↓ falling, → stable; the badge says whether the readings are stable, oscillating, or trending.",
+    "trend_history": "<strong>7-day trend.</strong> The conviction reading on this instrument across the last seven publications. Read in bands, not digits — wobble of ±1 is natural variance. A sustained drift of 2-3 points is a real macro shift. The arrow shows ↑ rising, ↓ falling, → stable; the badge says whether the readings are stable, oscillating, or trending.",
     "stability_stable": "<strong>Stable.</strong> All readings within a 1-point band over the window. The macro view hasn't materially changed — wobble is pure noise. Hold positions through this without flinching.",
-    "stability_oscillating": "<strong>Oscillating.</strong> Readings span 2+ points but no clear direction. Could be LLM noise on a thin macro signal, or genuine ambivalence in the data. Don't act on individual prints; wait for the band to consolidate.",
+    "stability_oscillating": "<strong>Oscillating.</strong> Readings span 2+ points but no clear direction. Could be natural variance on a thin macro signal, or genuine ambivalence in the data. Don't act on individual prints; wait for the band to consolidate.",
     "stability_trending": "<strong>Trending.</strong> Readings show a sustained directional drift — conviction is firming or fading. This is actual signal, not noise. If you're holding a position, the thesis is materially shifting; re-read the Judge's reasoning to confirm whether to stay in.",
     "stability_n/a": "<strong>Not enough history.</strong> Fewer than 3 runs recorded for this instrument so the trend pattern can't be classified yet.",
     "thesis_drivers": "<strong>Driver status.</strong> The reasons (themes from THEMES.md, specialist support) the Strategist gave for today's bias, compared against the most recent prior run. <em>Intact / modified</em> means the driver's still alive (modified = same theme, slightly rephrased). <em>New</em> means added today. <em>Dropped</em> means removed since yesterday — that's the signal that something has shifted in the macro picture, not just the integer score.",

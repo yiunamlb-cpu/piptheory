@@ -368,55 +368,25 @@ class BiasEngine:
         contrarian_output: str,
         themes: str,
     ) -> dict:
-        """Per-instrument: run the full Council debate (Bull→Bear→Judge),
-        then immediately Layer 4b Filter on the Judge's output.
+        """Per-instrument: run the full Council debate (Bull→Bear→Judge).
 
-        Bundling these per instrument means the Filter call can start as
-        soon as that instrument's Judge finishes, without waiting for
-        other instruments' councils to complete.
-
-        Re-gate after Judge: if the Judge knocks conviction below the council
-        threshold, the macro view is no longer strong enough to justify a
-        structural review. Skip the Filter API call AND emit a synthetic
-        below-threshold card so the dashboard tier logic can handle it
-        cleanly. (The Filter agent's own prompt says "skip if Judge < 5",
-        but it has been observed to run anyway on borderline cases — this
-        gate makes the rule architectural, not advisory.)
-
-        Returns: {"council": {bull, bear, judge}, "filter": {...filter card dict}}.
+        The historical Layer 4b Tradability Filter (chart structural review)
+        was removed when the project pivoted to public macro research only —
+        no chart timing, no specific entries, no positions to gate. The
+        method name is kept for back-compat with the `as_completed` loop in
+        run(), and the returned dict still has a "filter" key (set to None)
+        so dependents that destructure it don't crash. New deployments can
+        rename this to run_council_for_instrument_async if/when convenient.
         """
         council = self.run_council_for_instrument(
             instrument, strategist_output, contrarian_output, themes,
         )
-        judge_conv = self._extract_conviction(council["judge"])
-        if judge_conv < COUNCIL_CONVICTION_THRESHOLD:
-            log.info(
-                "filter_skipped_below_threshold",
-                instrument=instrument,
-                judge_conviction=judge_conv,
-                threshold=COUNCIL_CONVICTION_THRESHOLD,
-            )
-            filter_card = {
-                "instrument": instrument,
-                "verdict": "below_threshold",
-                "agent_output": (
-                    "```yaml\n"
-                    f"instrument: {instrument}\n"
-                    f"judge_conviction: {judge_conv}\n"
-                    f"verdict: below_threshold\n"
-                    f"verdict_reason: \"Judge conviction {judge_conv}/10 is "
-                    f"below the {COUNCIL_CONVICTION_THRESHOLD}/10 threshold; "
-                    f"no structural review performed. Macro view too weak "
-                    f"to justify gating on chart structure.\"\n"
-                    "```\n"
-                ),
-                "setup_context": None,
-            }
-        else:
-            filter_card = self.run_setup_filter(instrument, council["judge"], themes)
-        return {"instrument": instrument, "council": council, "filter": filter_card}
+        return {"instrument": instrument, "council": council, "filter": None}
 
-    # --- Layer 4b — Tradability Filter ---
+    # --- Layer 4b — Tradability Filter (DISABLED for public release) ---
+    # Method kept defined but unused. If you ever want chart timing back,
+    # call it from run_council_and_filter_for_instrument and restore the
+    # writes in run() below. See git log for the original implementation.
 
     def run_setup_filter(
         self,
@@ -424,10 +394,9 @@ class BiasEngine:
         judge_card: str,
         themes: str,
     ) -> dict:
-        """Run the Tradability Filter for a single instrument.
-
-        Returns a dict including the agent's full output and a parsed verdict
-        (best-effort). Falls back to verdict='unparseable' if extraction fails.
+        """DEPRECATED. Was the chart structural review; removed from the
+        public release pipeline. Method retained in case the user wants to
+        flip chart timing back on for a private fork.
         """
         log.info("layer4b_filter_start", instrument=instrument)
         try:
@@ -449,8 +418,6 @@ class BiasEngine:
 
         user_msg = setup_filter_input(instrument, judge_card, ctx, themes,
                                       events_block=events_block)
-        # Filter runs at temperature 0 — categorical decisions (tradable/watch/pass)
-        # should not flip between runs given identical inputs.
         result = run_agent(
             "layer4b_tradability/setup_filter", user_msg, client=self.client,
             temperature=0.0,
@@ -561,9 +528,8 @@ class BiasEngine:
 
         council_dir = out_dir / "04_council"
         council_dir.mkdir(exist_ok=True)
-        filter_dir = out_dir / "04b_tradability_filter"
-        filter_dir.mkdir(exist_ok=True)
-        filter_results: dict[str, dict] = {}
+        # Layer 4b (Tradability Filter) directory intentionally not created —
+        # public-release build skips chart structural review entirely.
 
         # Layer 4 + 4b — parallel across instruments. Each instrument's
         # bull→bear→judge→filter chain stays sequential internally (the
@@ -603,11 +569,10 @@ class BiasEngine:
                 (council_dir / f"{inst}_bear.md").write_text(council_outputs["bear"], encoding="utf-8")
                 (council_dir / f"{inst}_judge.md").write_text(council_outputs["judge"], encoding="utf-8")
 
-                filter_card = bundle["filter"]
-                filter_results[inst] = filter_card
-                (filter_dir / f"{inst}.md").write_text(
-                    filter_card.get("agent_output") or "_no output_", encoding="utf-8"
-                )
+                # Layer 4b (Tradability Filter) is disabled for the public
+                # research release — no chart timing, no entry verdicts.
+                # bundle["filter"] is None; we keep the variable so any
+                # downstream destructuring stays valid.
 
                 # Append to per-instrument score history. Same date re-runs
                 # replace rather than duplicate so the sparkline stays
@@ -625,7 +590,7 @@ class BiasEngine:
                 except Exception as e:
                     log.warning("score_history_record_failed", instrument=inst, error=str(e))
 
-        log.info("layer4_parallel_complete", completed=len(filter_results))
+        log.info("layer4_parallel_complete", completed=len(result.layer4_council))
 
         # Driver snapshots for the thesis tracker. Extract from each
         # Strategist bias card — same pattern as conviction extraction
@@ -673,21 +638,12 @@ class BiasEngine:
                 log.warning("score_history_strategist_record_failed",
                             instrument=inst, error=str(e))
 
-        if filter_results:
-            (filter_dir / "_summary.json").write_text(
-                json.dumps(
-                    {i: {"verdict": v.get("verdict")} for i, v in filter_results.items()},
-                    indent=2,
-                ),
-                encoding="utf-8",
-            )
-
-        # Layer 5 — only feed PM the judge cards for instruments that have a
-        # verdict (any category); PM organises by tradable_now / watch / pass.
+        # Layer 5 — feed PM brief the Judge outputs only. No filter results
+        # in the public research build.
         judge_outputs = {inst: outputs["judge"] for inst, outputs in result.layer4_council.items()}
         if judge_outputs:
             result.layer5_pm_brief = self.run_pm_brief(
-                judge_outputs, themes, filter_results=filter_results
+                judge_outputs, themes, filter_results=None,
             )
             (out_dir / "05_pm_brief.md").write_text(result.layer5_pm_brief, encoding="utf-8")
         else:

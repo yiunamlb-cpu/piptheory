@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ run_date }} — nam-hedgefund · Showcase{% endblock %}
+{% block title %}{{ run_date }} — piptheory · Showcase{% endblock %}
 
 {% block content %}
 <main class="page">
@@ -7,7 +7,7 @@
   {# ─── Top bar ────────────────────────────────────────────────────── #}
   <header class="sc-top">
     <div class="sc-brand">
-      NAM·HEDGEFUND
+      PIPTHEORY
       <span class="sub">/ SHOWCASE</span>
     </div>
     <div class="sc-top-meta">
@@ -93,45 +93,35 @@
           <div class="sc-stat-label">Themes</div>
         </div>
         <div class="sc-stat">
-          <div class="sc-stat-num" data-counter="{{ trades|length }}">{{ trades|length }}</div>
-          <div class="sc-stat-label">Open</div>
+          <div class="sc-stat-num" data-counter="{{ today.ideas|length }}">{{ today.ideas|length }}</div>
+          <div class="sc-stat-label">Hi-conv</div>
         </div>
       </div>
 
-      {# Today's call #}
+      {# Today's calls #}
       <div class="sc-block">
         <div class="sc-block-head">
-          <span class="glyph">◆</span><span class="lbl">Today's call</span>
+          <span class="glyph">◆</span><span class="lbl">Today's calls</span>
           <span class="meta">{{ run_date }}</span>
         </div>
         <div class="sc-today-headline">
-          {% if today.actions %}
-            ⚠ {{ today.actions|length }} open trade{{ "s" if today.actions|length != 1 }} need attention.
-          {% elif today.ideas %}
-            {{ today.ideas|length }} setup{{ "s" if today.ideas|length != 1 }} on the table.
+          {% if today.ideas %}
+            {{ today.ideas|length }} high-conviction read{{ "s" if today.ideas|length != 1 }}.
           {% else %}
-            Stand aside.
+            No high-conviction reads.
           {% endif %}
         </div>
         <div class="sc-today-sub">
-          {% if today.actions %}
-            The advisor flagged urgent action on positions you're holding.
-          {% elif today.ideas %}
-            Passed the four-stage filter (macro → red-team → council → chart).
+          {% if today.ideas %}
+            Passed the multi-stage research process (data → synthesis → red-team → council).
           {% else %}
-            No setup at a clean structural location. Cash is a position.
+            The research panel didn't see a macro setup strong enough to highlight.
           {% endif %}
         </div>
-        {% for a in today.actions %}
-        <div class="sc-today-action" data-action="why-position" data-id="{{ a.position_id }}">
-          <div><span class="sym">{{ a.instrument }}</span> <span style="color: var(--text-3); font-size: 10px;">{{ a.direction|upper }}</span></div>
-          <div class="verb">{{ a.action_label }}</div>
-        </div>
-        {% endfor %}
         {% for i in today.ideas %}
         <div class="sc-today-action idea" data-action="why-instrument" data-symbol="{{ i.instrument }}">
           <div><span class="sym">{{ i.instrument }}</span> <span style="color: var(--text-3); font-size: 10px;">{{ i.direction|upper }} · {{ i.conviction }}/10</span></div>
-          <div class="verb">{% if i.verdict == "tradable_now" %}Ready{% else %}Watch{% endif %}</div>
+          <div class="verb">{{ i.strength_label }}</div>
         </div>
         {% endfor %}
       </div>
@@ -181,37 +171,16 @@
         {% endif %}
       </div>
 
-      {# Open trades #}
+      {# About / methodology link block #}
       <div class="sc-block">
         <div class="sc-block-head">
-          <span class="glyph">✦</span><span class="lbl">Open trades</span>
-          <span class="meta">{{ trades|length }}</span>
+          <span class="glyph">ⓘ</span><span class="lbl">About PIPTHEORY</span>
         </div>
-        {% if trades %}
-        <ul class="sc-mini-trades">
-          {% for t in trades %}
-          <li data-action="why-position" data-id="{{ t.id }}">
-            <span class="sym">{{ t.instrument }}</span>
-            <span class="dir">{{ t.direction|upper }}</span>
-            <span class="pnl {% if t.pnl_pct and t.pnl_pct >= 0 %}pos{% elif t.pnl_pct %}neg{% endif %}">{{ "%+.2f"|format(t.pnl_pct or 0) }}%</span>
-            <span class="verb">{{ t.action_label }}</span>
-          </li>
-          {% endfor %}
-        </ul>
-        {% else %}
-        <div class="sc-empty">No open trades.</div>
-        {% endif %}
-      </div>
-
-      {# Tools #}
-      <div class="sc-block">
-        <div class="sc-block-head">
-          <span class="glyph">▸</span><span class="lbl">Tools</span>
-        </div>
+        <p style="font-size: 12px; color: var(--text-2); line-height: 1.5; margin: 0 0 10px;">
+          A multi-agent macro research desk. Specialist panels read economic data, central-bank statements, and positioning each morning; debate produces the daily brief.
+        </p>
         <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-          <button class="sc-btn sc-btn-ghost" data-action="open-new-trade">+ Trade</button>
-          <button class="sc-btn sc-btn-ghost" data-action="open-ask">Ask</button>
-          <button class="sc-btn sc-btn-ghost" data-action="open-journal">Journal</button>
+          <a href="/about" class="sc-btn sc-btn-ghost">How it works →</a>
         </div>
       </div>
 
@@ -248,89 +217,8 @@
   </div>
 </aside>
 
-{# ─── Modals (reused from desktop) ──────────────────────────────── #}
-<div id="modal-new-trade" class="modal" aria-hidden="true">
-  <div class="modal-card">
-    <header class="modal-head">
-      <span class="modal-title">Record a new trade</span>
-      <button class="slideover-close" data-action="close-modal" data-target="modal-new-trade">×</button>
-    </header>
-    <div class="modal-body">
-      <form id="new-trade-form">
-        <div class="field">
-          <label for="nt-instrument">Instrument</label>
-          <select id="nt-instrument" name="instrument" required>
-            {% for sym in active_universe %}<option value="{{ sym }}">{{ sym }}</option>{% endfor %}
-          </select>
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label for="nt-direction">Direction</label>
-            <select id="nt-direction" name="direction" required>
-              <option value="long">Long</option><option value="short">Short</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="nt-entry-date">Entry date</label>
-            <input type="date" id="nt-entry-date" name="entry_date" required>
-          </div>
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label for="nt-entry-price">Entry price</label>
-            <input type="number" step="any" id="nt-entry-price" name="entry_price" required>
-          </div>
-          <div class="field">
-            <label for="nt-stop">Stop level</label>
-            <input type="number" step="any" id="nt-stop" name="emergency_stop">
-          </div>
-        </div>
-        <div class="field">
-          <label for="nt-notes">Notes</label>
-          <textarea id="nt-notes" name="notes" rows="2"></textarea>
-        </div>
-      </form>
-    </div>
-    <footer class="modal-foot">
-      <span class="muted" id="nt-status" style="margin-right: auto; font-size: 12px;"></span>
-      <button class="sc-btn sc-btn-ghost" data-action="close-modal" data-target="modal-new-trade">Cancel</button>
-      <button class="sc-btn" data-action="submit-new-trade">Record</button>
-    </footer>
-  </div>
-</div>
-
-<div id="modal-ask" class="modal" aria-hidden="true">
-  <div class="modal-card">
-    <header class="modal-head">
-      <span class="modal-title">Ask</span>
-      <button class="slideover-close" data-action="close-modal" data-target="modal-ask">×</button>
-    </header>
-    <div class="modal-body">
-      <div class="field">
-        <label for="ask-persona">Voice</label>
-        <select id="ask-persona">{% for p in personas %}<option value="{{ p.key }}">{{ p.label }}</option>{% endfor %}</select>
-      </div>
-      <div id="chat-history" class="chat-history" aria-live="polite"></div>
-      <form id="chat-form" class="chat-form">
-        <textarea id="chat-input" placeholder="Ask about today's brief or your open trades…" rows="2"></textarea>
-        <button type="submit" class="sc-btn" id="chat-send">Send</button>
-      </form>
-    </div>
-  </div>
-</div>
-
-<div id="modal-journal" class="modal" aria-hidden="true">
-  <div class="modal-card">
-    <header class="modal-head">
-      <span class="modal-title">Closed trades</span>
-      <button class="slideover-close" data-action="close-modal" data-target="modal-journal">×</button>
-    </header>
-    <div class="modal-body">
-      <ul id="closed-list" class="closed-list"></ul>
-      <p class="muted" id="closed-empty" style="text-align: center; padding: 20px 0;">No closed trades yet.</p>
-    </div>
-  </div>
-</div>
+{# Cookie consent (required for AdSense in EU) #}
+{% include "_cookie_consent.html" %}
 
 {% endblock %}
 
@@ -342,7 +230,6 @@
     surface: "showcase",
     instruments: {{ instruments | tojson }},
     activeUniverse: {{ active_universe | tojson }},
-    personas: {{ personas | tojson }},
     graph: {{ graph | tojson }}
   };
 </script>

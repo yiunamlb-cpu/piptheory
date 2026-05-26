@@ -1,5 +1,5 @@
 @echo off
-rem nam-hedgefund dashboard auto-start.
+rem piptheory dashboard auto-start.
 rem Registered with Windows Task Scheduler — see scripts/install_dashboard_task.ps1.
 rem
 rem Replaces the Streamlit launcher with FastAPI (uvicorn). Same port (8501),

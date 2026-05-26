@@ -1,0 +1,31 @@
+{# Cookie / consent banner. Required for AdSense (and GDPR generally) when
+   serving EU/UK traffic. Lightweight: single dismiss, state stored in
+   localStorage, no third-party CMP dependency. If you later move to a
+   premium ad network they'll typically require their own CMP (e.g.
+   Mediavine uses Sourcepoint) — swap this out then. #}
+
+<div id="cookie-consent" class="cookie-consent" hidden>
+  <div class="cookie-consent-text">
+    <strong>This site uses cookies.</strong> We use them for site analytics
+    and to show non-intrusive ads. By continuing to browse you agree to
+    our <a href="/about#privacy">privacy policy</a>.
+  </div>
+  <div class="cookie-consent-actions">
+    <button class="btn btn-sm" id="cookie-consent-dismiss">Got it</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  var banner = document.getElementById('cookie-consent');
+  if (!banner) return;
+  try {
+    if (localStorage.getItem('pt_cookie_consent') === '1') return;
+    banner.hidden = false;
+    document.getElementById('cookie-consent-dismiss').addEventListener('click', function () {
+      try { localStorage.setItem('pt_cookie_consent', '1'); } catch (e) {}
+      banner.hidden = true;
+    });
+  } catch (e) { /* localStorage unavailable — show every visit */ }
+})();
+</script>

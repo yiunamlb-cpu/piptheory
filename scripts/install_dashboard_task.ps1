@@ -7,13 +7,13 @@
 #     powershell -ExecutionPolicy Bypass -File scripts\install_dashboard_task.ps1
 #
 # To uninstall:
-#     schtasks /delete /tn "nam-hedgefund-dashboard" /f
+#     schtasks /delete /tn "piptheory-dashboard" /f
 #
 # To trigger now:
-#     schtasks /run /tn "nam-hedgefund-dashboard"
+#     schtasks /run /tn "piptheory-dashboard"
 
 param(
-    [string]$TaskName = "nam-hedgefund-dashboard"
+    [string]$TaskName = "piptheory-dashboard"
 )
 
 $repoRoot = "C:\Users\user\Downloads\claude hedgefund"
@@ -49,7 +49,7 @@ Register-ScheduledTask `
     -Trigger $trigger `
     -Settings $settings `
     -Principal $principal `
-    -Description "nam-hedgefund: auto-start the Streamlit dashboard at login. Tailscale Serve mapping re-applied on every start so the https://desktop.tail*.ts.net/ URL works post-reboot." | Out-Null
+    -Description "piptheory: auto-start the Streamlit dashboard at login. Tailscale Serve mapping re-applied on every start so the https://desktop.tail*.ts.net/ URL works post-reboot." | Out-Null
 
 Write-Host ""
 Write-Host "Installed task '$TaskName'." -ForegroundColor Green

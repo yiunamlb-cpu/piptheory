@@ -1,0 +1,41 @@
+# Ad slot configuration for the PIPTHEORY public site.
+#
+# Three slots are wired into the templates:
+#   top         — leaderboard banner above the analysis (728x90 / responsive)
+#   sidebar     — medium rectangle (300x250 / responsive)
+#   in_article  — native rectangle inside the daily brief (300x250)
+#
+# Until adsense_publisher_id is set below, the templates render a clean
+# "Sponsored slot — contact for placement" stub in the top slot only and
+# render nothing for the others. Once your AdSense account is approved:
+#
+#   1. Copy your Publisher ID (looks like ca-pub-1234567890123456) into
+#      adsense_publisher_id below.
+#   2. Create three ad units in AdSense (top, sidebar, in_article),
+#      copy their slot IDs into the slots map below.
+#   3. Add this loader script tag to app/templates/base.html <head>:
+#        <script async
+#          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+#          crossorigin="anonymous"></script>
+#
+# Carbon Ads or Mediavine: rewrite app/templates/_ad_slot.html to render
+# their script tag instead of the AdSense one. Their slot IDs go in
+# `carbon_zone` / `mediavine_site_id` below; the AdSense fields are
+# checked first by the template's current logic.
+
+# AdSense (active provider) — leave empty until approved
+adsense_publisher_id: ""    # e.g. "ca-pub-1234567890123456"
+slots:
+  top: ""                    # AdSense slot ID for the top leaderboard
+  sidebar: ""                # AdSense slot ID for the sidebar rectangle
+  in_article: ""             # AdSense slot ID for the in-article rectangle
+
+# Carbon Ads (alternative) — apply at carbonads.net when you have ~10k
+# monthly visitors. Replace the AdSense ad unit with Carbon's <script>
+# tag in _ad_slot.html.
+carbon_zone: ""
+
+# Mediavine / Raptive (premium) — requires 50k+ monthly sessions. They
+# provide a single site tag that auto-places ads. When approved, replace
+# the entire _ad_slot.html with their tag.
+mediavine_site_id: ""

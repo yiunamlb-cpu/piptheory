@@ -1,0 +1,41 @@
+{# Ad slot partial. Three slot types: "top" (leaderboard), "sidebar"
+   (medium rectangle 300x250), "in_article" (300x250 native).
+
+   Defaults to AdSense (highest fill rate, easiest to onboard). Two other
+   networks are pre-wired in `data/ad_config.yaml` if you want to switch
+   later — Carbon Ads (editorial single ad, $2-4 CPM, approval required)
+   or Mediavine / Raptive (premium, 50k+ monthly sessions required).
+
+   To wire AdSense:
+     1. Sign up at adsense.google.com, get approved
+     2. Add the publisher ID + per-slot IDs to data/ad_config.yaml
+     3. They render automatically here
+
+   When config isn't filled in, this partial renders a tasteful
+   placeholder so layout doesn't break. #}
+
+{% set ad_slot = ad_slot|default("top") %}
+
+{% if ad_config and ad_config.adsense_publisher_id and ad_config.slots and ad_config.slots[ad_slot] %}
+  {# AdSense ad unit — auto-loads via the AdSense script already in base.html #}
+  <div class="ad-slot ad-slot-{{ ad_slot }}">
+    <span class="ad-disclosure">Advertisement</span>
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="{{ ad_config.adsense_publisher_id }}"
+         data-ad-slot="{{ ad_config.slots[ad_slot] }}"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+{% else %}
+  {# Placeholder while no ad config is loaded. Use sparingly — too many
+     placeholders make the page feel commercial without earning anything.
+     For the "top" slot we render a thin invitation; for sidebar/in_article
+     we render nothing so the page stays clean. #}
+  {% if ad_slot == "top" %}
+  <div class="ad-slot ad-slot-top ad-slot-placeholder">
+    <span class="ad-disclosure">Sponsored slot — <a href="/about#advertising">contact for placement</a></span>
+  </div>
+  {% endif %}
+{% endif %}

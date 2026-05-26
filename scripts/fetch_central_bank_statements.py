@@ -30,7 +30,7 @@ REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
 DATA_DIR = REPO / "data"
-USER_AGENT = "Mozilla/5.0 (nam-hedgefund central-bank fetcher)"
+USER_AGENT = "Mozilla/5.0 (piptheory central-bank fetcher)"
 TIMEOUT = 20
 
 

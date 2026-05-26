@@ -10,14 +10,14 @@
 #     powershell -ExecutionPolicy Bypass -File scripts\install_scheduled_task.ps1
 #
 # To uninstall:
-#     schtasks /delete /tn "nam-hedgefund-daily" /f
+#     schtasks /delete /tn "piptheory-daily" /f
 #
 # To trigger a test run immediately:
-#     schtasks /run /tn "nam-hedgefund-daily"
+#     schtasks /run /tn "piptheory-daily"
 
 param(
     [string]$RunTime = "06:00",
-    [string]$TaskName = "nam-hedgefund-daily"
+    [string]$TaskName = "piptheory-daily"
 )
 
 $repoRoot = "C:\Users\user\Downloads\claude hedgefund"
@@ -55,7 +55,7 @@ Register-ScheduledTask `
     -Trigger $trigger `
     -Settings $settings `
     -Principal $principal `
-    -Description "nam-hedgefund: daily bias engine run. Reads FRED + COT + prices, runs agent stack, writes bias_cards/{date}/." | Out-Null
+    -Description "piptheory: daily bias engine run. Reads FRED + COT + prices, runs agent stack, writes bias_cards/{date}/." | Out-Null
 
 Write-Host ""
 Write-Host "Installed task '$TaskName'." -ForegroundColor Green

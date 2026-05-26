@@ -1,75 +1,41 @@
 {% extends "base.html" %}
-{% block title %}{{ run_date }} — nam-hedgefund{% endblock %}
+{% block title %}PIPTHEORY · {{ run_date }}{% endblock %}
 
 {% block content %}
 <main class="page">
 
-  {# ─── Top bar ─────────────────────────────────────────────────────── #}
+  {# ─── Top bar ─────────────────────────────────────────────────── #}
   <header class="topbar">
     <div class="brand">
       <span class="brand-mark" aria-hidden="true"></span>
-      <span>nam-hedgefund</span>
+      <span>PIPTHEORY</span>
     </div>
-    <button class="icon-btn" data-action="open-menu" aria-label="Menu">≡</button>
+    <a href="/about" class="icon-btn" style="text-decoration: none; font-size: 11px; font-weight: 600;" aria-label="About">?</a>
   </header>
 
   <div class="topbar-meta">
-    {{ run_date }} · last updated <span id="last-updated">…</span>
+    <span class="sync-dot" style="display: inline-block; vertical-align: middle; margin-right: 4px;"></span>
+    Last sync <strong data-relative-time="{{ last_synced_iso or '' }}">{{ run_date }}</strong> · next ~07:00 UTC
   </div>
 
-  {# ─── Run-status banner ────────────────────────────────────────────── #}
-  <div id="run-status-banner" class="run-banner" hidden>
-    <div class="run-banner-row">
-      <div class="run-banner-spinner" aria-hidden="true"></div>
-      <div>
-        <div class="run-banner-stage" id="run-stage">Starting…</div>
-        <div class="run-banner-meta">
-          <span id="run-elapsed">00:00</span>
-          <span class="dot-sep">·</span>
-          <span id="run-pct">0%</span>
-        </div>
-      </div>
-    </div>
-    <div class="run-banner-progress"><div class="run-banner-bar" id="run-bar"></div></div>
-  </div>
+  {# ─── Top ad ─── #}
+  {% set ad_slot = "top" %}{% include "_ad_slot.html" with context %}
 
-  {# ─── Partial-run notice ─────────────────────────────────────────── #}
+  {# ─── Partial-run notice ────────────────────────────────── #}
   {% if partial_run %}
   <div class="run-banner" style="background: var(--warn-tint); border-color: var(--warn-border);">
-    <div style="font-weight: 500; margin-bottom: 6px;">⚠ Partial run</div>
+    <div style="font-weight: 500; margin-bottom: 6px;">⚠ Partial publication</div>
     <div style="font-size: 13px; color: var(--warn-text);">{{ partial_msg }}</div>
   </div>
   {% endif %}
 
-  {# ─── ACTION cards (open trades that need attention) ─────────────── #}
-  {% if today.actions %}
-  <div class="section-label">Action needed</div>
-  {% for a in today.actions %}
-  <article class="today-card urgent" data-position-id="{{ a.position_id }}">
-    <div class="today-card-tag urgent term" data-term="advisor_{{ a.action }}">⚠ {{ a.action_label|upper }}</div>
-    <div class="today-card-title">
-      {{ a.instrument }}
-      <span class="dir">{{ a.direction|upper }}</span>
-      <span class="today-card-pnl {% if a.pnl_pct and a.pnl_pct >= 0 %}pnl-pos{% else %}pnl-neg{% endif %}">
-        {{ "%+.2f"|format(a.pnl_pct or 0) }}%
-      </span>
-    </div>
-    <p class="today-card-reason">{{ a.reason }}</p>
-    <div class="today-card-actions">
-      <button class="btn" data-action="close-position" data-id="{{ a.position_id }}">Mark closed</button>
-      <button class="btn btn-ghost" data-action="why-position" data-id="{{ a.position_id }}">Why?</button>
-    </div>
-  </article>
-  {% endfor %}
-  {% endif %}
-
-  {# ─── IDEA cards (fresh setups) ──────────────────────────────────── #}
+  {# ─── TODAY: high-conviction reads ──────────────────────── #}
   {% if today.ideas %}
-  <div class="section-label">{% if today.actions %}Also: ideas worth a look{% else %}Today's ideas{% endif %}</div>
+  <div class="section-label">Today's calls</div>
   {% for i in today.ideas %}
   <article class="today-card idea">
-    <div class="today-card-tag idea term" data-term="{% if i.verdict == 'tradable_now' %}tradable_now{% else %}watch{% endif %}">
-      {% if i.verdict == "tradable_now" %}READY{% else %}WATCH{% endif %} · {{ i.strength_label|upper }}
+    <div class="today-card-tag idea">
+      {{ i.strength_label|upper }} · {{ i.conviction }}/10
     </div>
     <div class="today-card-title">
       {{ i.instrument }} <span class="dir">{{ i.direction|upper }}</span>
@@ -78,44 +44,18 @@
       {{ i.macro_summary }}
     </p>
     <div class="today-card-actions">
-      <button class="btn btn-primary" data-action="record-trade" data-instrument="{{ i.instrument }}" data-direction="{{ i.direction }}">+ Record</button>
-      <button class="btn btn-ghost" data-action="why-instrument" data-symbol="{{ i.instrument }}">Why?</button>
+      <button class="btn btn-ghost" data-action="why-instrument" data-symbol="{{ i.instrument }}">Read reasoning →</button>
     </div>
   </article>
   {% endfor %}
-  {% endif %}
-
-  {# ─── Empty TODAY state ───────────────────────────────────────────── #}
-  {% if not today.actions and not today.ideas %}
+  {% else %}
   <div class="today-empty">
-    <p style="margin: 0; font-weight: 500;">Nothing to act on today.</p>
-    <p class="muted" style="margin-top: 6px; font-size: 13px;">No open trades need attention and no setups are clean enough to take.</p>
+    <p style="margin: 0; font-weight: 500;">No high-conviction reads today.</p>
+    <p class="muted" style="margin-top: 6px; font-size: 13px;">The research panel didn't see a strong macro setup. Most days will be like this.</p>
   </div>
   {% endif %}
 
-  {# ─── Open trades summary ─────────────────────────────────────────── #}
-  {% if trades %}
-  <div class="section-label">Your trades ({{ trades|length }})</div>
-  <div class="trades-list">
-    {% for t in trades %}
-    <div class="trade-row {{ t.action_class }}" data-position-id="{{ t.id }}" data-action="open-trade-detail">
-      <div class="trade-row-main">
-        <div class="trade-row-symbol">
-          {{ t.instrument }}<span class="dir">{{ t.direction|upper }}</span>
-        </div>
-        <div class="trade-row-action">
-          <strong class="term" data-term="advisor_{{ t.action }}">{{ t.action_label }}.</strong> {{ t.reason|truncate(80, True) }}
-        </div>
-      </div>
-      <div class="trade-row-pnl {% if t.pnl_pct and t.pnl_pct >= 0 %}pnl-pos{% elif t.pnl_pct %}pnl-neg{% else %}pnl-flat{% endif %}">
-        {{ "%+.1f"|format(t.pnl_pct or 0) }}%
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-  {% endif %}
-
-  {# ─── Macro snapshot card ──────────────────────────────────────────── #}
+  {# ─── Macro snapshot ────────────────────────────────────── #}
   <div class="section-label">Macro</div>
   <div class="macro-card">
     {% if macro.regime %}
@@ -123,9 +63,8 @@
     {% endif %}
     {% if regime and regime.label %}
     <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;">
-      <span class="muted" style="font-size: 11px; text-transform: uppercase;">Regime (data):</span>
-      <span class="chip chip-{{ 'good' if regime.label == 'GOLDILOCKS' else 'warn' if regime.label == 'STAGFLATION' else 'bad' if regime.label == 'DEFLATION' else 'brand' if regime.label == 'REFLATION' else 'neutral' }}"
-            data-term="regime_{{ regime.label|lower }}">{{ regime.label }}</span>
+      <span class="muted" style="font-size: 11px; text-transform: uppercase;">Regime:</span>
+      <span class="chip chip-{{ 'good' if regime.label == 'GOLDILOCKS' else 'warn' if regime.label == 'STAGFLATION' else 'bad' if regime.label == 'DEFLATION' else 'brand' if regime.label == 'REFLATION' else 'neutral' }}">{{ regime.label }}</span>
     </div>
     {% endif %}
     {% if macro.themes %}
@@ -146,84 +85,47 @@
     <a class="macro-link" data-action="open-brief">Read full brief →</a>
   </div>
 
-  {% if ftmo and not ftmo.error and ftmo.open_position_count > 0 %}
-  <div class="section-label">FTMO status</div>
-  <div class="macro-card" style="font-size: 14px;">
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
-      <div>
-        <div class="muted" style="font-size: 11px;">Trailing DD left</div>
-        <div style="font-weight: 600;">${{ "{:,.0f}".format(ftmo.trailing_dd_remaining_usd) }} ({{ "%.1f"|format(ftmo.trailing_dd_remaining_pct) }}%)</div>
-      </div>
-      <div>
-        <div class="muted" style="font-size: 11px;">Unrealised P&amp;L</div>
-        <div style="font-weight: 600;" class="{% if ftmo.open_unrealised_pnl_usd > 0 %}pnl-pos{% elif ftmo.open_unrealised_pnl_usd < 0 %}pnl-neg{% endif %}">
-          {% if ftmo.open_unrealised_pnl_usd >= 0 %}+{% endif %}${{ "{:,.0f}".format(ftmo.open_unrealised_pnl_usd) }}
-        </div>
-      </div>
-    </div>
-    {% if ftmo.weekend_gap_warning %}
-    <div class="macro-catalyst" style="background: var(--warn-tint);">⚠ {{ ftmo.weekend_gap_warning }}</div>
-    {% endif %}
-    {% for w in ftmo.correlation_warnings %}
-    <div class="macro-catalyst" style="background: var(--warn-tint);">⚠ {{ w }}</div>
-    {% endfor %}
-  </div>
-  {% endif %}
+  {# ─── In-article ad slot ─── #}
+  {% set ad_slot = "in_article" %}{% include "_ad_slot.html" with context %}
 
-  {# ─── Recent events log (compact preview) ───────────────────────── #}
-  <div class="section-label">News log
-    {% if recent_events %}<span class="muted" style="text-transform: none; letter-spacing: 0; font-weight: 400;"> · {{ recent_events|length }}</span>{% endif %}
-  </div>
-  <div class="link-row" data-action="open-events-log">
-    {% if recent_events %}
-    <span style="display:flex;flex-direction:column;gap:2px;">
-      <strong style="font-size:14px;">{{ recent_events[0].headline|truncate(60, True) }}</strong>
-      <span class="muted" style="font-size:12px;">{{ recent_events[0].date }} · {{ recent_events[0].relevance|upper }}</span>
-    </span>
-    {% else %}
-    <span>No events logged — tap to add</span>
-    {% endif %}
-    <span class="arrow">→</span>
-  </div>
-
-  {# ─── Link rows ─────────────────────────────────────────────────────── #}
+  {# ─── Link rows ──────────────────────────────────────────── #}
   <div class="section-label">More</div>
   <div class="link-row" data-action="open-instruments-list">
     <span>All {{ instruments|length }} instruments</span>
     <span class="arrow">→</span>
   </div>
-  <div class="link-row" data-action="open-journal">
-    <span>Closed trades journal</span>
+  <div class="link-row" data-action="open-past-runs">
+    <span>Past publications</span>
     <span class="arrow">→</span>
   </div>
-  <div class="link-row" data-action="open-past-runs">
-    <span>Past runs</span>
+  <div class="link-row" onclick="location.href='/about'">
+    <span>About PIPTHEORY · how it works</span>
     <span class="arrow">→</span>
   </div>
 
   <p class="muted" style="text-align: center; margin: 24px 0 8px; font-size: 12px;">
-    Rendered {{ render_time }} · <a href="?view=desktop">Switch to desktop</a>
+    <a href="?view=desktop">Switch to desktop view</a>
   </p>
 
+  {# ─── Footer ─── #}
+  {% include "_footer.html" %}
+
 </main>
+
+{# ─── Bottom toolbar (public — Home / Brief / About / More) ─────── #}
+<nav class="bottom-bar" aria-label="Primary navigation">
+  <button class="active" data-action="scroll-top"><span class="icon">⌂</span><span>Today</span></button>
+  <button data-action="open-brief"><span class="icon">📄</span><span>Brief</span></button>
+  <button onclick="location.href='/about'"><span class="icon">ⓘ</span><span>About</span></button>
+  <button data-action="open-menu"><span class="icon">≡</span><span>More</span></button>
+</nav>
 
 {# ─── Sticky surface-toggle: switches to Showcase ──────────────── #}
 <a class="surface-toggle" href="?view=showcase" title="Switch to Showcase view">
   <span class="arrow">→</span>Showcase
 </a>
 
-{# ─── FAB: + new trade (always reachable) ───────────────────────── #}
-<button class="fab" data-action="open-new-trade" aria-label="Record a new trade">+</button>
-
-{# ─── Bottom toolbar ────────────────────────────────────────────── #}
-<nav class="bottom-bar" aria-label="Primary navigation">
-  <button class="active" data-action="scroll-top"><span class="icon">⌂</span><span>Home</span></button>
-  <button data-action="open-brief"><span class="icon">📄</span><span>Brief</span></button>
-  <button data-action="open-ask"><span class="icon">💬</span><span>Ask</span></button>
-  <button data-action="open-menu"><span class="icon">≡</span><span>More</span></button>
-</nav>
-
-{# ─── Generic sheet (slides up from bottom) ─────────────────────── #}
+{# ─── Generic sheet ────────────────────────────────────────────── #}
 <div id="overlay" class="overlay"></div>
 <div id="sheet" class="sheet" aria-hidden="true">
   <div class="sheet-handle"></div>
@@ -237,6 +139,9 @@
   <div class="sheet-foot" id="sheet-foot" hidden></div>
 </div>
 
+{# ─── Cookie consent ──────────────────────────────────────────── #}
+{% include "_cookie_consent.html" %}
+
 {% endblock %}
 
 {% block scripts %}
@@ -246,8 +151,7 @@
     runs: {{ runs | tojson }},
     surface: "mobile",
     instruments: {{ instruments | tojson }},
-    activeUniverse: {{ active_universe | tojson }},
-    personas: {{ personas | tojson }}
+    activeUniverse: {{ active_universe | tojson }}
   };
 </script>
 <script src="/static/app.js?v={{ static_version }}"></script>

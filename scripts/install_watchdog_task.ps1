@@ -5,11 +5,11 @@
 #   .\scripts\install_watchdog_task.ps1
 #
 # To remove:
-#   Unregister-ScheduledTask -TaskName "NamHedgefund-Watchdog" -Confirm:$false
+#   Unregister-ScheduledTask -TaskName "Piptheory-Watchdog" -Confirm:$false
 
 $ErrorActionPreference = "Stop"
 
-$taskName = "NamHedgefund-Watchdog"
+$taskName = "Piptheory-Watchdog"
 $repo = "C:\Users\user\Downloads\claude hedgefund"
 $watchdog = Join-Path $repo "scripts\dashboard_watchdog.vbs"
 
@@ -64,7 +64,7 @@ Register-ScheduledTask `
     -Trigger $trigger `
     -Settings $settings `
     -Principal $principal `
-    -Description "Watchdog for nam-hedgefund dashboard. Checks port 8501 every 2 minutes; relaunches uvicorn via run_dashboard.bat if dead."
+    -Description "Watchdog for piptheory dashboard. Checks port 8501 every 2 minutes; relaunches uvicorn via run_dashboard.bat if dead."
 
 Write-Host "Installed scheduled task: $taskName" -ForegroundColor Green
 Write-Host "  Runs every 2 minutes."

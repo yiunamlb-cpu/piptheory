@@ -1,4 +1,4 @@
-' nam-hedgefund dashboard watchdog — pure VBScript, no PowerShell.
+' piptheory dashboard watchdog — pure VBScript, no PowerShell.
 '
 ' Runs under wscript.exe which is genuinely windowless from the kernel's
 ' perspective, so no console flash on each scheduler tick. Earlier

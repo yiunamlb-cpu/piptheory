@@ -1,5 +1,5 @@
 @echo off
-rem nam-hedgefund daily bias engine run.
+rem piptheory daily bias engine run.
 rem Registered with Windows Task Scheduler — see install instructions in
 rem scripts/install_scheduled_task.ps1.
 rem

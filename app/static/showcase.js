@@ -1,4 +1,4 @@
-/* nam-hedgefund — showcase surface (graph dashboard).
+/* piptheory — showcase surface (graph dashboard).
 
    Loads after app.js. Builds the force-directed instrument↔theme
    graph, renders into #sc-graph, wires hover/click selection,

@@ -1,0 +1,33 @@
+{# Site-wide footer. Shared by all surfaces. Carries the legal disclaimer
+   (must be clearly visible — required by ad networks and broker rules)
+   plus navigation, attribution, and the next-sync time. #}
+
+<footer class="site-footer">
+  <div class="footer-disclaimer">
+    <strong>Not financial advice.</strong> PIPTHEORY publishes research only.
+    Nothing on this site is a recommendation to buy, sell, or hold any
+    financial instrument. Markets carry the risk of loss. Do your own
+    research and consult a licensed advisor before acting on any view
+    discussed here.
+  </div>
+  <div class="footer-row">
+    <div class="footer-brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <strong>PIPTHEORY</strong>
+      <span class="muted" style="margin-left: 8px;">daily macro research</span>
+    </div>
+    <nav class="footer-nav">
+      <a href="/">Today</a>
+      <a href="/about">How it works</a>
+      <a href="/about#methodology">Methodology</a>
+      <a href="/about#disclaimer">Disclaimer</a>
+      <a href="/about#privacy">Privacy</a>
+      <a href="/about#advertising">Advertise</a>
+    </nav>
+  </div>
+  <div class="footer-row footer-meta">
+    <span>Last published <span data-relative-time="{{ last_synced_iso or '' }}">{{ run_date }}</span>.</span>
+    <span>Next sync ≈ 07:00 UTC daily.</span>
+    <span>© PIPTHEORY {{ render_time[:4] if render_time and render_time|length >= 4 else '2026' }}.</span>
+  </div>
+</footer>

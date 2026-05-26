@@ -7,11 +7,11 @@
 #   .\scripts\install_fetch_statements_task.ps1
 #
 # Remove:
-#   Unregister-ScheduledTask -TaskName "NamHedgefund-FetchStatements" -Confirm:$false
+#   Unregister-ScheduledTask -TaskName "Piptheory-FetchStatements" -Confirm:$false
 
 $ErrorActionPreference = "Stop"
 
-$taskName = "NamHedgefund-FetchStatements"
+$taskName = "Piptheory-FetchStatements"
 $repo = "C:\Users\user\Downloads\claude hedgefund"
 $wrapper = Join-Path $repo "scripts\fetch_statements_wrapper.vbs"
 

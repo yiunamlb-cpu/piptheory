@@ -1,4 +1,4 @@
-# nam-hedgefund
+# piptheory
 
 A solo discretionary macro research desk, augmented by LLM agents.
 

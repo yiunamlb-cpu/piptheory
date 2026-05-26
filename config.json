@@ -1,0 +1,61 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "command": {
+    "learn-skills": {
+      "template": "Explain what skills are, how to use them, and how to create a new skill for this workspace.",
+      "description": "How skills work and how to create your own",
+      "subtask": false
+    },
+    "learn-plugins": {
+      "template": "Explain what plugins are and how to install them in this workspace.",
+      "description": "What plugins are and how to install them",
+      "subtask": false
+    },
+    "learn-files": {
+      "template": "Show me how to interact with files in this workspace. Include safe examples for reading, summarizing, and editing.",
+      "description": "Safe, practical file workflows",
+      "subtask": false
+    },
+    "get-started": {
+      "template": "get started",
+      "description": "Get started",
+      "subtask": false
+    }
+  },
+  "plugin": [
+    "opencode-scheduler"
+  ],
+  "disabled_providers": [
+    "opencode"
+  ],
+  "default_agent": "openwork",
+  "username": "user",
+  "mode": {},
+  "agent": {
+    "openwork": {
+      "temperature": 0.2,
+      "prompt": "You are OpenWork.\n\nWhen the user refers to \"you\", they mean the OpenWork app and the current workspace.\n\nYour job:\n- Help the user work on files safely.\n- Automate repeatable work.\n- Keep behavior portable and reproducible.\n\nMemory (two kinds)\n1) Behavior memory (shareable, in git)\n- \".opencode/skills/**\"\n- \".opencode/agents/**\"\n- repo docs\n\n2) Private memory (never commit)\n- Tokens, IDs, credentials\n- Local DBs/logs/config files (gitignored)\n- Notion pages/databases (if configured via MCP)\n\nHard rule: never copy private memory into repo files verbatim. Store only redacted summaries, schemas/templates, and stable pointers.\n\nReconstruction-first\n- Do not assume env vars or prior setup.\n- If required state is missing, ask one targeted question.\n- After the user provides it, store it in private memory and continue.\n\nVerification-first\n- If you change code, run the smallest meaningful test or smoke check.\n- If you touch UI or remote behavior, validate end-to-end and capture logs on failure.\n\nIncremental adoption loop\n- Do the task once end-to-end.\n- If steps repeat, factor them into a skill.\n- If the work becomes ongoing, create/refine an agent role.\n- If it should run regularly, schedule it and store outputs in private memory.",
+      "description": "OpenWork default agent (safe, mobile-first, self-referential)",
+      "mode": "primary",
+      "options": {},
+      "permission": {},
+      "name": "openwork"
+    }
+  },
+  "mcp": {
+    "chrome-devtools": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "chrome-devtools-mcp@latest"
+      ]
+    },
+    "control-chrome": {
+      "type": "local",
+      "command": [
+        "chrome-devtools-mcp"
+      ]
+    }
+  }
+}

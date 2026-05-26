@@ -1,48 +1,39 @@
 {% extends "base.html" %}
-{% block title %}{{ run_date }} — nam-hedgefund{% endblock %}
+{% block title %}PIPTHEORY · daily macro research · {{ run_date }}{% endblock %}
 
 {% block content %}
 <main class="page">
 
-  {# ─── Top bar ─────────────────────────────────────────────────────── #}
+  {# ─── Top bar ────────────────────────────────────────────────────── #}
   <header class="topbar">
     <div class="brand">
       <span class="brand-mark" aria-hidden="true"></span>
-      <span>nam-hedgefund</span>
-    </div>
-    <div class="topbar-meta">
-      {{ run_date }} <span class="dot-sep">·</span>
-      <span id="last-updated" class="muted">…</span>
+      <span><strong>PIPTHEORY</strong> <span class="muted" style="font-weight: 400; margin-left: 6px;">daily macro research</span></span>
     </div>
     <div class="topbar-actions">
-      <select id="run-picker" class="select" aria-label="Run date">
+      <a href="/about" class="btn btn-sm btn-ghost">About</a>
+      <select id="run-picker" class="select" aria-label="Past publications">
         {% for r in runs %}
         <option value="{{ r }}" {% if r == run_date %}selected{% endif %}>{{ r }}</option>
         {% endfor %}
       </select>
-      <button id="run-now-btn" class="btn btn-primary">▶ Run again</button>
     </div>
   </header>
 
-  {# ─── Run-status banner (only visible when a run is in flight) ─────── #}
-  <div id="run-status-banner" class="run-banner" hidden>
-    <div class="run-banner-row">
-      <div class="run-banner-spinner" aria-hidden="true"></div>
-      <div>
-        <div class="run-banner-stage" id="run-stage">Starting…</div>
-        <div class="run-banner-meta">
-          <span id="run-elapsed">00:00</span>
-          <span class="dot-sep">·</span>
-          <span id="run-pct">0%</span>
-        </div>
-      </div>
-      <button class="btn btn-sm btn-ghost" id="run-log-toggle" style="margin-left:auto;">Show log</button>
-    </div>
-    <div class="run-banner-progress"><div class="run-banner-bar" id="run-bar"></div></div>
-    <pre class="run-banner-log" id="run-log" hidden></pre>
+  {# ─── Top ad slot (leaderboard) ─────────────────────────────────── #}
+  {% include "_ad_slot.html" with context %}{% set ad_slot = "top" %}
+
+  {# ─── Last-synced badge — prominent under the top bar ───────────── #}
+  <div class="sync-badge">
+    <span class="sync-dot" aria-hidden="true"></span>
+    <span><strong>Last sync:</strong> <span data-relative-time="{{ last_synced_iso or '' }}">{{ run_date }}</span></span>
+    <span class="sync-sep">·</span>
+    <span>Next publication: <strong>tomorrow ~07:00 UTC</strong></span>
+    <span class="sync-sep">·</span>
+    <span>{{ active_universe|length }} instruments tracked</span>
   </div>
 
-  {# ─── Partial-run notice ─────────────────────────────────────────── #}
+  {# ─── Partial-run notice (rare) ─────────────────────────────────── #}
   {% if partial_run %}
   <div class="run-banner" style="background: var(--warn-tint); border-color: var(--warn-border); margin-bottom: 14px;">
     <div class="run-banner-row">
@@ -50,7 +41,6 @@
       <div>
         <div class="run-banner-stage">{{ partial_msg }}</div>
       </div>
-      <button class="btn btn-sm btn-primary" id="run-now-btn-partial" onclick="document.getElementById('run-now-btn').click()" style="margin-left: auto;">▶ Run again</button>
     </div>
   </div>
   {% endif %}
@@ -58,80 +48,37 @@
   {# ─── Top row: TODAY (left) + MACRO (right) ───────────────────────── #}
   <div class="top-row">
 
-    {# ─── TODAY ─── #}
+    {# ─── TODAY: high-conviction reads ─── #}
     <section class="panel" aria-labelledby="today-title">
-      <h2 id="today-title" class="panel-title">Today</h2>
+      <h2 id="today-title" class="panel-title">Today's calls</h2>
 
-      {# Actions on open trades — bubble up urgent advice #}
-      {% if today.actions %}
-      <div class="today-block">
-        <div class="today-head urgent">
-          ⚠ Action needed on
-          {{ today.actions|length }} open trade{{ "s" if today.actions|length != 1 }}
-        </div>
-        {% for a in today.actions %}
-        <div class="today-card urgent" style="margin-bottom: 8px;" data-position-id="{{ a.position_id }}">
-          <div class="today-card-head">
-            <div class="today-card-symbol">
-              {{ a.instrument }}<span class="dir">{{ a.direction|upper }}</span>
-              <span class="chip chip-bad" data-term="advisor_{{ a.action }}" style="margin-left: 8px;">{{ a.action_label }}</span>
-            </div>
-            <div class="today-card-stats">
-              <span><span class="term" data-term="pnl">P&amp;L</span> <strong class="{% if a.pnl_pct >= 0 %}pnl-pos{% else %}pnl-neg{% endif %}">{{ "%+.2f"|format(a.pnl_pct or 0) }}%</strong></span>
-            </div>
-          </div>
-          <p class="today-card-reason">{{ a.reason }}</p>
-          <div class="today-card-actions">
-            <button class="btn btn-sm" data-action="close-position" data-id="{{ a.position_id }}">Mark closed</button>
-            <button class="btn btn-sm btn-ghost" data-action="why-position" data-id="{{ a.position_id }}">Why?</button>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-      {% endif %}
-
-      {# Trade ideas — fresh setups (not already open) #}
       {% if today.ideas %}
       <div class="today-block">
         <div class="today-head">
-          {{ today.ideas|length }} idea{{ "s" if today.ideas|length != 1 }} worth a look
+          {{ today.ideas|length }} high-conviction read{{ "s" if today.ideas|length != 1 }}
         </div>
         {% for i in today.ideas %}
         <div class="today-card" style="margin-bottom: 8px;">
           <div class="today-card-head">
             <div class="today-card-symbol">
               {{ i.instrument }}<span class="dir">{{ i.direction|upper }}</span>
-              {% if i.verdict == "tradable_now" %}
-              <span class="chip chip-good" data-term="tradable_now" style="margin-left: 8px;">Ready</span>
-              {% else %}
-              <span class="chip chip-warn" data-term="watch" style="margin-left: 8px;">Watch</span>
-              {% endif %}
-            </div>
-            <div class="today-card-stats">
-              <span class="term" data-term="strength">{{ i.strength_label }} ({{ i.conviction }}/10)</span>
+              <span class="chip chip-{% if i.conviction >= 8 %}good{% else %}warn{% endif %}" style="margin-left: 8px;">
+                {{ i.strength_label }} · {{ i.conviction }}/10
+              </span>
             </div>
           </div>
-          <p class="today-card-reason">
-            <strong>{{ i.macro_summary }}</strong><br>
-            <span class="muted">{{ i.chart_summary }}</span>
-            {% if i.invalidation %}<br><span class="muted">Wrong if: closes past {{ i.invalidation }}</span>{% endif %}
-          </p>
+          <p class="today-card-reason">{{ i.macro_summary }}</p>
           <div class="today-card-actions">
-            <button class="btn btn-sm btn-primary" data-action="record-trade" data-instrument="{{ i.instrument }}" data-direction="{{ i.direction }}">+ Record this trade</button>
-            <button class="btn btn-sm btn-ghost" data-action="why-instrument" data-symbol="{{ i.instrument }}">Why?</button>
+            <button class="btn btn-sm btn-ghost" data-action="why-instrument" data-symbol="{{ i.instrument }}">Read full reasoning →</button>
           </div>
         </div>
         {% endfor %}
       </div>
-      {% endif %}
-
-      {# Empty state #}
-      {% if not today.actions and not today.ideas %}
+      {% else %}
       <div class="today-empty">
-        <p style="margin: 0;">Nothing to act on today.</p>
+        <p style="margin: 0; font-weight: 500;">No high-conviction reads today.</p>
         <p class="muted" style="margin: 8px 0 0; font-size: 13px;">
-          No open trades need attention and no setups are clean enough to take.
-          Stand aside — cash is a position.
+          The research panel didn't see a macro setup strong enough to highlight. Most days will be like this — see the full instrument table below for the complete view.
         </p>
       </div>
       {% endif %}
@@ -139,7 +86,7 @@
 
     {# ─── MACRO PICTURE ─── #}
     <section class="panel" aria-labelledby="macro-title">
-      <h2 id="macro-title" class="panel-title"><span class="term" data-term="macro_picture">Macro picture</span></h2>
+      <h2 id="macro-title" class="panel-title">Macro picture</h2>
 
       {% if macro.regime %}
       <p class="macro-regime">{{ macro.regime }}</p>
@@ -166,14 +113,11 @@
       </div>
       {% endif %}
 
-      {# Deterministic regime anchor — code-classified from FRED, doesn't drift run-to-run #}
       {% if regime %}
       <div class="regime-anchor">
         <div class="regime-anchor-row">
-          <span class="muted" data-term="regime_anchor" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">Regime (data-classified)</span>
-          <span class="chip chip-{{ 'good' if regime.label == 'GOLDILOCKS' else 'warn' if regime.label == 'STAGFLATION' else 'bad' if regime.label == 'DEFLATION' else 'brand' if regime.label == 'REFLATION' else 'neutral' }}"
-                data-term="regime_{{ regime.label|lower }}"
-                style="margin-left: 6px;">{{ regime.label }}</span>
+          <span class="muted" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">Regime (data-classified)</span>
+          <span class="chip chip-{{ 'good' if regime.label == 'GOLDILOCKS' else 'warn' if regime.label == 'STAGFLATION' else 'bad' if regime.label == 'DEFLATION' else 'brand' if regime.label == 'REFLATION' else 'neutral' }}" style="margin-left: 6px;">{{ regime.label }}</span>
           <span class="muted" style="font-size: 11px; margin-left: 6px;">G:{{ regime.growth_score|string if regime.growth_score >= 0 else regime.growth_score }} · I:{{ regime.inflation_score|string if regime.inflation_score >= 0 else regime.inflation_score }}</span>
         </div>
       </div>
@@ -181,102 +125,7 @@
     </section>
   </div>
 
-  {# ─── Recent events log (user-maintained news input) ─────────────── #}
-  <section class="section">
-    <div class="section-head">
-      <h2 class="section-title">Recent events log
-        <span class="muted" style="text-transform: none; letter-spacing: 0; font-weight: 400; margin-left: 8px;">
-          (your news input — the system has no news API)
-        </span>
-      </h2>
-      <div class="section-aside">
-        <button class="btn btn-sm" data-action="open-add-event">+ Add event</button>
-      </div>
-    </div>
-    {% if recent_events %}
-    <ul class="events-list">
-      {% for e in recent_events %}
-      <li class="event-row event-row-{{ e.relevance }}">
-        <div class="event-row-head">
-          <span class="event-date">{{ e.date }}</span>
-          <span class="muted">({{ e.days_ago }}d ago)</span>
-          <span class="chip chip-{% if e.relevance == 'high' %}bad{% elif e.relevance == 'medium' %}warn{% else %}neutral{% endif %}"
-                data-term="relevance_{{ e.relevance }}">
-            {{ e.relevance|upper }}
-          </span>
-          <span class="event-headline">{{ e.headline }}</span>
-          <button class="btn btn-sm btn-ghost event-delete" data-action="delete-event"
-                  data-date="{{ e.date }}" data-headline="{{ e.headline }}" title="Delete">×</button>
-        </div>
-        {% if e.impact or e.notes or e.affects %}
-        <div class="event-row-meta">
-          {% if e.impact %}<div><span class="muted">Impact:</span> {{ e.impact }}</div>{% endif %}
-          {% if e.notes %}<div><span class="muted">Note:</span> {{ e.notes }}</div>{% endif %}
-          {% if e.affects %}<div><span class="muted">Affects:</span> {{ e.affects|join(', ') }}</div>{% endif %}
-        </div>
-        {% endif %}
-      </li>
-      {% endfor %}
-    </ul>
-    {% else %}
-    <div class="trades-empty" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);">
-      No events logged. When something material happens (Trump tariff, surprise data, geopolitical shock),
-      add it here so the system factors it into tomorrow's analysis.
-    </div>
-    {% endif %}
-  </section>
-
-  {# ─── Open trades strip ─────────────────────────────────────────────── #}
-  <section class="section">
-    <div class="section-head">
-      <h2 class="section-title">Open trades ({{ trades|length }})</h2>
-      <div class="section-aside">
-        <button class="btn btn-sm" data-action="open-new-trade">+ New trade</button>
-      </div>
-    </div>
-    {% if trades %}
-    <div class="trades-strip">
-      {% for t in trades %}
-      <div class="trades-row {{ t.action_class }}" data-position-id="{{ t.id }}">
-        <div class="trade-symbol">{{ t.instrument }}</div>
-        <div class="trade-dir">{{ t.direction|upper }}</div>
-        <div class="trade-prices">
-          {{ "%g"|format(t.entry_price) }} → {{ "%g"|format(t.current_price or 0) if t.current_price else "—" }}
-        </div>
-        <div class="trade-pnl {% if t.pnl_pct and t.pnl_pct >= 0 %}pnl-pos{% elif t.pnl_pct %}pnl-neg{% else %}pnl-flat{% endif %}">
-          {{ "%+.2f"|format(t.pnl_pct or 0) }}%
-        </div>
-        <div class="trade-action">
-          <strong class="term" data-term="advisor_{{ t.action }}">{{ t.action_label }}.</strong> {{ t.reason }}
-          {% if t.trend_health and t.trend_health != "unknown" %}
-          <div style="margin-top: 4px;">
-            <span class="chip chip-{% if t.trend_health == 'trend_healthy' %}good{% elif t.trend_health == 'fading' %}warn{% elif t.trend_health == 'reversal_risk' %}bad{% else %}neutral{% endif %}"
-                  data-term="trend_{{ t.trend_health }}"
-                  style="font-size: 10px;">
-              Trend: {{ t.trend_health|replace("_", " ") }}
-            </span>
-            <span class="muted" style="font-size: 11px; margin-left: 6px;">{{ t.trend_health_reason|truncate(80, True) }}</span>
-          </div>
-          {% endif %}
-        </div>
-        <div class="trade-row-buttons">
-          <button class="btn btn-sm" data-action="close-position" data-id="{{ t.id }}">Close</button>
-          <button class="btn btn-sm btn-ghost" data-action="edit-position" data-id="{{ t.id }}">Edit</button>
-          <button class="btn btn-sm btn-ghost" data-action="why-position" data-id="{{ t.id }}">Why?</button>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-    {% else %}
-    <div class="trades-strip">
-      <div class="trades-empty">
-        No open trades. Click <strong>+ New trade</strong> when you've taken one on FTMO.
-      </div>
-    </div>
-    {% endif %}
-  </section>
-
-  {# ─── Today's brief (full prose, inline) ──────────────────────────── #}
+  {# ─── Brief inline ──────────────────────────────────────────────── #}
   <section class="section">
     <div class="section-head">
       <h2 class="section-title">Today's brief</h2>
@@ -284,48 +133,39 @@
     <div class="brief-block">
       {% if brief_md %}
         <article class="prose">{{ brief_md | markdown | safe }}</article>
+        {# ─── In-article ad slot ─── #}
+        {% set ad_slot = "in_article" %}{% include "_ad_slot.html" with context %}
       {% else %}
         <div class="brief-empty">
-          <p style="margin: 0;">No written brief for this run.</p>
-          <p class="muted" style="margin: 6px 0 0;">No instrument met the bar this morning. Quiet day.</p>
+          <p style="margin: 0;">No written brief for this publication.</p>
+          <p class="muted" style="margin: 6px 0 0;">No instrument met the bar this morning.</p>
         </div>
       {% endif %}
     </div>
   </section>
 
-  {# ─── All instruments (one row each) ──────────────────────────────── #}
+  {# ─── All instruments ─────────────────────────────────────────── #}
   <section class="section">
     <div class="section-head">
       <h2 class="section-title">All instruments ({{ instruments|length }})</h2>
-      <div class="section-aside muted">Click a row for full reasoning.</div>
+      <div class="section-aside muted">Click a row for the full reasoning chain.</div>
     </div>
     <div class="instr-table">
       <table>
         <thead>
           <tr>
             <th>Symbol</th>
-            <th><span class="term" data-term="direction">Direction</span></th>
-            <th><span class="term" data-term="strength">Strength</span></th>
-            <th><span class="term" data-term="trend_history">7-day trend</span></th>
-            <th><span class="term" data-term="state">State</span></th>
+            <th>Direction</th>
+            <th>Strength</th>
+            <th>7-day trend</th>
+            <th>State</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           {% for r in instruments %}
-          <tr class="{% if r.is_open_position %}has-position{% endif %}" data-symbol="{{ r.symbol }}">
-            <td>
-              <span class="instr-symbol">{{ r.symbol }}</span>
-              <span class="muted" style="margin-left: 6px;">{{ r.name }}</span>
-              {% set d = r.history.delta if r.history and r.history.delta else None %}
-              {% if d and d.changed and d.kind != "minor" %}
-              <span class="chip chip-{% if d.kind == 'direction_flip' %}bad{% elif d.kind == 'conviction_drop' %}warn{% elif d.kind == 'conviction_jump' %}good{% else %}neutral{% endif %}"
-                    data-term="delta_{{ d.kind }}"
-                    style="margin-left: 8px; font-size: 10px;">
-                {% if d.kind == "direction_flip" %}⚡ {% endif %}{{ d.summary }}
-              </span>
-              {% endif %}
-            </td>
+          <tr data-symbol="{{ r.symbol }}">
+            <td><span class="instr-symbol">{{ r.symbol }}</span> <span class="muted" style="margin-left: 6px;">{{ r.name }}</span></td>
             <td class="instr-bias">{{ r.direction_raw or "—" }}</td>
             <td>
               <span class="instr-strength">
@@ -338,26 +178,13 @@
             <td class="instr-history">
               {% if r.history.n_entries >= 2 %}
                 <span class="sparkline" data-convictions="{{ r.history.convictions|tojson }}" aria-hidden="true"></span>
-                <span class="trend-arrow trend-{{ r.history.stability }}" title="Last {{ r.history.n_entries }} runs">{{ r.history.trend_arrow }}</span>
+                <span class="trend-arrow trend-{{ r.history.stability }}" title="Last {{ r.history.n_entries }} publications">{{ r.history.trend_arrow }}</span>
                 <span class="muted" style="font-size: 11px;">avg {{ r.history.weighted_avg_3d }}</span>
-                <span class="chip chip-{% if r.history.stability == 'stable' %}good{% elif r.history.stability == 'trending' %}warn{% elif r.history.stability == 'oscillating' %}neutral{% else %}neutral{% endif %}"
-                      data-term="stability_{{ r.history.stability }}"
-                      style="margin-left: 6px;">{{ r.history.stability }}</span>
               {% else %}
                 <span class="muted" style="font-size: 12px;">—</span>
               {% endif %}
             </td>
-            <td class="instr-state">
-              {{ r.state }}
-              {% if r.thesis.drivers %}
-                <div class="driver-summary" data-term="thesis_drivers">
-                  <span class="muted" style="font-size: 11px;">{{ r.thesis.summary_label }}</span>
-                  {% if r.thesis.dropped_count > 0 %}
-                    <span class="chip chip-warn" style="margin-left: 4px; font-size: 10px;">−{{ r.thesis.dropped_count }} dropped</span>
-                  {% endif %}
-                </div>
-              {% endif %}
-            </td>
+            <td class="instr-state">{{ r.state }}</td>
             <td><a class="why-link" data-action="why-instrument" data-symbol="{{ r.symbol }}">Why? →</a></td>
           </tr>
           {% endfor %}
@@ -366,68 +193,17 @@
     </div>
   </section>
 
-  {# ─── FTMO informational widget ──────────────────────────────────── #}
-  {% if ftmo and not ftmo.error %}
-  <section class="section">
-    <div class="section-head">
-      <h2 class="section-title"><span class="term" data-term="ftmo_status">FTMO status</span></h2>
-      <div class="section-aside muted">Informational. Sizing is your call.</div>
-    </div>
-    <div class="ftmo-panel">
-      <div class="ftmo-row">
-        <div class="ftmo-stat">
-          <div class="ftmo-label">Trailing DD remaining</div>
-          <div class="ftmo-value {% if ftmo.trailing_dd_remaining_pct < 1.5 %}pnl-neg{% elif ftmo.trailing_dd_remaining_pct < 3 %}pnl-flat{% else %}pnl-pos{% endif %}">
-            ${{ "{:,.0f}".format(ftmo.trailing_dd_remaining_usd) }}
-            <span class="muted" style="font-size: 12px;">({{ "%.2f"|format(ftmo.trailing_dd_remaining_pct) }}%)</span>
-          </div>
-        </div>
-        <div class="ftmo-stat">
-          <div class="ftmo-label">Open unrealised P&amp;L</div>
-          <div class="ftmo-value {% if ftmo.open_unrealised_pnl_usd > 0 %}pnl-pos{% elif ftmo.open_unrealised_pnl_usd < 0 %}pnl-neg{% else %}pnl-flat{% endif %}">
-            {% if ftmo.open_unrealised_pnl_usd >= 0 %}+{% endif %}${{ "{:,.0f}".format(ftmo.open_unrealised_pnl_usd) }}
-          </div>
-        </div>
-        <div class="ftmo-stat">
-          <div class="ftmo-label">Open positions</div>
-          <div class="ftmo-value">{{ ftmo.open_position_count }}</div>
-        </div>
-        <div class="ftmo-stat">
-          <div class="ftmo-label">Est. daily swap</div>
-          <div class="ftmo-value {% if ftmo.estimated_daily_swap_usd < 0 %}pnl-neg{% elif ftmo.estimated_daily_swap_usd > 0 %}pnl-pos{% else %}pnl-flat{% endif %}">
-            {% if ftmo.estimated_daily_swap_usd >= 0 %}+{% endif %}${{ "%.2f"|format(ftmo.estimated_daily_swap_usd) }}
-          </div>
-        </div>
-      </div>
-      {% if ftmo.correlation_warnings or ftmo.weekend_gap_warning %}
-      <div class="ftmo-warnings">
-        {% if ftmo.weekend_gap_warning %}
-        <div class="ftmo-warn"><strong>⚠ Weekend gap risk:</strong> {{ ftmo.weekend_gap_warning }}</div>
-        {% endif %}
-        {% for w in ftmo.correlation_warnings %}
-        <div class="ftmo-warn"><strong>⚠ Correlation:</strong> {{ w }}</div>
-        {% endfor %}
-      </div>
-      {% endif %}
-    </div>
-  </section>
-  {% endif %}
+  {# ─── Sidebar ad slot (rectangle) — placed below the table so it
+       doesn't crowd the analysis. On wider screens this can move to
+       an actual sidebar; for now inline. ─── #}
+  {% set ad_slot = "sidebar" %}{% include "_ad_slot.html" with context %}
 
-  {# ─── Tools footer ────────────────────────────────────────────────── #}
-  <footer class="tools-footer">
-    <div class="tools-links">
-      <button class="btn btn-sm" data-action="open-new-trade">+ New trade</button>
-      <button class="btn btn-sm" data-action="open-ask">Ask</button>
-      <button class="btn btn-sm" data-action="open-journal">Closed trades</button>
-    </div>
-    <div>
-      Rendered {{ render_time }} · Mobile? <a href="?view=mobile">Switch to mobile view</a>
-    </div>
-  </footer>
+  {# ─── Footer ────────────────────────────────────────────────── #}
+  {% include "_footer.html" %}
 </main>
 
 {# ─── Sticky surface-toggle: switches to Showcase ──────────────── #}
-<a class="surface-toggle" href="?view=showcase" title="Switch to the Showcase view (visual / dark canvas)">
+<a class="surface-toggle" href="?view=showcase" title="Switch to the visual / graph showcase view">
   <span class="arrow">→</span>Showcase
 </a>
 
@@ -443,205 +219,8 @@
   </div>
 </aside>
 
-{# ─── Modal: New trade form ───────────────────────────────────────── #}
-<div id="modal-new-trade" class="modal" aria-hidden="true">
-  <div class="modal-card">
-    <header class="modal-head">
-      <span class="modal-title">Record a new trade</span>
-      <button class="slideover-close" data-action="close-modal" data-target="modal-new-trade">×</button>
-    </header>
-    <div class="modal-body">
-      <form id="new-trade-form">
-        <div class="field">
-          <label for="nt-instrument">Instrument</label>
-          <select id="nt-instrument" name="instrument" required>
-            {% for sym in active_universe %}
-            <option value="{{ sym }}">{{ sym }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label for="nt-direction">Direction</label>
-            <select id="nt-direction" name="direction" required>
-              <option value="long">Long</option>
-              <option value="short">Short</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="nt-entry-date">Entry date</label>
-            <input type="date" id="nt-entry-date" name="entry_date" required>
-          </div>
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label for="nt-entry-price">Entry price</label>
-            <input type="number" step="any" id="nt-entry-price" name="entry_price" required>
-          </div>
-          <div class="field">
-            <label for="nt-stop">Stop level <span class="muted">(structural invalidation)</span></label>
-            <input type="number" step="any" id="nt-stop" name="emergency_stop">
-          </div>
-        </div>
-        <div class="field">
-          <label for="nt-notes">Notes <span class="muted">(why now, what you're watching)</span></label>
-          <textarea id="nt-notes" name="notes" rows="2"></textarea>
-        </div>
-      </form>
-    </div>
-    <footer class="modal-foot">
-      <span class="muted" id="nt-status" style="margin-right: auto; font-size: 12px;"></span>
-      <button class="btn btn-ghost" data-action="close-modal" data-target="modal-new-trade">Cancel</button>
-      <button class="btn btn-primary" data-action="submit-new-trade">Record</button>
-    </footer>
-  </div>
-</div>
-
-{# ─── Modal: Ask (chat) ───────────────────────────────────────────── #}
-<div id="modal-ask" class="modal" aria-hidden="true">
-  <div class="modal-card">
-    <header class="modal-head">
-      <span class="modal-title">Ask</span>
-      <button class="slideover-close" data-action="close-modal" data-target="modal-ask">×</button>
-    </header>
-    <div class="modal-body">
-      <div class="field">
-        <label for="ask-persona">Voice</label>
-        <select id="ask-persona">
-          {% for p in personas %}
-          <option value="{{ p.key }}">{{ p.label }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div id="chat-history" class="chat-history" aria-live="polite"></div>
-      <form id="chat-form" class="chat-form">
-        <textarea id="chat-input" placeholder="Ask about today's brief or your open trades…" rows="2"></textarea>
-        <button type="submit" class="btn btn-primary" id="chat-send">Send</button>
-      </form>
-    </div>
-  </div>
-</div>
-
-{# ─── Modal: Edit an open position ──────────────────────────────── #}
-<div id="modal-edit-trade" class="modal" aria-hidden="true">
-  <div class="modal-card">
-    <header class="modal-head">
-      <span class="modal-title">Edit trade <span class="muted" id="et-symbol-label" style="font-weight: 400;"></span></span>
-      <button class="slideover-close" data-action="close-modal" data-target="modal-edit-trade">×</button>
-    </header>
-    <div class="modal-body">
-      <p class="muted" style="margin-top: 0; font-size: 13px;">
-        Correct typos or update size, stop, or notes. The bias / conviction /
-        thesis snapshot from when you opened the trade stays frozen — that's
-        the baseline the advisor uses to detect "thesis weakened" later.
-      </p>
-      <input type="hidden" id="et-id">
-      <div class="field-row">
-        <div class="field">
-          <label for="et-entry-date">Entry date</label>
-          <input type="date" id="et-entry-date">
-        </div>
-        <div class="field">
-          <label for="et-entry-price">Entry price</label>
-          <input type="number" step="any" id="et-entry-price">
-        </div>
-      </div>
-      <div class="field-row">
-        <div class="field">
-          <label for="et-size">Size (units / lots)</label>
-          <input type="number" step="any" id="et-size">
-        </div>
-        <div class="field">
-          <label for="et-stop">Stop level</label>
-          <input type="number" step="any" id="et-stop">
-        </div>
-      </div>
-      <div class="field">
-        <label for="et-notes">Notes <span class="muted">(replaces existing — to append a dated entry, use Add note instead)</span></label>
-        <textarea id="et-notes" rows="3"></textarea>
-      </div>
-    </div>
-    <footer class="modal-foot">
-      <span class="muted" id="et-status" style="margin-right: auto; font-size: 12px;"></span>
-      <button class="btn btn-ghost" data-action="close-modal" data-target="modal-edit-trade">Cancel</button>
-      <button class="btn btn-primary" data-action="submit-edit-trade">Save changes</button>
-    </footer>
-  </div>
-</div>
-
-{# ─── Modal: Add a recent event ───────────────────────────────────── #}
-<div id="modal-add-event" class="modal" aria-hidden="true">
-  <div class="modal-card">
-    <header class="modal-head">
-      <span class="modal-title">Log a recent event</span>
-      <button class="slideover-close" data-action="close-modal" data-target="modal-add-event">×</button>
-    </header>
-    <div class="modal-body">
-      <p class="muted" style="margin-top: 0; font-size: 13px;">
-        The system has no news API — this is how news enters the pipeline.
-        Tomorrow's Strategist run will read this log and factor it into its analysis.
-      </p>
-      <form id="add-event-form">
-        <div class="field-row">
-          <div class="field">
-            <label for="ae-date">Date</label>
-            <input type="date" id="ae-date" name="date" required>
-          </div>
-          <div class="field">
-            <label for="ae-relevance">Relevance</label>
-            <select id="ae-relevance" name="relevance">
-              <option value="high">High — regime-defining</option>
-              <option value="medium" selected>Medium — thematic</option>
-              <option value="low">Low — minor</option>
-            </select>
-          </div>
-        </div>
-        <div class="field">
-          <label for="ae-headline">Headline (one line, plain English)</label>
-          <input type="text" id="ae-headline" name="headline" maxlength="200" required
-                 placeholder='e.g. "Trump announces 25% tariff on Mexican imports"'>
-        </div>
-        <div class="field">
-          <label for="ae-impact">Cross-asset impact <span class="muted">(optional)</span></label>
-          <input type="text" id="ae-impact" name="impact"
-                 placeholder='e.g. "Peso -3%, NQ -1.2%, gold +0.8%"'>
-        </div>
-        <div class="field">
-          <label for="ae-notes">Your interpretation <span class="muted">(optional)</span></label>
-          <textarea id="ae-notes" name="notes" rows="2"
-                    placeholder='e.g. "Confirms trade-war regime; gold catching safe-haven bid"'></textarea>
-        </div>
-        <div class="field">
-          <label for="ae-affects">Affects <span class="muted">(optional, comma-separated symbols)</span></label>
-          <input type="text" id="ae-affects" name="affects"
-                 placeholder="e.g. USDMXN, NQ, GC">
-        </div>
-      </form>
-    </div>
-    <footer class="modal-foot">
-      <span class="muted" id="ae-status" style="margin-right: auto; font-size: 12px;"></span>
-      <button class="btn btn-ghost" data-action="close-modal" data-target="modal-add-event">Cancel</button>
-      <button class="btn btn-primary" data-action="submit-add-event">Save</button>
-    </footer>
-  </div>
-</div>
-
-{# ─── Modal: Closed trades journal ────────────────────────────────── #}
-<div id="modal-journal" class="modal" aria-hidden="true">
-  <div class="modal-card">
-    <header class="modal-head">
-      <span class="modal-title">Closed trades</span>
-      <button class="slideover-close" data-action="close-modal" data-target="modal-journal">×</button>
-    </header>
-    <div class="modal-body">
-      <p class="muted" style="margin-top: 0;">Most recent first. Builds up over time as the data Layer 7 calibration will read.</p>
-      <ul id="closed-list" class="closed-list"></ul>
-      <p class="muted" id="closed-empty" style="text-align: center; padding: 20px 0;">
-        No closed trades yet.
-      </p>
-    </div>
-  </div>
-</div>
+{# ─── Cookie consent (required for AdSense in EU) ──────────────── #}
+{% include "_cookie_consent.html" %}
 
 {% endblock %}
 
