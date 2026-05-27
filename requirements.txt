@@ -21,3 +21,4 @@ markdown>=3.7
 # for BoJ statements (boj.or.jp publishes Policy Board decisions as
 # PDF, not HTML).
 pypdf>=4.0
+python-multipart>=0.0.18
