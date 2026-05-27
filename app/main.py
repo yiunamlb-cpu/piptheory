@@ -1476,15 +1476,16 @@ def _load_or_create_admin_token() -> str:
     """Return the admin token.
 
     Priority:
+      0. DEBUG HARDCODE — will be removed once env-var works on Render
       1. env PIPTHEORY_ADMIN_TOKEN
       2. env PIPTHEORY_ADMIN_TOKEN_FALLBACK (hardcoded / env fallback for Render)
       3. state/admin_token.txt
       4. generate 32-char URL-safe token, write to file, log path to stderr
-
-    The file lives under state/ which is gitignored but persists within
-    a Render deploy's lifetime (wiped on redeploy).  Priority 2 provides
-    a stable token for Render without wrestling the Dashboard UI.
     """
+    # DEBUG: return hardcoded token regardless of env — remove once
+    # PIPTHEORY_ADMIN_TOKEN is reliably set on Render
+    return "pt-fallback-8Xk2mR9vLp4nWq7yB6cJ3hT5gE1sA0dF"
+
     env_token = os.environ.get("PIPTHEORY_ADMIN_TOKEN", "").strip()
     if env_token:
         return env_token
