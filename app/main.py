@@ -1466,22 +1466,30 @@ async def api_run_log(lines: int = 30):
 _ADMIN_TOKEN_FILE = PROJECT_ROOT / "state" / "admin_token.txt"
 
 
+_FALLBACK_ADMIN_TOKEN = os.environ.get(
+    "PIPTHEORY_ADMIN_TOKEN_FALLBACK",
+    "pt-fallback-8Xk2mR9vLp4nWq7yB6cJ3hT5gE1sA0dF",  # hardcoded fallback for Render
+).strip()
+
+
 def _load_or_create_admin_token() -> str:
-    """Return the admin token, creating one if neither env nor file exists.
+    """Return the admin token.
 
     Priority:
       1. env PIPTHEORY_ADMIN_TOKEN
-      2. state/admin_token.txt
-      3. generate 32-char URL-safe token, write to file, log path to stderr
+      2. env PIPTHEORY_ADMIN_TOKEN_FALLBACK (hardcoded / env fallback for Render)
+      3. state/admin_token.txt
+      4. generate 32-char URL-safe token, write to file, log path to stderr
 
-    The file lives under state/ which is gitignored. Permissions are
-    intentionally not chmod'd — on Windows the user account boundary is
-    the only meaningful protection; on POSIX deployments the operator
-    should restrict the state dir externally.
+    The file lives under state/ which is gitignored but persists within
+    a Render deploy's lifetime (wiped on redeploy).  Priority 2 provides
+    a stable token for Render without wrestling the Dashboard UI.
     """
     env_token = os.environ.get("PIPTHEORY_ADMIN_TOKEN", "").strip()
     if env_token:
         return env_token
+    if _FALLBACK_ADMIN_TOKEN:
+        return _FALLBACK_ADMIN_TOKEN
     if _ADMIN_TOKEN_FILE.exists():
         try:
             tok = _ADMIN_TOKEN_FILE.read_text(encoding="utf-8").strip()
