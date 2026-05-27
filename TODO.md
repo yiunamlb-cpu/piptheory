@@ -24,7 +24,7 @@
 - [ ] Point DNS — set CNAME record at domain registrar to the value Render gives you
 - [ ] Sign up for [Google Analytics](https://analytics.google.com) — create property for piptheory.com
 - [ ] Set Render env var: `GA_MEASUREMENT_ID` = your GA4 `G-XXXXXXXXXX` ID
-- [ ] Run local pipeline then push state: `.\scripts\push_state.ps1`
+- [x] Run local pipeline then push state: `.\scripts\push_state.ps1`
 - [ ] Verify site is live at piptheory.com
 - [ ] Apply for [AdSense](https://adsense.google.com) once you have traffic
 - [ ] Replace placeholder ad slots with real AdSense code
