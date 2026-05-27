@@ -15,17 +15,18 @@
 - [x] State sync script (scripts/push_state.ps1)
 - [x] All code pushed to GitHub
 
-## To do (manual steps)
+## To do (manual steps) — updated 27 May 2026
 
-- [ ] Sign up at [render.com](https://render.com) and connect GitHub account
-- [ ] Create Web Service — select `piptheory` repo (auto-detects render.yaml)
-- [ ] Set Render env var: `ADMIN_TOKEN` (pick a strong password for /admin panel)
-- [ ] Add custom domain in Render — Settings > Custom Domains > `piptheory.com`
-- [ ] Point DNS — set CNAME record at domain registrar to the value Render gives you
+- [x] Sign up at [render.com](https://render.com) and connect GitHub account
+- [x] Create Web Service — select `piptheory` repo (auto-detects render.yaml)
+- [ ] Set Render env var: `PIPTHEORY_ADMIN_TOKEN` (note: code uses this name, not ADMIN_TOKEN — auto-generates if not set)
+- [x] Add custom domain in Render — Settings > Custom Domains > `piptheory.com` ✅ + `www.piptheory.com` redirect
+- [x] Point DNS — A record `@` → `216.24.57.1` (Render IP), CNAME `www` → `@`
 - [ ] Sign up for [Google Analytics](https://analytics.google.com) — create property for piptheory.com
 - [ ] Set Render env var: `GA_MEASUREMENT_ID` = your GA4 `G-XXXXXXXXXX` ID
 - [x] Run local pipeline then push state: `.\scripts\push_state.ps1`
-- [ ] Verify site is live at piptheory.com
+- [x] Verify site is live at piptheory.com ✅ (HTTP 200, SSL issued)
 - [ ] Apply for [AdSense](https://adsense.google.com) once you have traffic
 - [ ] Replace placeholder ad slots with real AdSense code
 - [x] Rename GitHub repo from `nam-hedgefund` to `piptheory`
+- [x] GitHub Actions keep-alive cron (`*/10 * * * *`) running ✅

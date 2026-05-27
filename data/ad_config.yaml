@@ -24,11 +24,11 @@
 # checked first by the template's current logic.
 
 # AdSense (active provider) — leave empty until approved
-adsense_publisher_id: ""    # e.g. "ca-pub-1234567890123456"
+adsense_publisher_id: "ca-pub-2904897250631328"    # piptheory.com AdSense account
 slots:
-  top: ""                    # AdSense slot ID for the top leaderboard
-  sidebar: ""                # AdSense slot ID for the sidebar rectangle
-  in_article: ""             # AdSense slot ID for the in-article rectangle
+  top: ""                    # TODO: create ad unit in AdSense dashboard
+  sidebar: ""                # TODO: create ad unit in AdSense dashboard
+  in_article: ""             # TODO: create ad unit in AdSense dashboard
 
 # Carbon Ads (alternative) — apply at carbonads.net when you have ~10k
 # monthly visitors. Replace the AdSense ad unit with Carbon's <script>
