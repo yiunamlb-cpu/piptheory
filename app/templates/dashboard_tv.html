@@ -12,6 +12,9 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga_id }}"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','{{ ga_id }}');</script>
   {% endif %}
+  {% if ad_config and ad_config.adsense_publisher_id %}
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ ad_config.adsense_publisher_id }}" crossorigin="anonymous"></script>
+  {% endif %}
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v={{ static_version }}">
   <link rel="icon" type="image/png" sizes="180x180" href="/static/favicon.png?v={{ static_version }}">
   <link rel="apple-touch-icon" sizes="180x180" href="/static/favicon.png?v={{ static_version }}">
