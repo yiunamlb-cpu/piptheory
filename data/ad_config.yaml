@@ -24,7 +24,7 @@
 # checked first by the template's current logic.
 
 # AdSense (active provider) — leave empty until approved
-adsense_publisher_id: "ca-pub-2904897250631328"    # piptheory.com AdSense account
+adsense_publisher_id: "ca-pub-6708879321883192"    # new piptheory.com AdSense account
 slots:
   top: ""                    # TODO: create ad unit in AdSense dashboard
   sidebar: ""                # TODO: create ad unit in AdSense dashboard
