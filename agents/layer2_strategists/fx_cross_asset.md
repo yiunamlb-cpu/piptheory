@@ -134,15 +134,13 @@ SPECIALIST SUPPORT:
 CROSS-ASSET CONFIRMATION:
   [Y/N] — [1-2 line summary of which assets confirm or dissent]
 
-CURRENT PRICE: [level]
-KEY LEVELS:
-  Bias-supporting pullback zone: [price range]
-  Invalidation level: [price]
-
 INVALIDATION CONDITIONS:
   Data: [specific data print or central bank action that would force re-read]
-  Price: [level beyond which thesis is wrong]
   Time: [if no movement in N days, re-evaluate]
+  # NOTE: This agent is part of a PUBLIC research site. Do NOT include
+  # specific price levels, entry zones, stop levels, or invalidation
+  # prices. Invalidation is expressed in macro terms (data prints, CB
+  # actions, time decay), never numeric price.
 
 CONTRADICTIONS TO FLAG:
   [Any specialist contradictions or cross-asset dissents that the Bias Council should debate]

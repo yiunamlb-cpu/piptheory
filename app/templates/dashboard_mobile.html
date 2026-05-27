@@ -29,60 +29,124 @@
   </div>
   {% endif %}
 
-  {# ─── TODAY: high-conviction reads ──────────────────────── #}
+  {# ─── PHASE 1 REDESIGN: regime hero (mobile-compact) ─────────────── #}
+  {% set g_s = (regime.growth_score if regime else 0) %}
+  {% set i_s = (regime.inflation_score if regime else 0) %}
+  {% set g_clamped = (4 if g_s > 4 else (-4 if g_s < -4 else g_s)) %}
+  {% set i_clamped = (4 if i_s > 4 else (-4 if i_s < -4 else i_s)) %}
+  {% set px = 100 + (g_clamped / 4.0) * 70 %}
+  {% set py = 100 - (i_clamped / 4.0) * 70 %}
+  {% set r_label = (regime.label if regime else 'TRANSITION') %}
+  {% set r_taglines = {
+    'GOLDILOCKS':  'Growth holding, inflation contained — risk assets in the sweet spot.',
+    'REFLATION':   'Growth and inflation accelerating together — commodities and cyclicals lead.',
+    'STAGFLATION': 'Growth weakening while inflation lingers — the hardest mix for risk.',
+    'DEFLATION':   'Growth and inflation both falling — yields decline, defensives lead.',
+    'TRANSITION':  'Regime in flux — signals mixed between regimes. Await confirmation.'
+  } %}
+
+  <section class="regime-hero" data-regime="{{ r_label }}" aria-label="Macro regime">
+    <svg class="regime-quadrant" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect class="q-bg {{ 'q-active' if r_label == 'STAGFLATION' }}" x="0"   y="0"   width="100" height="100" fill="#DC2626" />
+      <rect class="q-bg {{ 'q-active' if r_label == 'REFLATION' }}"  x="100" y="0"   width="100" height="100" fill="#D97706" />
+      <rect class="q-bg {{ 'q-active' if r_label == 'DEFLATION' }}"  x="0"   y="100" width="100" height="100" fill="#2563EB" />
+      <rect class="q-bg {{ 'q-active' if r_label == 'GOLDILOCKS' }}" x="100" y="100" width="100" height="100" fill="#059669" />
+      <rect class="q-frame" x="1" y="1" width="198" height="198" rx="4" />
+      <line class="q-axis" x1="100" y1="6" x2="100" y2="194" />
+      <line class="q-axis" x1="6" y1="100" x2="194" y2="100" />
+      <text class="q-label" x="7"   y="14"  >STAGFLATION</text>
+      <text class="q-label" x="193" y="14"   text-anchor="end">REFLATION</text>
+      <text class="q-label" x="7"   y="194" >DEFLATION</text>
+      <text class="q-label" x="193" y="194"  text-anchor="end">GOLDILOCKS</text>
+      <circle class="q-pulse" cx="{{ px|round(1) }}" cy="{{ py|round(1) }}" r="12" />
+      <circle class="q-point" cx="{{ px|round(1) }}" cy="{{ py|round(1) }}" r="7" />
+    </svg>
+    <div>
+      <p class="regime-hero-label">Today's macro regime</p>
+      <h1 class="regime-hero-name">{{ r_label|title }}</h1>
+      <p class="regime-hero-tagline">{{ r_taglines.get(r_label, '') }}</p>
+      <div class="regime-hero-meta">
+        <span class="regime-hero-meta-item">G <strong>{{ '+' if g_s > 0 else '' }}{{ g_s }}</strong></span>
+        <span class="regime-hero-meta-item">I <strong>{{ '+' if i_s > 0 else '' }}{{ i_s }}</strong></span>
+        {% if macro.days_to_catalyst is not none %}
+        <span class="regime-hero-meta-item">Next <strong>{{ macro.days_to_catalyst }}d</strong></span>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  {# ─── TODAY: high-conviction reads — POSTER CARDS ────────────────── #}
+  <div class="section-label">Today's calls{% if today.ideas %} · {{ today.ideas|length }}{% endif %}</div>
   {% if today.ideas %}
-  <div class="section-label">Today's calls</div>
-  {% for i in today.ideas %}
-  <article class="today-card idea">
-    <div class="today-card-tag idea">
-      {{ i.strength_label|upper }} · {{ i.conviction }}/10
-    </div>
-    <div class="today-card-title">
-      {{ i.instrument }} <span class="dir">{{ i.direction|upper }}</span>
-    </div>
-    <p class="today-card-reason">
-      {{ i.macro_summary }}
-    </p>
-    <div class="today-card-actions">
-      <button class="btn btn-ghost" data-action="why-instrument" data-symbol="{{ i.instrument }}">Read reasoning →</button>
-    </div>
-  </article>
-  {% endfor %}
+    {% for i in today.ideas %}
+    {% set band = 'vhigh' if i.conviction >= 9 else ('high' if i.conviction >= 8 else ('med' if i.conviction >= 6 else 'low')) %}
+    {% set dir_class = 'dir-long' if i.direction|lower in ('long','buy','up') else ('dir-short' if i.direction|lower in ('short','sell','down') else '') %}
+    {% set pct = (i.conviction / 10.0) %}
+    <article class="poster-card {{ dir_class }}">
+      <div class="conv-ring" title="Conviction {{ i.conviction }} of 10">
+        <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle class="conv-ring-track" cx="25" cy="25" r="22" />
+          <circle class="conv-ring-fill" cx="25" cy="25" r="22"
+                  data-band="{{ band }}"
+                  stroke-dasharray="{{ (138.23 * pct)|round(2) }} 138.23" />
+        </svg>
+        <div class="conv-ring-text">
+          <span class="conv-num">{{ i.conviction }}</span>
+          <span class="conv-denom">/10</span>
+        </div>
+      </div>
+      <div class="poster-body">
+        <div class="poster-symbol">
+          {{ i.instrument }}
+          <span class="poster-dir-word">{{ i.direction|upper }}</span>
+        </div>
+        <p class="poster-headline">{{ i.macro_summary }}</p>
+        <button class="poster-cta" data-action="why-instrument" data-symbol="{{ i.instrument }}">Read reasoning →</button>
+      </div>
+    </article>
+    {% endfor %}
   {% else %}
-  <div class="today-empty">
-    <p style="margin: 0; font-weight: 500;">No high-conviction reads today.</p>
-    <p class="muted" style="margin-top: 6px; font-size: 13px;">The research panel didn't see a strong macro setup. Most days will be like this.</p>
-  </div>
+    <div class="poster-empty">
+      <div class="poster-empty-icon">∅</div>
+      <p class="poster-empty-title">No high-conviction reads today</p>
+      <p class="poster-empty-sub">
+        The research panel didn't see a strong macro setup. Most days will be like this — the {{ r_label|title }} regime above tells the broader story.
+      </p>
+    </div>
   {% endif %}
 
-  {# ─── Macro snapshot ────────────────────────────────────── #}
-  <div class="section-label">Macro</div>
+  {# ─── Driving themes (dots, not bars) ─────────────────────────────── #}
+  <div class="section-label">Driving themes</div>
   <div class="macro-card">
     {% if macro.regime %}
-    <div class="macro-regime">{{ macro.regime }}</div>
-    {% endif %}
-    {% if regime and regime.label %}
-    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;">
-      <span class="muted" style="font-size: 11px; text-transform: uppercase;">Regime:</span>
-      <span class="chip chip-{{ 'good' if regime.label == 'GOLDILOCKS' else 'warn' if regime.label == 'STAGFLATION' else 'bad' if regime.label == 'DEFLATION' else 'brand' if regime.label == 'REFLATION' else 'neutral' }}">{{ regime.label }}</span>
-    </div>
+    <p class="muted" style="font-size: 13px; line-height: 1.5; margin: 0 0 12px;">
+      <em>{{ macro.regime }}</em>
+    </p>
     {% endif %}
     {% if macro.themes %}
-    <ul class="macro-themes">
+    <ul class="theme-list">
       {% for t in macro.themes[:5] %}
-      <li>
-        <span>{{ t.name }}</span>
-        <strong>{{ t.conviction }}/10</strong>
+      <li class="theme-tile">
+        <span class="theme-name">{{ t.name }}</span>
+        <span class="dot-conv" aria-label="Conviction {{ t.conviction }} of 10">
+          {% for n in range(1, 11) %}<span class="dot-conv-dot {{ 'on' if n <= t.conviction }}"></span>{% endfor %}
+          <span class="dot-conv-num">{{ t.conviction }}</span>
+        </span>
       </li>
       {% endfor %}
     </ul>
     {% endif %}
     {% if macro.next_catalyst %}
-    <div class="macro-catalyst">
-      <strong>Next:</strong> {{ macro.next_catalyst }}{% if macro.days_to_catalyst is not none %} ({{ macro.days_to_catalyst }} day{{ "s" if macro.days_to_catalyst != 1 }}){% endif %}
+    <div class="catalyst-pill">
+      <span class="catalyst-pill-icon {{ 'urgent' if macro.days_to_catalyst is not none and macro.days_to_catalyst <= 3 }}">
+        {{ macro.days_to_catalyst if macro.days_to_catalyst is not none else '·' }}{{ 'd' if macro.days_to_catalyst is not none }}
+      </span>
+      <span class="catalyst-pill-text">
+        <strong>Next catalyst:</strong> {{ macro.next_catalyst }}
+      </span>
     </div>
     {% endif %}
-    <a class="macro-link" data-action="open-brief">Read full brief →</a>
+    <a class="macro-link" data-action="open-brief" style="margin-top: 12px; display: inline-block;">Read full brief →</a>
   </div>
 
   {# ─── In-article ad slot ─── #}
@@ -119,11 +183,6 @@
   <button onclick="location.href='/about'"><span class="icon">ⓘ</span><span>About</span></button>
   <button data-action="open-menu"><span class="icon">≡</span><span>More</span></button>
 </nav>
-
-{# ─── Sticky surface-toggle: switches to Showcase ──────────────── #}
-<a class="surface-toggle" href="?view=showcase" title="Switch to Showcase view">
-  <span class="arrow">→</span>Showcase
-</a>
 
 {# ─── Generic sheet ────────────────────────────────────────────── #}
 <div id="overlay" class="overlay"></div>

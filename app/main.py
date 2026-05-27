@@ -11,13 +11,15 @@ Routes:
 from __future__ import annotations
 
 import json
+import os
 import re
+import secrets
 import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -80,6 +82,10 @@ def _compute_static_version() -> str:
 
 _STATIC_VERSION = _compute_static_version()
 templates.env.globals["static_version"] = _STATIC_VERSION
+
+# Google Analytics — set GA_MEASUREMENT_ID env var (e.g. "G-XXXXXXXXXX")
+_GA_ID = os.environ.get("GA_MEASUREMENT_ID", "")
+templates.env.globals["ga_id"] = _GA_ID
 
 
 def _load_ad_config() -> dict:
@@ -665,6 +671,14 @@ def _build_instruments_table(run: Run, open_instruments: set[str] | None = None)
     older callers.
     """
     open_instruments = open_instruments or set()
+    # Pull primary theme out of each judge.md if present so we can show
+    # which theme drives each instrument. Format:
+    #   "PRIMARY THEME (from THEMES.md): <theme name>"
+    _PRIMARY_THEME_RE = re.compile(
+        r"PRIMARY\s+THEME[^:\n]*:\**\s*\**\s*([^\n*]+)",
+        re.IGNORECASE,
+    )
+
     rows: list[dict] = []
     for b in run.instrument_biases:
         co = run.council.get(b.instrument)
@@ -676,18 +690,95 @@ def _build_instruments_table(run: Run, open_instruments: set[str] | None = None)
             bias_raw = b.bias
         direction = _normalise_dir_word(bias_raw)
 
-        # Macro-only state copy
+        # Macro-only state copy + tier band. Tiers drive the visual split
+        # in the dashboard between "high-conviction" (featured cards),
+        # "developing" (compact rows), and "below the bar" (de-emphasized).
         if conv >= 8:
-            state, state_class = "Strong macro read", "good"
-        elif conv >= 6:
-            state, state_class = "Moderate macro lean", "warn"
+            state, state_class, tier_band = "Strong macro read", "good", "high"
+        elif conv >= 7:
+            state, state_class, tier_band = "Solid macro read", "good", "high"
         elif conv >= 5:
-            state, state_class = "Weak macro lean", "neutral"
+            state, state_class, tier_band = "Developing read", "warn", "developing"
+        elif conv >= 4:
+            state, state_class, tier_band = "Watch only", "neutral", "watch"
         else:
-            state, state_class = "Below the bar — no actionable read", "neutral"
+            state, state_class, tier_band = "Below the bar", "neutral", "noise"
 
-        hist = score_history.summary_for(b.instrument, n=7)
+        # Primary theme — try judge file first, fall back to nothing
+        primary_theme = ""
+        if co and co.judge:
+            if pm := _PRIMARY_THEME_RE.search(co.judge):
+                primary_theme = pm.group(1).strip().split("(")[0].strip()
+                # Some outputs slip a trailing comma or period
+                primary_theme = primary_theme.rstrip(",.;:").strip()
+                # Strip pipeline artifacts: "Candidate – ", trailing dashes, N/A
+                primary_theme = re.sub(r"^(?:Candidate|Emerging)\s*[–—-]\s*", "", primary_theme, flags=re.IGNORECASE).strip()
+                primary_theme = primary_theme.rstrip("–—- ").strip()
+                if primary_theme.startswith("[N/A") or primary_theme.upper() == "N/A":
+                    primary_theme = ""
+
+        hist = score_history.summary_for(b.instrument, n=14)
         thesis = thesis_tracker.status_for(b.instrument)
+
+        # ── Inline reasoning data for full-page cards ──────────────
+        judge_raw = co.judge if co else ""
+        bull_raw = co.bull if co else ""
+        bear_raw = co.bear if co else ""
+
+        # Extract structured fields from judge output
+        _tf_m = re.search(r"TIMEFRAME[:\s]*([^\n]+)", judge_raw, re.I)
+        timeframe = _tf_m.group(1).strip() if _tf_m else ""
+        _pb = re.search(r"P\(bull[^)]*\)[:\s]*([\d.]+)%", judge_raw, re.I)
+        _pe = re.search(r"P\(bear[^)]*\)[:\s]*([\d.]+)%", judge_raw, re.I)
+        _ps = re.search(r"P\(sideways[^)]*\)[:\s]*([\d.]+)%", judge_raw, re.I)
+        p_bull = float(_pb.group(1)) if _pb else 0
+        p_bear = float(_pe.group(1)) if _pe else 0
+        p_flat = float(_ps.group(1)) if _ps else max(0, 100 - p_bull - p_bear)
+
+        # Extract bull thesis (1 sentence)
+        _bt = re.search(r"THESIS[^:\n]*:\s*\n?\s*([^\n]+)", bull_raw, re.I)
+        bull_thesis = _bt.group(1).strip() if _bt else ""
+
+        # Extract bear thesis (1 sentence)
+        _bet = re.search(r"THESIS[^:\n]*:\s*\n?\s*([^\n]+)", bear_raw, re.I)
+        bear_thesis = _bet.group(1).strip() if _bet else ""
+
+        # Extract judge narrative (after JUDGMENT REASONING:)
+        _jn = re.split(r"JUDGMENT\s+REASONING\s*:?\s*\n?", judge_raw, flags=re.I)
+        judge_narrative = _jn[-1].strip() if len(_jn) > 1 else judge_raw
+        # Strip prompt artifacts like "(3-5 sentences):" echoed by LLMs
+        judge_narrative = re.sub(
+            r"^\s*\(\d+-\d+\s+sentences?\)\s*:?\s*\n?", "", judge_narrative
+        ).strip()
+
+        # Extract advocate narratives — strip metadata header, start from
+        # PRIMARY DRIVER or SUPPORTING EVIDENCE (thesis shown separately)
+        def _strip_advocate_header(raw: str) -> str:
+            # Try to split at PRIMARY DRIVER or SUPPORTING EVIDENCE
+            for marker in [r"PRIMARY\s+DRIVER", r"SUPPORTING\s+EVIDENCE",
+                           r"KEY\s+ARGUMENTS?"]:
+                parts = re.split(marker + r"\s*:?\s*\n?", raw, maxsplit=1, flags=re.I)
+                if len(parts) > 1:
+                    return marker.replace(r"\s+", " ").replace(r"\s*", "").replace(r":?\s*\n?", "").replace("\\", "") + ":\n" + parts[1]
+            # Fallback: strip INSTRUMENT/ROLE/THESIS header lines
+            lines = raw.split("\n")
+            start = 0
+            for i, ln in enumerate(lines):
+                if re.match(r"^(INSTRUMENT|ROLE|THESIS)[:\s]", ln, re.I):
+                    start = i + 1
+                    continue
+                if ln.strip() and start > 0:
+                    break
+            return "\n".join(lines[start:]).strip() if start > 0 else raw
+
+        bull_narrative = _strip_advocate_header(bull_raw) if bull_raw else ""
+        bear_narrative = _strip_advocate_header(bear_raw) if bear_raw else ""
+
+        # Render HTML for each role
+        judge_html = _render_markdown(_format_analysis_sections(judge_narrative))
+        bull_html = _render_markdown(_format_analysis_sections(bull_narrative))
+        bear_html = _render_markdown(_format_analysis_sections(bear_narrative))
+
         rows.append({
             "symbol": b.instrument,
             "name": display_label(b.instrument),
@@ -698,10 +789,22 @@ def _build_instruments_table(run: Run, open_instruments: set[str] | None = None)
             "strength_label": _strength_label(conv),
             "state": state,
             "state_class": state_class,
-            "verdict": "",                     # legacy field — empty in public
-            "is_open_position": False,         # public site has no positions
+            "tier_band": tier_band,
+            "primary_theme": primary_theme,
+            "verdict": "",
+            "is_open_position": False,
             "history": hist,
             "thesis": thesis,
+            # Inline reasoning
+            "timeframe": timeframe,
+            "p_bull": p_bull,
+            "p_bear": p_bear,
+            "p_flat": p_flat,
+            "bull_thesis": bull_thesis,
+            "bear_thesis": bear_thesis,
+            "judge_html": judge_html,
+            "bull_html": bull_html,
+            "bear_html": bear_html,
         })
     rows.sort(key=lambda r: (-r["conviction"], r["symbol"]))
     return rows
@@ -747,17 +850,16 @@ def _get_regime() -> dict:
 # ─── HOME CONTEXT (the whole page) ──────────────────────────────────────────
 
 def _detect_surface(request: Request) -> str:
-    """Return 'mobile', 'desktop', or 'showcase'. Order of precedence:
-      1. ?view=... query param (sticky via cookie)
+    """Return 'mobile' or 'desktop'. Order of precedence:
+      1. ?view=mobile|desktop query param (sticky via cookie)
       2. cookie
       3. user-agent (mobile UAs → mobile)
       4. desktop default
 
-    'showcase' is the visual / dark-canvas surface — same data, dramatically
-    different presentation. Toggleable via the sticky tab on the other
-    surfaces; see app/templates/dashboard_showcase.html.
+    The showcase surface was removed when the project went public — only
+    desktop and mobile remain.
     """
-    valid = ("mobile", "desktop", "showcase")
+    valid = ("mobile", "desktop")
     override = request.query_params.get("view")
     if override in valid:
         return override
@@ -771,137 +873,103 @@ def _detect_surface(request: Request) -> str:
     return "desktop"
 
 
-_SPECIALIST_DEFS = [
-    # label, themes-it-informs (keyword), instruments-it-affects (FRED/USD axis)
-    ("Fed-Watcher",        ["fed", "stuck", "hawkish"],        ["DXY", "USDJPY", "ES", "NQ", "GC"]),
-    ("ECB-Watcher",        ["ecb", "hawkish", "euro"],         ["EURUSD", "DXY"]),
-    ("BoE-Watcher",        [],                                  ["GBPUSD"]),
-    ("BoJ-Watcher",        [],                                  ["USDJPY"]),
-    ("Inflation Tracker",  ["reflation", "energy", "inflation"], ["GC", "CL", "ES", "NQ"]),
-    ("Positioning Analyst",["china", "ecb", "fed", "ai"],       ["EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "GC", "CL"]),
-    ("Geopolitical Risk",  ["energy", "china"],                ["CL", "GC", "DXY"]),
+_HEADLINE_BLOCK_RE = re.compile(
+    r"^##\s+Headline\s*\n+(.+?)(?=\n\s*\n|\n##\s|\Z)",
+    re.IGNORECASE | re.MULTILINE | re.DOTALL,
+)
+# The brief's own H1 (markdown `# ...` or setext `===` underline) is
+# redundant with the page-level headline. Strip it so the rendered
+# article body starts from the first H2, with no duplicated title.
+_BRIEF_H1_ATX_RE = re.compile(r"^#\s+[^\n]+\n+", re.MULTILINE)
+_BRIEF_H1_SETEXT_RE = re.compile(r"^[^\n#=]+\n=+\s*\n+", re.MULTILINE)
+# Tidy up legacy headers from older brief output that still slip through.
+# These get replaced with editorial-voice equivalents so older runs don't
+# render with "tradable_now" / personal-trading jargon visible to readers.
+_LEGACY_H2_REWRITES = [
+    (re.compile(r"^##\s+1\.\s+Setups for review.*$", re.MULTILINE | re.IGNORECASE),
+     "## What the data favors"),
+    (re.compile(r"^##\s+2\.\s+Watch list.*$", re.MULTILINE | re.IGNORECASE),
+     "## On watch"),
+    (re.compile(r"^##\s+3\.\s+Passed despite bias.*$", re.MULTILINE | re.IGNORECASE),
+     "## Passed today"),
+    (re.compile(r"^##\s+What to watch in the next 24-48 hours.*$", re.MULTILINE | re.IGNORECASE),
+     "## What we're watching next"),
+    (re.compile(r"^##\s+Risk view.*$", re.MULTILINE | re.IGNORECASE),
+     "## Risks"),
+    (re.compile(r"^##\s+Confidence in this brief.*$", re.MULTILINE | re.IGNORECASE),
+     "## Confidence"),
+    (re.compile(r"^##\s+Executive summary.*$", re.MULTILINE | re.IGNORECASE),
+     "## Today's read"),
 ]
+# Lines from older briefs that leaked tactical / personal-trading content.
+# We strip these line-by-line. The fresh PM prompt prevents them from being
+# generated, but cached runs from before the prompt change can still hit
+# the page until they're regenerated.
+_LEAK_LINE_RES = [
+    re.compile(r"^\s*-\s*Setup at:.*$", re.MULTILINE | re.IGNORECASE),
+    re.compile(r"^\s*-\s*Key level to act around:.*$", re.MULTILINE | re.IGNORECASE),
+    re.compile(r"^\s*-\s*Invalidation level:.*$", re.MULTILINE | re.IGNORECASE),
+    re.compile(r"^\s*-\s*Target zone.*$", re.MULTILINE | re.IGNORECASE),
+    re.compile(r"^\s*-\s*Entry zone.*$", re.MULTILINE | re.IGNORECASE),
+    re.compile(r"\(tradable_now\)", re.IGNORECASE),
+    re.compile(r"\(watch verdict\)", re.IGNORECASE),
+]
+_REGIME_TAGLINE_FALLBACK = {
+    "GOLDILOCKS":  "Growth holds, inflation contained — risk assets in the sweet spot.",
+    "REFLATION":   "Growth and inflation accelerating together — commodities and cyclicals lead.",
+    "STAGFLATION": "Growth weakening while inflation lingers — the hardest mix for risk.",
+    "DEFLATION":   "Growth and inflation both falling — yields decline, defensives lead.",
+    "TRANSITION":  "Regime in flux — signals mixed between regimes. Await confirmation.",
+}
 
 
-def _build_graph(
-    instruments: list[dict],
-    macro_themes: list[dict],
-) -> dict:
-    """Produce a graph spec for the showcase surface.
+def _extract_headline(brief_md: str, regime_label: str | None) -> tuple[str, str]:
+    """Pull the headline out of the PM brief, clean the body.
 
-    Three node layers:
-      - Layer 1 specialists (7 agents that read data each morning)
-      - Macro themes (curated regime tracker)
-      - Instruments (FTMO-tradable universe)
+    Returns (headline_text, body_md_without_headline_and_h1).
 
-    Three edge classes:
-      - specialist → theme       (data-to-narrative)
-      - theme → instrument       (narrative-to-bias)  — built from
-        Strategist drivers via thesis_tracker
-      - specialist → instrument  (direct rate/data pull, e.g. ECB
-        watcher → EURUSD)
+    1. Extract `## Headline` if present (new-prompt format).
+       Fall back to regime tagline otherwise.
+    2. Strip the brief's own H1 — it's redundant with the page headline.
+    3. Rewrite legacy H2s ("1. Setups for review (tradable_now)" → "What
+       the data favors", etc.) so older runs don't expose trading jargon.
+    4. Drop "Setup at: $X" / "Invalidation level: $X" lines as defence
+       against any cached output that still has them.
 
-    This dense tri-layer structure mirrors how the pipeline actually
-    flows: specialists ingest data → themes encode regime → instruments
-    inherit bias. The graph visualises the whole information path.
+    The fresh-prompt path is clean and most of this cleanup is dead code.
+    But pipeline outputs are immutable artifacts — older runs would still
+    render badly without this post-processing.
     """
-    # Lowercased theme name → tokens, for matching against driver text
-    def _tokens(s: str) -> set[str]:
-        words = re.findall(r"[a-zA-Z]{3,}", s.lower())
-        stop = {"the", "and", "for", "with", "from", "into", "via",
-                "theme", "themes", "primary", "secondary"}
-        return {w for w in words if w not in stop}
+    if not brief_md:
+        return (_REGIME_TAGLINE_FALLBACK.get(regime_label or "TRANSITION", ""), brief_md)
 
-    theme_tokens = [(t["name"], _tokens(t["name"])) for t in macro_themes]
-    theme_ids = {t["name"] for t in macro_themes}
-    instr_ids = {r["symbol"] for r in instruments}
+    # 1. Headline extraction
+    m = _HEADLINE_BLOCK_RE.search(brief_md)
+    if m:
+        headline = " ".join(m.group(1).split()).strip().rstrip(".") + "."
+        body = brief_md[:m.start()] + brief_md[m.end():]
+    else:
+        headline = _REGIME_TAGLINE_FALLBACK.get(regime_label or "TRANSITION", "")
+        body = brief_md
 
-    nodes: list[dict] = []
-    edges: list[dict] = []
+    # 2. Strip the brief's own H1. Try ATX first (`# Title`), then setext
+    # (`Title\n=====`). Only strips the FIRST occurrence so any H1 deeper
+    # in the brief (unusual) survives.
+    body = _BRIEF_H1_ATX_RE.sub("", body, count=1)
+    body = _BRIEF_H1_SETEXT_RE.sub("", body, count=1)
 
-    # ── Instrument nodes ──
-    for r in instruments:
-        bias = (r.get("direction") or "no view")
-        kind = "long" if bias == "long" else ("short" if bias == "short" else "neutral")
-        nodes.append({
-            "id": f"i:{r['symbol']}",
-            "type": "instrument",
-            "label": r["symbol"],
-            "kind": kind,
-            "conviction": r["conviction"],
-            "is_open_position": r.get("is_open_position", False),
-            "subtitle": r.get("name", ""),
-            "size": 12 + min(10, max(0, (r["conviction"] - 4) * 2)),
-        })
+    # 3. Rewrite legacy section headers
+    for pat, replacement in _LEGACY_H2_REWRITES:
+        body = pat.sub(replacement, body)
 
-    # ── Theme nodes ──
-    for t in macro_themes:
-        nodes.append({
-            "id": f"t:{t['name']}",
-            "type": "theme",
-            "label": t["name"],
-            "kind": "theme",
-            "conviction": t["conviction"],
-            "size": 10 + t["conviction"] // 2,
-        })
+    # 4. Strip leaked tactical lines defensively
+    for pat in _LEAK_LINE_RES:
+        body = pat.sub("", body)
 
-    # ── Specialist nodes ──
-    for label, _, _ in _SPECIALIST_DEFS:
-        nodes.append({
-            "id": f"s:{label}",
-            "type": "specialist",
-            "label": label,
-            "kind": "specialist",
-            "conviction": 0,
-            "size": 11,
-        })
+    # Collapse any triple+ blank lines created by the line removals
+    body = re.sub(r"\n{3,}", "\n\n", body)
 
-    # ── Edges: theme → instrument (driver-derived) ──
-    for r in instruments:
-        thesis = r.get("thesis") or {}
-        drivers = thesis.get("drivers") or []
-        if not drivers:
-            continue
-        driver_text = " ".join(d.get("driver", "") for d in drivers)
-        d_tokens = _tokens(driver_text)
-        for theme_name, t_tokens in theme_tokens:
-            if not t_tokens:
-                continue
-            overlap = t_tokens & d_tokens
-            if overlap:
-                edges.append({
-                    "source": f"t:{theme_name}",
-                    "target": f"i:{r['symbol']}",
-                    "weight": len(overlap),
-                    "kind": "theme-instrument",
-                })
-
-    # ── Edges: specialist → theme (which themes each specialist informs) ──
-    for label, theme_keywords, _ in _SPECIALIST_DEFS:
-        if not theme_keywords:
-            continue
-        for theme in macro_themes:
-            theme_tokens_l = _tokens(theme["name"])
-            if any(kw in tok for kw in theme_keywords for tok in theme_tokens_l):
-                edges.append({
-                    "source": f"s:{label}",
-                    "target": f"t:{theme['name']}",
-                    "weight": 1,
-                    "kind": "specialist-theme",
-                })
-
-    # ── Edges: specialist → instrument (which instruments it directly affects) ──
-    for label, _, instr_list in _SPECIALIST_DEFS:
-        for sym in instr_list:
-            if sym in instr_ids:
-                edges.append({
-                    "source": f"s:{label}",
-                    "target": f"i:{sym}",
-                    "weight": 1,
-                    "kind": "specialist-instrument",
-                })
-
-    return {"nodes": nodes, "edges": edges}
+    return (headline, body.strip())
 
 
 def _build_home_context(run: Run, runs: list[str], date: str, surface: str) -> dict:
@@ -952,6 +1020,20 @@ def _build_home_context(run: Run, runs: list[str], date: str, surface: str) -> d
     except Exception:
         pass
 
+    brief_raw = run.layer5_pm_brief or ""
+    headline, brief_body = _extract_headline(
+        brief_raw, regime.get("label") if regime else None,
+    )
+
+    # Upcoming events for the catalyst calendar on the dashboard.
+    # Returns CalendarEvent objects within the lookahead window. Convert
+    # to plain dicts for the template.
+    try:
+        upcoming_raw = upcoming_events(days_ahead=14, min_severity="low")
+        upcoming_calendar = [e.to_dict() for e in upcoming_raw][:8]
+    except Exception:
+        upcoming_calendar = []
+
     return {
         "surface": surface,
         "run_date": date,
@@ -960,11 +1042,12 @@ def _build_home_context(run: Run, runs: list[str], date: str, surface: str) -> d
         "macro": macro,
         "regime": regime,
         "instruments": instruments,
-        "graph": _build_graph(instruments, macro["themes"]),
+        "upcoming_calendar": upcoming_calendar,
         "recent_events": recent_events,
         "partial_run": partial_run,
         "partial_msg": partial_msg,
-        "brief_md": run.layer5_pm_brief or "",
+        "brief_md": brief_body,
+        "brief_headline": headline,
         "last_synced_iso": last_synced_iso,
         "active_universe": ACTIVE_UNIVERSE,
         "render_time": datetime.now().strftime("%H:%M:%S"),
@@ -1023,15 +1106,12 @@ async def run_page(request: Request, date: str):
 
     surface = _detect_surface(request)
     ctx = _build_home_context(run, runs, date, surface)
-    template = {
-        "mobile": "dashboard_mobile.html",
-        "showcase": "dashboard_showcase.html",
-    }.get(surface, "dashboard_desktop.html")
+    template = "dashboard_tv.html"
 
     response = templates.TemplateResponse(request, template, ctx)
     # Sticky-set the override cookie so a manual ?view= choice persists.
     override = request.query_params.get("view")
-    if override in ("mobile", "desktop", "showcase"):
+    if override in ("mobile", "desktop"):
         response.set_cookie("nam_view", override, max_age=60 * 60 * 24 * 30, samesite="lax")
     return response
 
@@ -1356,11 +1436,366 @@ async def api_run_log(lines: int = 30):
     return JSONResponse({"lines": _read_log_tail(lines)})
 
 
+# ---------- admin: manual sync (NOT exposed to public) -----------------------
+#
+# Auth model:
+#   * A single shared secret token grants admin access.
+#   * Token source priority:
+#       1. env PIPTHEORY_ADMIN_TOKEN  (preferred for production)
+#       2. state/admin_token.txt      (auto-generated on first start if env
+#                                      not set; gitignored via state/* rule)
+#   * Cookie pt_admin holds the token verbatim. SameSite=Strict + HttpOnly
+#     blocks CSRF and JS exfiltration. Cookie is set with Secure when the
+#     request arrived over HTTPS (Tailscale Serve terminates TLS upstream).
+#
+# Surface model:
+#   * Routes live under /admin/* and are NOT linked from any public template,
+#     /about, footer, robots.txt, sitemap, etc. The public site has no
+#     awareness that admin exists.
+#   * /admin returns 404 (not 401) to anonymous visitors. The login form is
+#     served from the SAME path when the user POSTs the right token. This way
+#     scanners can't fingerprint the admin endpoint by status code alone.
+#   * Robots.txt should disallow /admin (added separately).
+#
+# Run model:
+#   * /admin/run POST spawns scripts/run_daily.bat via subprocess in a new
+#     process group so it survives uvicorn restarts and the parent doesn't
+#     block. PID is tracked in _run_state and surfaced via /admin/status
+#     for the run-in-progress UI.
+
+_ADMIN_TOKEN_FILE = PROJECT_ROOT / "state" / "admin_token.txt"
+
+
+def _load_or_create_admin_token() -> str:
+    """Return the admin token, creating one if neither env nor file exists.
+
+    Priority:
+      1. env PIPTHEORY_ADMIN_TOKEN
+      2. state/admin_token.txt
+      3. generate 32-char URL-safe token, write to file, log path to stderr
+
+    The file lives under state/ which is gitignored. Permissions are
+    intentionally not chmod'd — on Windows the user account boundary is
+    the only meaningful protection; on POSIX deployments the operator
+    should restrict the state dir externally.
+    """
+    env_token = os.environ.get("PIPTHEORY_ADMIN_TOKEN", "").strip()
+    if env_token:
+        return env_token
+    if _ADMIN_TOKEN_FILE.exists():
+        try:
+            tok = _ADMIN_TOKEN_FILE.read_text(encoding="utf-8").strip()
+            if tok:
+                return tok
+        except Exception:
+            pass
+    tok = secrets.token_urlsafe(32)
+    _ADMIN_TOKEN_FILE.parent.mkdir(parents=True, exist_ok=True)
+    _ADMIN_TOKEN_FILE.write_text(tok + "\n", encoding="utf-8")
+    print(
+        f"[piptheory.admin] generated new admin token at {_ADMIN_TOKEN_FILE}\n"
+        f"                  paste this into the /admin login form.",
+        file=sys.stderr,
+    )
+    return tok
+
+
+_ADMIN_TOKEN = _load_or_create_admin_token()
+_ADMIN_COOKIE = "pt_admin"
+
+
+def _is_admin(request: Request) -> bool:
+    """Constant-time check on the auth cookie."""
+    cookie_val = request.cookies.get(_ADMIN_COOKIE, "")
+    if not cookie_val or not _ADMIN_TOKEN:
+        return False
+    return secrets.compare_digest(cookie_val, _ADMIN_TOKEN)
+
+
+def _is_secure(request: Request) -> bool:
+    """Heuristic: is this connection HTTPS?
+
+    Tailscale Serve terminates TLS upstream, so we honor X-Forwarded-Proto.
+    Direct localhost access stays HTTP and Secure cookies wouldn't be sent.
+    """
+    if request.url.scheme == "https":
+        return True
+    fwd = request.headers.get("x-forwarded-proto", "").lower()
+    return "https" in fwd
+
+
+# In-memory tracker for the most recent admin-triggered pipeline run.
+# Lost on uvicorn restart; that's fine — _detect_running_pipeline() falls
+# back to log-based detection so the UI stays accurate across restarts.
+_run_state: dict = {"pid": None, "started_at": None}
+
+
+def _is_run_alive(pid: int | None) -> bool:
+    """True if the tracked PID is still running. Cheap, no dependencies."""
+    if not pid:
+        return False
+    if sys.platform == "win32":
+        # tasklist exit 0 + PID present in output => alive.
+        try:
+            out = subprocess.run(
+                ["tasklist", "/FI", f"PID eq {pid}", "/NH"],
+                capture_output=True, text=True, timeout=3,
+            )
+            return str(pid) in (out.stdout or "")
+        except Exception:
+            return False
+    try:
+        os.kill(pid, 0)
+        return True
+    except (OSError, ProcessLookupError):
+        return False
+
+
+def _spawn_pipeline_run() -> int | None:
+    """Start scripts/run_daily.bat in a detached process. Returns PID.
+
+    Returns None if a run is already in progress (no double-start). The
+    scheduled-task path and this admin path share the same .bat, so output
+    goes to the same logs/bias_engine.log and the UI is consistent.
+    """
+    detected = _detect_running_pipeline()
+    if detected:
+        return None
+    bat = PROJECT_ROOT / "scripts" / "run_daily.bat"
+    if not bat.exists():
+        raise RuntimeError(f"run_daily.bat not found at {bat}")
+
+    if sys.platform == "win32":
+        # DETACHED_PROCESS (0x08) + CREATE_NEW_PROCESS_GROUP (0x200) so the
+        # child survives if uvicorn exits. CREATE_NO_WINDOW (0x08000000)
+        # suppresses the console flash that .bat normally creates.
+        flags = 0x00000008 | 0x00000200 | 0x08000000
+        proc = subprocess.Popen(
+            ["cmd.exe", "/c", str(bat)],
+            cwd=str(PROJECT_ROOT),
+            creationflags=flags,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            close_fds=True,
+        )
+    else:
+        proc = subprocess.Popen(
+            ["bash", str(bat)],
+            cwd=str(PROJECT_ROOT),
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True,
+            close_fds=True,
+        )
+    _run_state["pid"] = proc.pid
+    _run_state["started_at"] = datetime.now()
+    return proc.pid
+
+
+def _admin_context(request: Request) -> dict:
+    """Common template context for admin dashboard."""
+    detected = _detect_running_pipeline()
+    return {
+        "request": request,
+        "static_version": _STATIC_VERSION,
+        "surface": "desktop",  # admin is desktop-only
+        "running": bool(detected),
+        "run_info": detected,
+        "latest": _latest_run_meta(),
+        "log_tail": _read_log_tail(60),
+        "stage": (
+            _detect_current_stage(_read_log_tail(200))["stage"]
+            if detected else None
+        ),
+    }
+
+
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_root(request: Request):
+    """If authenticated, show dashboard; else show login form.
+
+    Both states return 200 from the same path so anonymous scanners can't
+    distinguish 'admin exists, you're not logged in' from 'admin exists,
+    you are logged in'. The login template is deliberately bland.
+    """
+    if _is_admin(request):
+        return templates.TemplateResponse(
+            request, "admin_dashboard.html", _admin_context(request),
+        )
+    return templates.TemplateResponse(request, "admin_login.html", {
+        "request": request,
+        "static_version": _STATIC_VERSION,
+        "surface": "desktop",
+        "error": None,
+    })
+
+
+@app.post("/admin", response_class=HTMLResponse)
+async def admin_login(request: Request, token: str = Form(...)):
+    """Validate token, set cookie, redirect to /admin (now authenticated).
+
+    Reuses the /admin path for login POST so we don't expose a separate
+    /admin/login endpoint that scanners could distinguish.
+    """
+    if not secrets.compare_digest(token.strip(), _ADMIN_TOKEN):
+        # Same response shape as anonymous GET — generic login form with
+        # an "invalid token" hint. Don't 401; don't time-leak failure.
+        return templates.TemplateResponse(request, "admin_login.html", {
+            "request": request,
+            "static_version": _STATIC_VERSION,
+            "surface": "desktop",
+            "error": "Invalid token.",
+        }, status_code=200)
+    response = RedirectResponse(url="/admin", status_code=303)
+    response.set_cookie(
+        _ADMIN_COOKIE,
+        _ADMIN_TOKEN,
+        max_age=60 * 60 * 24 * 7,  # 7-day session
+        httponly=True,
+        samesite="strict",
+        secure=_is_secure(request),
+        path="/admin",  # only sent on /admin/* — never leaks to public routes
+    )
+    return response
+
+
+@app.post("/admin/logout")
+async def admin_logout(request: Request):
+    response = RedirectResponse(url="/admin", status_code=303)
+    response.delete_cookie(_ADMIN_COOKIE, path="/admin")
+    return response
+
+
+@app.post("/admin/run")
+async def admin_run(request: Request):
+    """Trigger the daily pipeline. Returns JSON for the dashboard's fetch()."""
+    if not _is_admin(request):
+        # Return 404 not 401/403 — preserves the 'admin doesn't exist'
+        # illusion for unauthenticated POSTs.
+        raise HTTPException(status_code=404, detail="Not Found")
+    try:
+        pid = _spawn_pipeline_run()
+    except Exception as e:
+        return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
+    if pid is None:
+        return JSONResponse({
+            "ok": False,
+            "error": "A run is already in progress.",
+        }, status_code=409)
+    return JSONResponse({"ok": True, "pid": pid})
+
+
+@app.get("/admin/status")
+async def admin_status(request: Request):
+    """JSON status for the admin dashboard's polling loop."""
+    if not _is_admin(request):
+        raise HTTPException(status_code=404, detail="Not Found")
+    detected = _detect_running_pipeline()
+    latest = _latest_run_meta()
+    if not detected:
+        if _run_state.get("pid"):
+            _run_state["pid"] = None
+            _run_state["started_at"] = None
+        return JSONResponse({"running": False, "latest": latest})
+    started_iso = detected.get("started_at")
+    started_dt: datetime | None = None
+    if started_iso:
+        try:
+            started_dt = datetime.fromisoformat(started_iso)
+        except ValueError:
+            pass
+    elapsed_s = (
+        int((datetime.now() - started_dt).total_seconds()) if started_dt else 0
+    )
+    est_total = 900
+    pct = min(95, int(elapsed_s / est_total * 100)) if elapsed_s else 0
+    stage_info = _detect_current_stage(_read_log_tail(200))
+    return JSONResponse({
+        "running": True,
+        "pid": detected.get("pid"),
+        "source": detected.get("source"),
+        "started_at": started_iso,
+        "elapsed_seconds": elapsed_s,
+        "estimated_total_seconds": est_total,
+        "estimated_pct": pct,
+        "stage": stage_info["stage"],
+        "last_event_line": stage_info["last_event_line"],
+        "latest": latest,
+    })
+
+
+@app.get("/admin/log")
+async def admin_log(request: Request, lines: int = 80):
+    if not _is_admin(request):
+        raise HTTPException(status_code=404, detail="Not Found")
+    return JSONResponse({"lines": _read_log_tail(lines)})
+
+
+# ---------- robots.txt: explicitly disallow /admin -----------
+
+@app.get("/robots.txt")
+async def robots():
+    body = (
+        "User-agent: *\n"
+        "Disallow: /admin\n"
+        "Disallow: /api/\n"
+        "Allow: /\n"
+    )
+    return HTMLResponse(content=body, media_type="text/plain")
+
+
 # ---------- markdown rendering helper for templates ----------
 
 import markdown as md_lib  # noqa: E402
 
 _md = md_lib.Markdown(extensions=["fenced_code", "tables", "nl2br", "sane_lists"])
+
+# ── Section-header pre-processor for card content ─────────────────────────
+# LLM output uses labels like "PRIMARY DRIVER:", "SUPPORTING EVIDENCE:" etc.
+# as plain text. Convert them to markdown ### headers so the CSS can style
+# them as proper section dividers instead of rendering as a wall of text.
+
+_SECTION_HEADER_RE = re.compile(
+    r"^(PRIMARY\s+DRIVER|SUPPORTING\s+EVIDENCE|CATALYST|KEY\s+RISKS?"
+    r"|MECHANISM|INVALIDATION(?:\s+CONDITIONS?)?|PROBABILITY\s+DECOMPOSITION"
+    r"|CONCLUSION|SUMMARY|KEY\s+ARGUMENTS?|COUNTER[\s-]?ARGUMENTS?"
+    r"|RISK\s+FACTORS?|TRADE\s+EXPRESSION|CONTRARIAN\s+ENGAGEMENT"
+    r"|NARRATIVE\s+SUMMARY|CONTRADICTIONS(?:\s*/\s*TENSIONS)?)\s*:?\s*$",
+    re.IGNORECASE,
+)
+_SECTION_INLINE_RE = re.compile(
+    r"^(PRIMARY\s+DRIVER|SUPPORTING\s+EVIDENCE|CATALYST|KEY\s+RISKS?"
+    r"|MECHANISM|INVALIDATION(?:\s+CONDITIONS?)?|CONTRARIAN\s+ENGAGEMENT"
+    r"|NARRATIVE\s+SUMMARY|CONTRADICTIONS(?:\s*/\s*TENSIONS)?)\s*:\s*(.+)$",
+    re.IGNORECASE,
+)
+
+
+def _format_analysis_sections(text: str) -> str:
+    """Convert LLM section labels into proper markdown ### headers."""
+    if not text:
+        return ""
+    lines = text.split("\n")
+    out: list[str] = []
+    for line in lines:
+        s = line.strip()
+        m = _SECTION_HEADER_RE.match(s)
+        if m:
+            out.append("")
+            out.append(f"### {m.group(1).strip().title()}")
+            out.append("")
+            continue
+        m2 = _SECTION_INLINE_RE.match(s)
+        if m2:
+            out.append("")
+            out.append(f"### {m2.group(1).strip().title()}")
+            out.append("")
+            out.append(m2.group(2).strip())
+            continue
+        out.append(line)
+    return "\n".join(out)
 
 
 def _render_markdown(text: str) -> str:

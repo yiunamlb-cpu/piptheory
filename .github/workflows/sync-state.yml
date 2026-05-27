@@ -1,0 +1,21 @@
+# Triggered manually or via API after local pipeline run.
+# Receives state files and commits them to the repo, triggering Render redeploy.
+name: Sync Pipeline State
+
+on:
+  workflow_dispatch:
+    inputs:
+      note:
+        description: "Optional note for the commit message"
+        required: false
+        default: "daily pipeline"
+
+# Also allow the local push-state script to just git-push directly.
+# This workflow is a fallback if you want a clean GitHub-native approach.
+
+jobs:
+  confirm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Info
+        run: echo "State sync triggered — ${{ github.event.inputs.note }}"

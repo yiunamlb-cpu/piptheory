@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}piptheory · admin{% endblock %}
+
+{% block content %}
+<main class="page" style="max-width: 420px; margin: 0 auto; padding: 80px 20px;">
+  <div style="border: 1px solid var(--border); border-radius: 8px; padding: 28px; background: var(--surface);">
+    <a href="/" aria-label="PIPTHEORY home" style="display: inline-block; margin-bottom: 4px;">
+      <img src="/static/logo-text.png?v={{ static_version }}" alt="PIPTHEORY" style="height: 22px; width: auto; display: block;" />
+    </a>
+    <p class="muted" style="margin: 0 0 24px; font-size: 13px;">Restricted area.</p>
+
+    {% if error %}
+    <div style="background: var(--bad-tint, #fef2f2); border: 1px solid var(--bad-border, #fecaca); color: var(--bad, #b91c1c); padding: 8px 12px; border-radius: 6px; margin-bottom: 14px; font-size: 13px;">
+      {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="POST" action="/admin" autocomplete="off">
+      <label for="token" style="display: block; font-size: 12px; font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted);">
+        Token
+      </label>
+      <input
+        type="password"
+        id="token"
+        name="token"
+        required
+        autofocus
+        spellcheck="false"
+        autocomplete="off"
+        style="width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-family: var(--mono, monospace); font-size: 13px; background: var(--bg); color: var(--text); box-sizing: border-box;"
+      />
+      <button
+        type="submit"
+        style="margin-top: 14px; width: 100%; padding: 10px; background: var(--text); color: var(--bg); border: 0; border-radius: 6px; font-weight: 500; font-size: 14px; cursor: pointer;"
+      >
+        Continue
+      </button>
+    </form>
+  </div>
+</main>
+{% endblock %}

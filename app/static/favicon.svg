@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Left diamond (darker) -->
+  <polygon points="37,28 65,56 37,84 9,56" fill="#3a3f47"/>
+  <!-- Right diamond (lighter) -->
+  <polygon points="63,16 91,44 63,72 35,44" fill="#9a9fa8"/>
+  <!-- Overlap zone (medium) -->
+  <polygon points="42,33 65,56 58,63 35,44" fill="#686d76"/>
+</svg>

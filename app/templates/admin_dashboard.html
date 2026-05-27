@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block title %}piptheory · admin{% endblock %}
+
+{% block content %}
+<main class="page" style="max-width: 960px; margin: 0 auto; padding: 24px 20px;">
+
+  <header class="topbar" style="margin-bottom: 18px;">
+    <a class="brand-link" href="/" aria-label="PIPTHEORY home">
+      <img class="brand-logo" src="/static/logo-text.png?v={{ static_version }}" alt="PIPTHEORY" />
+      <span class="brand-tagline">admin</span>
+    </a>
+    <form method="POST" action="/admin/logout" style="margin: 0;">
+      <button type="submit" class="btn btn-sm btn-ghost">Sign out</button>
+    </form>
+  </header>
+
+  {# ── Status card ──────────────────────────────────────── #}
+  <section class="panel" aria-labelledby="status-title" style="margin-bottom: 16px;">
+    <h2 id="status-title" class="panel-title">Pipeline status</h2>
+
+    <div id="admin-status">
+      {% if running %}
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+        <span class="sync-dot" style="background: var(--warn, #f59e0b);"></span>
+        <strong>Run in progress</strong>
+        {% if run_info and run_info.source %}<span class="muted" style="font-size: 12px;">({{ run_info.source }})</span>{% endif %}
+      </div>
+      {% if stage %}<div class="muted" style="font-size: 13px; margin-bottom: 6px;">Stage: {{ stage }}</div>{% endif %}
+      {% else %}
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+        <span class="sync-dot" aria-hidden="true"></span>
+        <strong>Idle</strong>
+      </div>
+      {% if latest %}
+      <div class="muted" style="font-size: 13px;">
+        Last completed run: <strong>{{ latest.run_date }}</strong>
+        {% if latest.completed_at %} · {{ latest.completed_at }}{% endif %}
+        {% if latest.cost_usd %} · ${{ "%.3f"|format(latest.cost_usd) }}{% endif %}
+      </div>
+      {% else %}
+      <div class="muted" style="font-size: 13px;">No completed runs found.</div>
+      {% endif %}
+      {% endif %}
+    </div>
+
+    <div style="margin-top: 16px; display: flex; gap: 10px; align-items: center;">
+      <button id="run-btn" class="btn" type="button" {% if running %}disabled{% endif %}>
+        {% if running %}Running…{% else %}Run pipeline now{% endif %}
+      </button>
+      <span id="run-msg" class="muted" style="font-size: 13px;"></span>
+    </div>
+  </section>
+
+  {# ── Log viewer ───────────────────────────────────────── #}
+  <section class="panel" aria-labelledby="log-title">
+    <h2 id="log-title" class="panel-title">Recent log <span class="muted" style="font-weight: 400; font-size: 12px;">(logs/bias_engine.log)</span></h2>
+    <pre id="log-view" style="background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-size: 11px; line-height: 1.5; max-height: 420px; overflow: auto; white-space: pre-wrap; word-break: break-word; margin: 0;">{% for ln in log_tail %}{{ ln }}
+{% endfor %}</pre>
+  </section>
+
+  <p class="muted" style="text-align: center; font-size: 11px; margin: 24px 0 8px;">
+    Manual sync is admin-only. Daily run is scheduled at 06:00 local via Windows Task Scheduler (piptheory-daily).
+  </p>
+
+</main>
+
+<script>
+(function () {
+  const runBtn = document.getElementById('run-btn');
+  const runMsg = document.getElementById('run-msg');
+  const statusEl = document.getElementById('admin-status');
+  const logEl = document.getElementById('log-view');
+  let polling = {{ 'true' if running else 'false' }};
+  let pollTimer = null;
+
+  function fmtElapsed(s) {
+    if (!s || s < 0) return '';
+    const m = Math.floor(s / 60), sec = s % 60;
+    return m + 'm ' + String(sec).padStart(2, '0') + 's';
+  }
+
+  async function refresh() {
+    try {
+      const [statusR, logR] = await Promise.all([
+        fetch('/admin/status', { credentials: 'same-origin' }),
+        fetch('/admin/log?lines=80', { credentials: 'same-origin' }),
+      ]);
+      if (statusR.status === 404) {
+        // session expired
+        location.reload();
+        return;
+      }
+      const status = await statusR.json();
+      const log = await logR.json();
+
+      if (status.running) {
+        polling = true;
+        runBtn.disabled = true;
+        runBtn.textContent = 'Running…';
+        const stage = status.stage || 'Starting';
+        const elapsed = fmtElapsed(status.elapsed_seconds);
+        const pct = status.estimated_pct || 0;
+        statusEl.innerHTML =
+          '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">' +
+          '<span class="sync-dot" style="background:var(--warn,#f59e0b);"></span>' +
+          '<strong>Run in progress</strong>' +
+          '<span class="muted" style="font-size:12px;">(' + (status.source || '') + ')</span>' +
+          '</div>' +
+          '<div class="muted" style="font-size:13px;margin-bottom:6px;">Stage: ' + stage + '</div>' +
+          '<div class="muted" style="font-size:13px;">Elapsed: ' + elapsed + ' · ~' + pct + '%</div>';
+      } else {
+        polling = false;
+        runBtn.disabled = false;
+        runBtn.textContent = 'Run pipeline now';
+        const latest = status.latest;
+        let latestHtml = 'No completed runs found.';
+        if (latest) {
+          latestHtml = 'Last completed run: <strong>' + latest.run_date + '</strong>';
+          if (latest.completed_at) latestHtml += ' · ' + latest.completed_at;
+          if (latest.cost_usd) latestHtml += ' · $' + latest.cost_usd.toFixed(3);
+        }
+        statusEl.innerHTML =
+          '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">' +
+          '<span class="sync-dot"></span><strong>Idle</strong></div>' +
+          '<div class="muted" style="font-size:13px;">' + latestHtml + '</div>';
+      }
+
+      if (log.lines && Array.isArray(log.lines)) {
+        const wasAtBottom = (logEl.scrollHeight - logEl.clientHeight - logEl.scrollTop) < 40;
+        logEl.textContent = log.lines.join('\n') + '\n';
+        if (wasAtBottom) logEl.scrollTop = logEl.scrollHeight;
+      }
+    } catch (e) {
+      runMsg.textContent = 'Refresh failed.';
+    }
+
+    if (polling) {
+      pollTimer = setTimeout(refresh, 4000);
+    }
+  }
+
+  runBtn.addEventListener('click', async () => {
+    runBtn.disabled = true;
+    runMsg.textContent = 'Starting…';
+    try {
+      const r = await fetch('/admin/run', { method: 'POST', credentials: 'same-origin' });
+      const data = await r.json().catch(() => ({}));
+      if (r.ok && data.ok) {
+        runMsg.textContent = 'Started (pid ' + data.pid + ').';
+        polling = true;
+        refresh();
+      } else {
+        runMsg.textContent = data.error || 'Failed.';
+        runBtn.disabled = false;
+      }
+    } catch (e) {
+      runMsg.textContent = 'Request failed.';
+      runBtn.disabled = false;
+    }
+  });
+
+  if (polling) refresh();
+  // Always do one fresh fetch on load so log is up to date even when idle.
+  setTimeout(refresh, 100);
+})();
+</script>
+{% endblock %}

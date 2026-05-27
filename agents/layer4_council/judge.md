@@ -138,15 +138,14 @@ JUDGMENT REASONING (3-5 sentences):
   [Why this bias and conviction. Reference the strongest 1-2 arguments from each advocate
    and how the contrarian challenge factored. Be specific about why one side outweighs.]
 
-KEY LEVELS:
-  Current price: [level]
-  Bias-supporting entry zone: [pullback range]
-  Invalidation level: [price]
-  Target zone (bias plays out to): [range]
+# NOTE: This output is rendered on a PUBLIC research website. Do NOT
+# include specific price levels, entry zones, target zones, or invalidation
+# prices. Invalidation is framed in macro terms (data prints, CB actions,
+# time decay), never numeric price. The KEY LEVELS section is intentionally
+# omitted in the public release.
 
 INVALIDATION CONDITIONS:
   Data: [what data print would force re-read]
-  Price: [price level]
   Time: [if no movement in N days]
 
 CONTRADICTIONS / TENSIONS:

@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+{% block title %}PIPTHEORY · {{ run_date }}{% endblock %}
+
+{# ════════════════════════════════════════════════════════════════════
+   PIPTHEORY — top-tier desk redesign
+
+   Designed against research of Bridgewater, Stratechery, FT, Variant
+   Perception, Federal Reserve, BIS. Principles applied:
+     - Serif headline + sans body + mono numerics
+     - One accent (the regime mark dot); rest of palette is greyscale
+     - 64-80px between sections
+     - Tables not cards for data
+     - Hairline rules between rows
+     - No gradients, no shadows, no rounded card chrome
+     - Editorial small-caps labels
+   ════════════════════════════════════════════════════════════════════ #}
+
+{% block content %}
+<main class="tdr-page">
+
+  {# ─── Masthead ──────────────────────────────────────────────────── #}
+  <header class="tdr-masthead">
+    <a class="tdr-masthead-brand" href="/" aria-label="PIPTHEORY home">
+      <img src="/static/logo-text.png?v={{ static_version }}" alt="PIPTHEORY" />
+    </a>
+    <div class="tdr-masthead-meta">
+      <span><strong data-long-date="{{ run_date }}">{{ run_date }}</strong></span>
+      {% if runs and runs|length > 1 %}
+      <select id="run-picker" aria-label="Past editions">
+        {% for r in runs %}
+        <option value="{{ r }}" {% if r == run_date %}selected{% endif %}>{{ r }}</option>
+        {% endfor %}
+      </select>
+      {% endif %}
+      <a href="/about">About</a>
+    </div>
+  </header>
+
+  {# ─── Partial-run banner (rare) ───────────────────────────────── #}
+  {% if partial_run %}
+  <div style="border: 1px solid var(--warn-border); background: var(--warn-tint); color: var(--warn-text); padding: 10px 14px; font-size: 13px; margin-bottom: 40px;">
+    Partial publication — {{ partial_msg }}
+  </div>
+  {% endif %}
+
+  {# ─── Lede: kicker + serif headline + byline signal ────────── #}
+  {% set r_label = (regime.label if regime else 'TRANSITION') %}
+  {% set r_label_display = {
+      'GOLDILOCKS':'Goldilocks',
+      'REFLATION':'Reflation',
+      'STAGFLATION':'Stagflation',
+      'DEFLATION':'Deflation',
+      'TRANSITION':'Transition'
+  } %}
+  {% set g_s = (regime.growth_score if regime else 0) %}
+  {% set i_s = (regime.inflation_score if regime else 0) %}
+
+  {# Bucket instruments by tier for the byline summary #}
+  {% set ns = namespace(hi=[], dev=[], watch=[]) %}
+  {% for r in instruments %}
+    {% if r.conviction >= 7 %}{{ ns.hi.append(r) or "" }}
+    {% elif r.conviction >= 5 %}{{ ns.dev.append(r) or "" }}
+    {% else %}{{ ns.watch.append(r) or "" }}{% endif %}
+  {% endfor %}
+  {% set top_read = ns.hi[0] if ns.hi else None %}
+  {% set top_dir = (top_read.direction if top_read else '')|lower %}
+  {% set top_dir_class =
+      'dir-long' if top_dir in ('long','buy','up') else
+      ('dir-short' if top_dir in ('short','sell','down') else 'dir-neutral')
+  %}
+
+  <section class="tdr-lede">
+    <p class="tdr-kicker">
+      <span class="tdr-kicker-dot" data-regime="{{ r_label }}" aria-hidden="true"></span>
+      {{ r_label_display.get(r_label, r_label|title) }} regime
+      · Edition {{ run_date }}
+    </p>
+    <h1 class="tdr-headline">{{ brief_headline }}</h1>
+    <div class="tdr-byline">
+      <span data-long-date="{{ run_date }}"><strong>{{ run_date }}</strong></span>
+      <span class="sep">·</span>
+      <span><strong>{{ instruments|length }}</strong> instruments</span>
+      {% if top_read %}
+      <span class="sep">·</span>
+      <span class="signal {{ top_dir_class }}">
+        <span class="signal-mark {{ top_dir_class }}" aria-hidden="true"></span>
+        Top read: {{ top_read.symbol }} · {{ top_read.direction|upper }} · {{ top_read.conviction }}/10
+      </span>
+      {% else %}
+      <span class="sep">·</span>
+      <span class="signal">Stand-aside day</span>
+      {% endif %}
+    </div>
+  </section>
+
+  {# ─── Top ad slot ───────────────────────────────────────────────── #}
+  {% set ad_slot = "top" %}{% include "_ad_slot.html" with context %}
+
+  {# ═══════════════════════ TODAY'S READ (the brief) ═══════════════ #}
+  {% if brief_md %}
+  <section class="tdr-section" aria-labelledby="read-label">
+    <div class="tdr-section-head">
+      <h2 id="read-label" class="tdr-section-label">Today's read</h2>
+      <span class="tdr-section-meta">90-second narrative</span>
+    </div>
+    <article class="tdr-prose">
+      {{ brief_md | markdown | safe }}
+    </article>
+  </section>
+  {% endif %}
+
+  {# ═══════════════════════ THE BOARD (all instruments) ═══════════ #}
+  <section class="tdr-section" aria-labelledby="board-label">
+    <div class="tdr-section-head">
+      <h2 id="board-label" class="tdr-section-label">The board</h2>
+      <span class="tdr-section-meta">All {{ instruments|length }} instruments tracked · ranked by conviction</span>
+    </div>
+    <div class="tdr-table-wrap">
+      <table class="tdr-table">
+        <thead>
+          <tr>
+            <th class="col-symbol-h">Symbol</th>
+            <th class="col-bias-h">Bias</th>
+            <th class="col-conv-h num">Conv.</th>
+            <th class="col-meter-h">&nbsp;</th>
+            <th class="col-theme-h">Primary theme</th>
+            <th class="col-spark-h">7d</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in instruments %}
+            {% set dir_lc = (r.direction or '')|lower %}
+            {% set dir_class =
+                'dir-long' if dir_lc in ('long','buy','up') else
+                ('dir-short' if dir_lc in ('short','sell','down') else 'dir-neutral')
+            %}
+            {% set dir_word =
+                'Long' if dir_class == 'dir-long' else
+                ('Short' if dir_class == 'dir-short' else 'Neutral')
+            %}
+            <tr class="{{ dir_class }}"
+                data-action="why-instrument" data-symbol="{{ r.symbol }}"
+                role="button" tabindex="0"
+                aria-label="{{ r.symbol }} {{ r.name }} {{ dir_word }} conviction {{ r.conviction }}">
+              <td class="col-symbol">
+                {{ r.symbol }}<span class="symname">{{ r.name }}</span>
+              </td>
+              <td class="col-bias">
+                <span class="dir-mark" aria-hidden="true"></span>{{ dir_word }}
+              </td>
+              <td class="col-conv">{{ r.conviction }}<span class="denom">/10</span></td>
+              <td class="col-meter">
+                <span class="tdr-meter" style="--meter-pct: {{ (r.conviction * 10) }}%;" aria-hidden="true"></span>
+              </td>
+              <td class="col-theme">{{ r.primary_theme or '—' }}</td>
+              <td class="col-spark">
+                {% if r.history and r.history.n_entries and r.history.n_entries >= 2 and r.history.convictions %}
+                  {% set convs = r.history.convictions %}
+                  {% set n = convs|length %}
+                  {% set step = (60 / (n - 1 if n > 1 else 1)) %}
+                  {% set points = [] %}
+                  {% for c in convs %}
+                    {% set x = (loop.index0 * step)|round(1) %}
+                    {% set y = (18 - ((c / 10.0) * 14))|round(1) %}
+                    {{ points.append(x ~ "," ~ y) or "" }}
+                  {% endfor %}
+                  <span class="tdr-spark" aria-hidden="true">
+                    <svg viewBox="0 0 64 22" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                      <polyline class="spark-line" points="{{ points|join(' ') }}" />
+                      {% set last_x = ((n - 1) * step)|round(1) %}
+                      {% set last_y = (18 - ((convs[-1] / 10.0) * 14))|round(1) %}
+                      <circle class="spark-dot" cx="{{ last_x }}" cy="{{ last_y }}" r="1.5" />
+                    </svg>
+                  </span>
+                {% else %}
+                  <span class="tdr-spark-empty">—</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  {# ─── Mid-article ad slot ──────────────────────────────────────── #}
+  {% set ad_slot = "in_article" %}{% include "_ad_slot.html" with context %}
+
+  {# ═══════════════════════ REGIME ════════════════════════════════ #}
+  <section class="tdr-section" aria-labelledby="regime-label">
+    <div class="tdr-section-head">
+      <h2 id="regime-label" class="tdr-section-label">Regime</h2>
+      <span class="tdr-section-meta">classification from FRED data</span>
+    </div>
+
+    {% set g_clamped = (4 if g_s > 4 else (-4 if g_s < -4 else g_s)) %}
+    {% set i_clamped = (4 if i_s > 4 else (-4 if i_s < -4 else i_s)) %}
+    {% set px = 100 + (g_clamped / 4.0) * 70 %}
+    {% set py = 100 - (i_clamped / 4.0) * 70 %}
+
+    <div class="tdr-regime-block">
+      <div>
+        <h3 class="tdr-regime-name">{{ r_label_display.get(r_label, r_label|title) }}</h3>
+        <p class="tdr-regime-scores">
+          Growth <strong>{{ '+' if g_s > 0 else '' }}{{ g_s }}</strong>
+          <span class="sep">·</span>
+          Inflation <strong>{{ '+' if i_s > 0 else '' }}{{ i_s }}</strong>
+        </p>
+        <div class="tdr-quadrant" role="img" aria-label="Growth-inflation quadrant. Current regime: {{ r_label }}.">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <line class="q-axis" x1="100" y1="10" x2="100" y2="190" />
+            <line class="q-axis" x1="10" y1="100" x2="190" y2="100" />
+            <line class="q-tick" x1="65" y1="98" x2="65" y2="102" />
+            <line class="q-tick" x1="135" y1="98" x2="135" y2="102" />
+            <line class="q-tick" x1="98" y1="65" x2="102" y2="65" />
+            <line class="q-tick" x1="98" y1="135" x2="102" y2="135" />
+            <text class="q-label" x="12"  y="20" >STAGFLATION</text>
+            <text class="q-label" x="188" y="20"  text-anchor="end">REFLATION</text>
+            <text class="q-label" x="12"  y="188">DEFLATION</text>
+            <text class="q-label" x="188" y="188" text-anchor="end">GOLDILOCKS</text>
+            <text class="q-axis-label" x="100" y="198" text-anchor="middle">GROWTH →</text>
+            <text class="q-axis-label" transform="rotate(-90 8 100)" x="8" y="100" text-anchor="middle" dy="3">INFLATION ↑</text>
+            <circle class="q-pulse" cx="{{ px|round(1) }}" cy="{{ py|round(1) }}" r="12" />
+            <circle class="q-point" cx="{{ px|round(1) }}" cy="{{ py|round(1) }}" r="5" />
+          </svg>
+        </div>
+      </div>
+
+      <div>
+        <p style="font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-3); margin: 0 0 0;">Driving themes</p>
+        {% if macro.themes %}
+        <ul class="tdr-themes">
+          {% for t in macro.themes[:6] %}
+          <li class="tdr-theme">
+            <span class="tdr-theme-name">{{ t.name }}</span>
+            <span class="tdr-theme-bar" aria-label="Conviction {{ t.conviction }} of 10">
+              {% for n in range(1, 11) %}<span class="tdr-theme-bar-cell {{ 'on' if n <= t.conviction }}"></span>{% endfor %}
+            </span>
+            <span class="tdr-theme-conv">{{ t.conviction }}<span class="denom">/10</span></span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p style="color: var(--text-3); font-size: 13px;">No driving themes identified.</p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  {# ═══════════════════════ CALENDAR ══════════════════════════════ #}
+  <section class="tdr-section" aria-labelledby="cal-label">
+    <div class="tdr-section-head">
+      <h2 id="cal-label" class="tdr-section-label">Calendar</h2>
+      <span class="tdr-section-meta">next 14 days · severity-ranked</span>
+    </div>
+    {% if upcoming_calendar %}
+    <table class="tdr-calendar">
+      <thead>
+        <tr>
+          <th>In</th>
+          <th>Date</th>
+          <th>Event</th>
+          <th>Severity</th>
+          <th>Affects</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in upcoming_calendar %}
+        <tr>
+          <td class="col-when">
+            {% if e.days_from_today == 0 %}Today
+            {% elif e.days_from_today == 1 %}+1d
+            {% else %}+{{ e.days_from_today }}d{% endif %}
+          </td>
+          <td class="col-date">{{ e.date[5:] }}</td>
+          <td class="col-event">{{ e.name }}</td>
+          <td class="col-severity s-{{ e.severity }}">{{ e.severity }}</td>
+          <td class="col-affects">
+            {% if e.affects %}{{ e.affects[:5]|join(' · ') }}{% if e.affects|length > 5 %} · +{{ e.affects|length - 5 }}{% endif %}
+            {% else %}—{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="tdr-calendar-empty">No scheduled events in the next 14 days.</p>
+    {% endif %}
+  </section>
+
+  {# ─── Low-position ad slot ─────────────────────────────────────── #}
+  {% set ad_slot = "sidebar" %}{% include "_ad_slot.html" with context %}
+
+  {# ─── Footer ────────────────────────────────────────────────────── #}
+  <footer class="tdr-footer">
+    <div class="tdr-footer-row">
+      <a class="tdr-masthead-brand" href="/" aria-label="PIPTHEORY home">
+        <img src="/static/logo-text.png?v={{ static_version }}" alt="PIPTHEORY" style="height: 16px;" />
+      </a>
+      <nav>
+        <a href="/about">About</a>
+        <a href="/about#methodology">Methodology</a>
+        <a href="/about#privacy">Privacy</a>
+        <a href="/about#disclaimer">Disclaimer</a>
+      </nav>
+      <div>© PIPTHEORY {{ run_date[:4] }}</div>
+    </div>
+    <p class="tdr-footer-disclaimer">
+      <strong>Not financial advice.</strong> PIPTHEORY publishes daily macro research only.
+      Nothing on this site is a recommendation to buy, sell, or hold any financial instrument.
+      No price targets, entries, or position sizing are published. Markets carry the risk of loss.
+      Do your own research and consult a licensed advisor before acting on any view discussed here.
+    </p>
+  </footer>
+
+</main>
+
+{# ─── Slide-over for instrument detail ────────────────────────────── #}
+<div id="overlay" class="overlay"></div>
+<aside id="slideover" class="slideover" aria-hidden="true">
+  <header class="slideover-head">
+    <span class="slideover-title" id="slideover-title">Detail</span>
+    <button class="slideover-close" data-action="close-slideover">×</button>
+  </header>
+  <div class="slideover-body" id="slideover-body">
+    <p class="muted">Loading…</p>
+  </div>
+</aside>
+
+{# Cookie consent (required for AdSense in EU) #}
+{% include "_cookie_consent.html" %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.__APP_CONFIG__ = {
+    runDate: {{ run_date | tojson }},
+    runs: {{ runs | tojson }},
+    surface: "tdr",
+    instruments: {{ instruments | tojson }},
+    activeUniverse: {{ active_universe | tojson }}
+  };
+
+  // Long-form date everywhere [data-long-date] is set
+  (function () {
+    document.querySelectorAll('[data-long-date]').forEach(function (el) {
+      var iso = el.getAttribute('data-long-date');
+      if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return;
+      var parts = iso.split('-');
+      var d = new Date(Date.UTC(+parts[0], +parts[1] - 1, +parts[2]));
+      if (isNaN(d.getTime())) return;
+      el.textContent = d.toLocaleDateString('en-US', {
+        weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+        timeZone: 'UTC'
+      });
+    });
+  })();
+
+  // Run picker
+  (function () {
+    var sel = document.getElementById('run-picker');
+    if (!sel) return;
+    sel.addEventListener('change', function () {
+      if (sel.value) window.location.href = '/run/' + sel.value;
+    });
+  })();
+
+  // Keyboard activation on table rows (Enter/Space opens the slideover
+  // via the existing data-action delegation in app.js)
+  (function () {
+    document.querySelectorAll('.tdr-table tbody tr[role="button"]').forEach(function (el) {
+      el.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          el.click();
+        }
+      });
+    });
+  })();
+</script>
+<script src="/static/app.js?v={{ static_version }}"></script>
+{% endblock %}

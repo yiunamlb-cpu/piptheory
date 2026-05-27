@@ -27,7 +27,7 @@
 
 Source: https://www.boj.or.jp/en/mopo/mpmdeci/mpr_2026/k260428a.pdf
 Statement date: 2026-04-28
-Fetched: 2026-05-26
+Fetched: 2026-05-27
 
 April 28, 202 6 
 Bank of Japan 

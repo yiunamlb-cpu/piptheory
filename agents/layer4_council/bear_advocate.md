@@ -109,9 +109,13 @@ CATALYST:
   Timing window: [date range]
 
 TIMEFRAME: [tactical (days) | swing (weeks) | positional (months)]
-TARGET ZONE: [price range]
-ENTRY ZONE: [price range — typically a pullback per trend-pullback strategy]
-INVALIDATION: [price level — bear case fails above this]
+
+# NOTE: This output is rendered on a PUBLIC research website. Do NOT
+# include TARGET ZONE, ENTRY ZONE, or numeric INVALIDATION price levels.
+# Invalidation is expressed in macro terms only:
+INVALIDATION: [what would force a re-read of the bear case — name the
+  specific data print, central-bank action, or macro condition that
+  would weaken the thesis. No price levels.]
 
 BULL ENGAGEMENT:
   Strongest bull point against this bear case: [from Bull Advocate output]

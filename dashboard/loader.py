@@ -124,15 +124,19 @@ def _extract_filter_verdict(filter_md: str) -> str:
     return m.group(1).lower() if m else "unparseable"
 
 
-# Match a per-instrument section in the strategist output. Tolerates markdown headings.
+# Per-instrument section in the strategist output. Newer LLM runs wrap
+# the labels in markdown bold (`**INSTRUMENT:**`), so the regex tolerates
+# any combination of `*` characters and whitespace between the label and
+# the value. Older runs without bold still parse correctly because `\**`
+# matches zero asterisks.
 _INSTRUMENT_PATTERN = re.compile(
-    r"INSTRUMENT:\s*([A-Z][A-Z0-9]*)\b(.*?)(?=INSTRUMENT:\s*[A-Z]|\Z)",
+    r"INSTRUMENT:\**\s*\**\s*([A-Z][A-Z0-9]*)\b(.*?)(?=INSTRUMENT:\**\s*\**\s*[A-Z]|\Z)",
     re.DOTALL | re.IGNORECASE,
 )
 _CONVICTION_PATTERN = re.compile(r"CONVICTION[^\d]{0,30}(\d+)\s*/\s*10", re.IGNORECASE)
-_BIAS_PATTERN = re.compile(r"BIAS:?\**\s*([^\n*]+)", re.IGNORECASE)
-_TIMEFRAME_PATTERN = re.compile(r"TIMEFRAME:?\**\s*([^\n*]+)", re.IGNORECASE)
-_PRIORITY_PATTERN = re.compile(r"PRIORITY:?\**\s*([A-D][+\-]?)", re.IGNORECASE)
+_BIAS_PATTERN = re.compile(r"BIAS:?\**\s*\**\s*([^\n*]+)", re.IGNORECASE)
+_TIMEFRAME_PATTERN = re.compile(r"TIMEFRAME:?\**\s*\**\s*([^\n*]+)", re.IGNORECASE)
+_PRIORITY_PATTERN = re.compile(r"PRIORITY:?\**\s*\**\s*([A-D][+\-]?)", re.IGNORECASE)
 
 
 def parse_strategist(strategist_md: str) -> list[InstrumentBias]:
@@ -197,8 +201,9 @@ def load_run(run_date: str) -> Run | None:
             entry = council.setdefault(instrument, CouncilOutput(instrument=instrument))
             setattr(entry, role, _read(f))
         # Parse judge conviction + bias (authoritative final values when present).
+        # Bold-tolerant like the strategist patterns above.
         _JUDGE_BIAS_RE = re.compile(
-            r"FINAL\s*BIAS:?\**\s*([^\n*]+)", re.IGNORECASE,
+            r"FINAL\s*BIAS:?\**\s*\**\s*([^\n*]+)", re.IGNORECASE,
         )
         for instrument, co in council.items():
             if co.judge:

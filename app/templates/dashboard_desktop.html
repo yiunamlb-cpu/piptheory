@@ -33,6 +33,41 @@
     <span>{{ active_universe|length }} instruments tracked</span>
   </div>
 
+  {# ─── How to read this page — orientation strip ─────────────────── #}
+  {# Dismissible on first read; localStorage flag means returning visitors
+     don't see it. Helps first-timers understand what they're looking at. #}
+  <aside class="explainer-strip" id="explainer-strip" hidden>
+    <div class="explainer-strip-num">1</div>
+    <div class="explainer-strip-body">
+      <div class="explainer-strip-title">How to read this page</div>
+      <ol class="explainer-strip-steps">
+        <li><strong>Regime</strong> below classifies today's macro mix (growth vs inflation). It sets the stage.</li>
+        <li><strong>Today's read</strong> is the morning brief — a 90-second narrative of what the data says.</li>
+        <li><strong>Today's calls</strong> are the few instruments where conviction is ≥ 7 of 10. Most days the list is short or empty — that's the point.</li>
+        <li><strong>Driving themes</strong> are the macro forces underneath. <strong>All instruments</strong> at the bottom is the full table.</li>
+      </ol>
+      <p class="explainer-strip-foot">
+        This is <strong>research, not financial advice</strong>. No price targets, no entries, no sizing — just the daily macro read.
+        <a href="/about" style="margin-left: 6px;">More about how it works →</a>
+      </p>
+    </div>
+    <button class="explainer-strip-close" id="explainer-strip-close" aria-label="Dismiss">×</button>
+  </aside>
+  <script>
+    (function () {
+      var strip = document.getElementById('explainer-strip');
+      if (!strip) return;
+      try {
+        if (localStorage.getItem('pt_explainer_dismissed') === '1') return;
+      } catch (e) { /* localStorage blocked — still show */ }
+      strip.hidden = false;
+      document.getElementById('explainer-strip-close').addEventListener('click', function () {
+        try { localStorage.setItem('pt_explainer_dismissed', '1'); } catch (e) {}
+        strip.hidden = true;
+      });
+    })();
+  </script>
+
   {# ─── Partial-run notice (rare) ─────────────────────────────────── #}
   {% if partial_run %}
   <div class="run-banner" style="background: var(--warn-tint); border-color: var(--warn-border); margin-bottom: 14px;">
@@ -45,81 +80,151 @@
   </div>
   {% endif %}
 
-  {# ─── Top row: TODAY (left) + MACRO (right) ───────────────────────── #}
+  {# ─── PHASE 1 REDESIGN: regime hero strip ────────────────────────── #}
+  {# Compute plot coordinates for the quadrant. Score range is roughly
+     -4..+4; we clamp and scale to a 70px radius around the (100,100)
+     center of a 200x200 viewBox so the dot never escapes the frame. #}
+  {% set g_s = (regime.growth_score if regime else 0) %}
+  {% set i_s = (regime.inflation_score if regime else 0) %}
+  {% set g_clamped = (4 if g_s > 4 else (-4 if g_s < -4 else g_s)) %}
+  {% set i_clamped = (4 if i_s > 4 else (-4 if i_s < -4 else i_s)) %}
+  {% set px = 100 + (g_clamped / 4.0) * 70 %}
+  {% set py = 100 - (i_clamped / 4.0) * 70 %}
+  {% set r_label = (regime.label if regime else 'TRANSITION') %}
+  {% set r_taglines = {
+    'GOLDILOCKS':  'Growth holding, inflation contained — risk assets in the sweet spot.',
+    'REFLATION':   'Growth and inflation accelerating together — commodities and cyclicals lead.',
+    'STAGFLATION': 'Growth weakening while inflation lingers — the hardest mix for risk.',
+    'DEFLATION':   'Growth and inflation both falling — yields decline, defensives lead.',
+    'TRANSITION':  'Regime in flux — signals mixed between regimes. Await confirmation.'
+  } %}
+
+  <section class="regime-hero" data-regime="{{ r_label }}" aria-label="Macro regime">
+    <div>
+      <p class="regime-hero-label">Today's macro regime</p>
+      <h1 class="regime-hero-name">{{ r_label|title }}</h1>
+      <p class="regime-hero-tagline">{{ r_taglines.get(r_label, '') }}</p>
+      <div class="regime-hero-meta">
+        <span class="regime-hero-meta-item">Growth <strong>{{ '+' if g_s > 0 else '' }}{{ g_s }}</strong></span>
+        <span class="regime-hero-meta-item">Inflation <strong>{{ '+' if i_s > 0 else '' }}{{ i_s }}</strong></span>
+        <span class="regime-hero-meta-item">{{ active_universe|length }} instruments tracked</span>
+        {% if macro.next_catalyst and macro.days_to_catalyst is not none %}
+        <span class="regime-hero-meta-item">Next catalyst <strong>{{ macro.days_to_catalyst }}d</strong></span>
+        {% endif %}
+      </div>
+    </div>
+
+    {# 2x2 quadrant. Active quadrant gets q-active for stronger tint. #}
+    <svg class="regime-quadrant" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      {# Background quadrants — order: top-left, top-right, bottom-left, bottom-right #}
+      <rect class="q-bg {{ 'q-active' if r_label == 'STAGFLATION' }}" x="0"   y="0"   width="100" height="100" fill="#DC2626" />
+      <rect class="q-bg {{ 'q-active' if r_label == 'REFLATION' }}"  x="100" y="0"   width="100" height="100" fill="#D97706" />
+      <rect class="q-bg {{ 'q-active' if r_label == 'DEFLATION' }}"  x="0"   y="100" width="100" height="100" fill="#2563EB" />
+      <rect class="q-bg {{ 'q-active' if r_label == 'GOLDILOCKS' }}" x="100" y="100" width="100" height="100" fill="#059669" />
+      {# Frame + axes #}
+      <rect class="q-frame" x="1" y="1" width="198" height="198" rx="4" />
+      <line class="q-axis" x1="100" y1="6" x2="100" y2="194" />
+      <line class="q-axis" x1="6" y1="100" x2="194" y2="100" />
+      {# Quadrant labels #}
+      <text class="q-label" x="7"   y="14"  >STAGFLATION</text>
+      <text class="q-label" x="193" y="14"   text-anchor="end">REFLATION</text>
+      <text class="q-label" x="7"   y="194" >DEFLATION</text>
+      <text class="q-label" x="193" y="194"  text-anchor="end">GOLDILOCKS</text>
+      {# Axis hints #}
+      <text class="q-axis-label" x="100" y="106" text-anchor="middle">GROWTH →</text>
+      <text class="q-axis-label" transform="rotate(-90 6 100)" x="6" y="100" text-anchor="middle" dy="4">INFLATION ↑</text>
+      {# Current regime point (pulse + solid) #}
+      <circle class="q-pulse" cx="{{ px|round(1) }}" cy="{{ py|round(1) }}" r="12" />
+      <circle class="q-point" cx="{{ px|round(1) }}" cy="{{ py|round(1) }}" r="7" />
+    </svg>
+  </section>
+
+  {# ─── Top row: TODAY (left) + MACRO themes (right) ─────────────────── #}
   <div class="top-row">
 
-    {# ─── TODAY: high-conviction reads ─── #}
+    {# ─── TODAY: high-conviction reads — POSTER CARDS ─── #}
     <section class="panel" aria-labelledby="today-title">
-      <h2 id="today-title" class="panel-title">Today's calls</h2>
+      <h2 id="today-title" class="panel-title">
+        Today's calls
+        {% if today.ideas %}<span class="muted" style="font-weight: 400; font-size: 12px; margin-left: 6px;">· {{ today.ideas|length }} high-conviction read{{ "s" if today.ideas|length != 1 }}</span>{% endif %}
+      </h2>
 
       {% if today.ideas %}
-      <div class="today-block">
-        <div class="today-head">
-          {{ today.ideas|length }} high-conviction read{{ "s" if today.ideas|length != 1 }}
-        </div>
         {% for i in today.ideas %}
-        <div class="today-card" style="margin-bottom: 8px;">
-          <div class="today-card-head">
-            <div class="today-card-symbol">
-              {{ i.instrument }}<span class="dir">{{ i.direction|upper }}</span>
-              <span class="chip chip-{% if i.conviction >= 8 %}good{% else %}warn{% endif %}" style="margin-left: 8px;">
-                {{ i.strength_label }} · {{ i.conviction }}/10
-              </span>
+        {# Conviction band controls the ring color: 7=med, 8=high, 9-10=vhigh #}
+        {% set band = 'vhigh' if i.conviction >= 9 else ('high' if i.conviction >= 8 else ('med' if i.conviction >= 6 else 'low')) %}
+        {% set dir_class = 'dir-long' if i.direction|lower in ('long','buy','up') else ('dir-short' if i.direction|lower in ('short','sell','down') else '') %}
+        {% set arrow = '↑' if dir_class == 'dir-long' else ('↓' if dir_class == 'dir-short' else '·') %}
+        <article class="poster-card {{ dir_class }}">
+          <span class="poster-direction {{ dir_class }}" aria-hidden="true">{{ arrow }}</span>
+          <div class="poster-body">
+            <div class="poster-symbol">
+              {{ i.instrument }}
+              <span class="poster-dir-word">{{ i.direction|upper }}</span>
+            </div>
+            <p class="poster-headline">{{ i.macro_summary }}</p>
+            <button class="poster-cta" data-action="why-instrument" data-symbol="{{ i.instrument }}">Read full reasoning →</button>
+          </div>
+          {# Conviction ring — SVG circle with stroke-dasharray. circ ~138.23 #}
+          {% set pct = (i.conviction / 10.0) %}
+          <div class="conv-ring" title="Conviction {{ i.conviction }} of 10">
+            <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle class="conv-ring-track" cx="25" cy="25" r="22" />
+              <circle class="conv-ring-fill" cx="25" cy="25" r="22"
+                      data-band="{{ band }}"
+                      stroke-dasharray="{{ (138.23 * pct)|round(2) }} 138.23" />
+            </svg>
+            <div class="conv-ring-text">
+              <span class="conv-num">{{ i.conviction }}</span>
+              <span class="conv-denom">/10</span>
             </div>
           </div>
-          <p class="today-card-reason">{{ i.macro_summary }}</p>
-          <div class="today-card-actions">
-            <button class="btn btn-sm btn-ghost" data-action="why-instrument" data-symbol="{{ i.instrument }}">Read full reasoning →</button>
-          </div>
-        </div>
+        </article>
         {% endfor %}
-      </div>
       {% else %}
-      <div class="today-empty">
-        <p style="margin: 0; font-weight: 500;">No high-conviction reads today.</p>
-        <p class="muted" style="margin: 8px 0 0; font-size: 13px;">
-          The research panel didn't see a macro setup strong enough to highlight. Most days will be like this — see the full instrument table below for the complete view.
-        </p>
-      </div>
+        <div class="poster-empty">
+          <div class="poster-empty-icon">∅</div>
+          <p class="poster-empty-title">No high-conviction reads today</p>
+          <p class="poster-empty-sub">
+            The research panel didn't see a macro setup strong enough to highlight.
+            Most days will be like this — the {{ r_label|title }} regime context above tells the broader story.
+          </p>
+        </div>
       {% endif %}
     </section>
 
-    {# ─── MACRO PICTURE ─── #}
+    {# ─── MACRO themes panel (dots, not bars) ─── #}
     <section class="panel" aria-labelledby="macro-title">
-      <h2 id="macro-title" class="panel-title">Macro picture</h2>
+      <h2 id="macro-title" class="panel-title">Driving themes</h2>
 
       {% if macro.regime %}
-      <p class="macro-regime">{{ macro.regime }}</p>
+      <p class="muted" style="font-size: 13px; line-height: 1.5; margin: 0 0 14px;">
+        <em>{{ macro.regime }}</em>
+      </p>
       {% endif %}
 
       {% if macro.themes %}
-      <ul class="macro-themes">
+      <ul class="theme-list">
         {% for t in macro.themes %}
-        <li class="macro-theme">
-          <span class="macro-theme-name">{{ t.name }}</span>
-          <span class="macro-theme-bar"><span class="macro-theme-bar-fill" style="width: {{ t.pct }}%;"></span></span>
-          <span class="macro-theme-conv">{{ t.conviction }}/10</span>
+        <li class="theme-tile">
+          <span class="theme-name">{{ t.name }}</span>
+          <span class="dot-conv" aria-label="Conviction {{ t.conviction }} of 10">
+            {% for n in range(1, 11) %}<span class="dot-conv-dot {{ 'on' if n <= t.conviction }}"></span>{% endfor %}
+            <span class="dot-conv-num">{{ t.conviction }}</span>
+          </span>
         </li>
         {% endfor %}
       </ul>
       {% endif %}
 
       {% if macro.next_catalyst %}
-      <div class="macro-catalyst">
-        <strong>Next catalyst:</strong> {{ macro.next_catalyst }}
-        {% if macro.days_to_catalyst is not none %}
-          ({{ macro.days_to_catalyst }} day{{ "s" if macro.days_to_catalyst != 1 }})
-        {% endif %}
-      </div>
-      {% endif %}
-
-      {% if regime %}
-      <div class="regime-anchor">
-        <div class="regime-anchor-row">
-          <span class="muted" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">Regime (data-classified)</span>
-          <span class="chip chip-{{ 'good' if regime.label == 'GOLDILOCKS' else 'warn' if regime.label == 'STAGFLATION' else 'bad' if regime.label == 'DEFLATION' else 'brand' if regime.label == 'REFLATION' else 'neutral' }}" style="margin-left: 6px;">{{ regime.label }}</span>
-          <span class="muted" style="font-size: 11px; margin-left: 6px;">G:{{ regime.growth_score|string if regime.growth_score >= 0 else regime.growth_score }} · I:{{ regime.inflation_score|string if regime.inflation_score >= 0 else regime.inflation_score }}</span>
-        </div>
+      <div class="catalyst-pill">
+        <span class="catalyst-pill-icon {{ 'urgent' if macro.days_to_catalyst is not none and macro.days_to_catalyst <= 3 }}">
+          {{ macro.days_to_catalyst if macro.days_to_catalyst is not none else '·' }}{{ 'd' if macro.days_to_catalyst is not none }}
+        </span>
+        <span class="catalyst-pill-text">
+          <strong>Next catalyst:</strong> {{ macro.next_catalyst }}
+        </span>
       </div>
       {% endif %}
     </section>
@@ -201,11 +306,6 @@
   {# ─── Footer ────────────────────────────────────────────────── #}
   {% include "_footer.html" %}
 </main>
-
-{# ─── Sticky surface-toggle: switches to Showcase ──────────────── #}
-<a class="surface-toggle" href="?view=showcase" title="Switch to the visual / graph showcase view">
-  <span class="arrow">→</span>Showcase
-</a>
 
 {# ─── Slide-over for instrument detail ────────────────────────────── #}
 <div id="overlay" class="overlay"></div>

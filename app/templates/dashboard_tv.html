@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f0f1f3" id="metaTheme">
+  <script>(function(){var t=localStorage.getItem('pt_theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('metaTheme').content='#0f1117';}})();</script>
+  <title>PIPTHEORY — Macro Research</title>
+  <meta name="description" content="Free daily macro research across FX, indices, commodities and fixed income. Institutional-grade analysis with full reasoning transparency.">
+  <!-- Google Analytics 4 — replace G-XXXXXXXXXX with your real Measurement ID -->
+  {% if ga_id %}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga_id }}"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','{{ ga_id }}');</script>
+  {% endif %}
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v={{ static_version }}">
+  <link rel="icon" type="image/png" sizes="180x180" href="/static/favicon.png?v={{ static_version }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/favicon.png?v={{ static_version }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/dashboard.css?v={{ static_version }}">
+</head>
+<body>
+
+<header class="tv-topbar">
+  <a href="/" class="tv-logo">
+    <img src="/static/logo-text.png?v={{ static_version }}" alt="PIPTHEORY" height="19"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+    <span class="tv-logo-text" style="display:none">PIPTHEORY</span>
+  </a>
+  <div class="tv-topbar-right">
+    <select class="tv-date-pick" id="datePicker">
+      {% for r in runs %}
+      <option value="{{ r }}" {% if r == run_date %}selected{% endif %}>{{ r }}</option>
+      {% endfor %}
+    </select>
+    {% if last_synced_iso %}
+    <span class="tv-topbar-div"></span>
+    <span class="tv-sync-dot"></span>
+    <span>Synced <time id="syncTime" datetime="{{ last_synced_iso }}">{{ last_synced_iso }}</time></span>
+    {% endif %}
+    <button class="tv-theme-toggle" id="themeToggle" title="Toggle theme">&#9790;</button>
+  </div>
+</header>
+
+<div class="tv-ticker-bar">
+  <div class="tv-ticker-badge">Watch</div>
+  <div class="tv-ticker-track">
+    <div class="tv-ticker-scroll">
+      {% if brief_headline %}<span class="tv-ticker-item">{{ brief_headline }}</span><span class="tv-ticker-sep">|</span>{% endif %}
+      {% if regime %}<span class="tv-ticker-item">Regime: {{ regime.label|default('Transition') }}</span><span class="tv-ticker-sep">|</span>{% endif %}
+      {% if macro.next_catalyst %}<span class="tv-ticker-item">&#9889; {{ macro.next_catalyst }}{% if macro.days_to_catalyst is not none %} ({{ macro.days_to_catalyst }}d){% endif %}</span><span class="tv-ticker-sep">|</span>{% endif %}
+      {% for e in upcoming_calendar[:5] if upcoming_calendar %}
+      <span class="tv-ticker-item">{{ e.date[5:] }} &middot; {{ e.name }}</span>{% if not loop.last %}<span class="tv-ticker-sep">|</span>{% endif %}
+      {% endfor %}
+      <span class="tv-ticker-sep">|</span>
+      {# duplicate for seamless loop #}
+      {% if brief_headline %}<span class="tv-ticker-item">{{ brief_headline }}</span><span class="tv-ticker-sep">|</span>{% endif %}
+      {% if regime %}<span class="tv-ticker-item">Regime: {{ regime.label|default('Transition') }}</span><span class="tv-ticker-sep">|</span>{% endif %}
+      {% if macro.next_catalyst %}<span class="tv-ticker-item">&#9889; {{ macro.next_catalyst }}{% if macro.days_to_catalyst is not none %} ({{ macro.days_to_catalyst }}d){% endif %}</span><span class="tv-ticker-sep">|</span>{% endif %}
+      {% for e in upcoming_calendar[:5] if upcoming_calendar %}
+      <span class="tv-ticker-item">{{ e.date[5:] }} &middot; {{ e.name }}</span>{% if not loop.last %}<span class="tv-ticker-sep">|</span>{% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% if partial_run %}<div class="tv-alert">{{ partial_msg }}</div>{% endif %}
+
+<!-- Intro + Sidebar side by side -->
+<div class="tv-top-row">
+  <details class="tv-intro-collapse tv-intro-inner" open>
+    <summary class="tv-intro-toggle">
+      <div class="tv-intro-title">100% Free Daily Macro Research</div>
+      <span class="tv-intro-toggle-icon">&#9660;</span>
+    </summary>
+    <p class="tv-intro-lead">
+      PIPTHEORY delivers in-depth, institutional-grade macro research across foreign exchange, equity indices, commodities, and fixed income &mdash; completely free, every single day.
+      Each instrument is analysed through multiple rounds of structured debate, producing conviction-weighted directional views with full reasoning transparency and zero groupthink.
+    </p>
+    <div class="tv-intro-pipeline">
+      <div class="tv-intro-step">
+        <span class="tv-intro-step-num">1</span>
+        <span class="tv-intro-step-title">Analyse</span>
+        <div class="tv-intro-step-desc">Each instrument is independently evaluated through distinct lenses: central bank policy, inflation dynamics, geopolitical risk, cross-asset flows, and market positioning.</div>
+      </div>
+      <div class="tv-intro-step">
+        <span class="tv-intro-step-num">2</span>
+        <span class="tv-intro-step-title">Debate</span>
+        <div class="tv-intro-step-desc">A bull advocate and bear advocate build the strongest competing case for every instrument &mdash; stress-testing assumptions, surfacing blind spots, and challenging each other's thesis.</div>
+      </div>
+      <div class="tv-intro-step">
+        <span class="tv-intro-step-num">3</span>
+        <span class="tv-intro-step-title">Decide</span>
+        <div class="tv-intro-step-desc">A final arbiter weighs both sides, assigns a conviction score from 1 to 10, and delivers a directional bias with full reasoning transparency.</div>
+      </div>
+    </div>
+    <p class="tv-intro-note">Currently tracking <strong>9 instruments</strong> across 4 asset classes, updated daily at 07:00 UTC. Additional instruments and asset classes are in active development.</p>
+  </details>
+
+  <aside class="tv-sidebar">
+    <div class="tv-panel">
+      <div class="tv-panel-head">Market Snapshot</div>
+      <div class="tv-panel-desc">Current macro regime, growth &amp; inflation signals, and the next scheduled catalyst.</div>
+      <div class="tv-snap-grid">
+        <div>
+          <div class="tv-snap-label">Regime</div>
+          <div class="tv-snap-val">{{ regime.label|default('—') if regime else '—' }}</div>
+        </div>
+        <div>
+          <div class="tv-snap-label">Next Catalyst</div>
+          <div class="tv-snap-val" style="font-size:12px">{{ macro.next_catalyst or '—' }}</div>
+        </div>
+        {% if regime and not regime.error %}
+        <div>
+          <div class="tv-snap-label">Growth</div>
+          <div class="tv-snap-val {% if regime.growth_score|default(0) > 0 %}pos{% elif regime.growth_score|default(0) < 0 %}neg{% else %}neu{% endif %}">
+            {% if regime.growth_score|default(0) > 0 %}&#9650;{% elif regime.growth_score|default(0) < 0 %}&#9660;{% endif %}
+            {{ regime.growth_score|default(0) }}
+          </div>
+        </div>
+        <div>
+          <div class="tv-snap-label">Inflation</div>
+          <div class="tv-snap-val {% if regime.inflation_score|default(0) > 0 %}neg{% elif regime.inflation_score|default(0) < 0 %}pos{% else %}neu{% endif %}">
+            {% if regime.inflation_score|default(0) > 0 %}&#9650;{% elif regime.inflation_score|default(0) < 0 %}&#9660;{% endif %}
+            {{ regime.inflation_score|default(0) }}
+          </div>
+        </div>
+        {% endif %}
+        <div class="tv-snap-desc">{{ macro.regime or brief_headline }}</div>
+      </div>
+    </div>
+
+    {% if macro.themes %}
+    <div class="tv-panel">
+      <div class="tv-panel-head">Key Themes</div>
+      <div class="tv-panel-desc">Ranked macro narratives driving today's views, scored by conviction and cross-asset evidence.</div>
+      <div class="tv-themes">
+        {% for t in macro.themes[:6] %}
+        <div class="tv-theme-row">
+          <span class="tv-theme-rank">{{ loop.index }}.</span>
+          <span class="tv-theme-name">{{ t.name }}</span>
+          <span class="tv-theme-score">{{ t.conviction }}/10</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="tv-panel">
+      <div class="tv-panel-head">Economic Calendar</div>
+      <div class="tv-panel-desc">Upcoming data releases and central bank events that could shift macro conditions.</div>
+      {% if upcoming_calendar %}
+      <div class="tv-cal-list">
+        {% for e in upcoming_calendar %}
+        <div class="tv-cal-row">
+          <span class="tv-cal-date">{{ e.date[5:] }}</span>
+          <span class="tv-cal-dot sev-{{ e.severity|default('low') }}"></span>
+          <span class="tv-cal-name">{{ e.name }}</span>
+          <span class="tv-cal-syms">
+            {% for sym in (e.affects or [])[:3] %}
+            <span class="tv-cal-sym">{{ sym }}</span>
+            {% endfor %}
+          </span>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="tv-cal-empty">No upcoming events</div>
+      {% endif %}
+    </div>
+  </aside>
+</div>
+
+<!-- Ad: Leaderboard -->
+<div class="tv-ad-row">
+  <div class="tv-ad-slot tv-ad-leaderboard tv-ad-desktop">Ad Slot &mdash; Leaderboard (728&times;90)</div>
+  <div class="tv-ad-slot tv-ad-mobile-banner tv-ad-mobile">Ad Slot &mdash; Mobile (320&times;50)</div>
+</div>
+
+<!-- Sort toolbar -->
+<div class="tv-toolbar">
+  <span class="tv-toolbar-label">Sort by</span>
+  <button class="tv-sort-btn active" data-sort="conviction" onclick="sortCards(this)">Conviction</button>
+  <button class="tv-sort-btn" data-sort="alpha" onclick="sortCards(this)">A &ndash; Z</button>
+  <button class="tv-sort-btn" data-sort="bulls" onclick="sortCards(this)">Bulls First</button>
+  <button class="tv-sort-btn" data-sort="bears" onclick="sortCards(this)">Bears First</button>
+  <span class="tv-toolbar-spacer"></span>
+  <button class="tv-expand-all" id="expandToggle" onclick="toggleAllCards()">Expand All</button>
+</div>
+
+<!-- Instrument Cards -->
+<div class="tv-cards" id="cardsContainer">
+{% for r in instruments %}
+{% set dir_class = 'dir-long' if r.direction == 'long' else ('dir-short' if r.direction == 'short' else 'dir-neutral') %}
+{% set convictions = r.history.convictions if r.history and r.history.convictions else [] %}
+{% set delta = convictions[-1] - convictions[-2] if convictions|length >= 2 else 0 %}
+
+<div class="tv-card {{ dir_class }}" data-symbol="{{ r.symbol }}" data-conviction="{{ r.conviction }}" data-direction="{{ r.direction }}" data-rank="{{ loop.index }}">
+  <div class="tv-card-head" onclick="toggleCard(this.parentElement)">
+    <div class="tv-card-rank">{{ loop.index }}</div>
+    <div class="tv-card-info">
+      <div class="tv-card-top">
+        <span class="tv-card-sym">{{ r.symbol }}</span>
+        <span class="tv-card-name">{{ r.name }}</span>
+        <span class="tv-card-bias">
+          {% if r.direction == 'long' %}&#9650; BULLISH{% elif r.direction == 'short' %}&#9660; BEARISH{% else %}&#8212; NEUTRAL{% endif %}
+        </span>
+      </div>
+      {% if r.primary_theme %}
+      <div class="tv-card-theme">{{ r.primary_theme }}</div>
+      {% endif %}
+      <div class="tv-card-bar">
+        <div class="tv-card-bar-fill" style="width:{{ r.conviction * 10 }}%"></div>
+      </div>
+    </div>
+    <div class="tv-card-metrics">
+      <div class="tv-card-score-wrap">
+        <div class="tv-card-score">{{ r.conviction }}</div>
+        <div class="tv-card-score-label">/ 10</div>
+      </div>
+      <div class="tv-card-spark">
+        {% set n = convictions|length %}
+        {% if n >= 2 %}
+        {% set spark_color = '#3BE8B0' if r.direction == 'long' else ('#FD636B' if r.direction == 'short' else '#8d95a2') %}
+        {% set step = 110.0 / (n - 1) %}
+        <svg viewBox="0 0 110 36" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="sg-{{ r.symbol }}" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="{{ spark_color }}" stop-opacity="0.2"/>
+              <stop offset="100%" stop-color="{{ spark_color }}" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path fill="url(#sg-{{ r.symbol }})" d="M 0,{{ (36 - convictions[0] * 3.2)|round(1) }} {% for c in convictions %}L {{ (loop.index0 * step)|round(1) }},{{ (36 - c * 3.2)|round(1) }} {% endfor %}L {{ ((n-1)*step)|round(1) }},36 L 0,36 Z"/>
+          <polyline class="tv-spark-line" fill="none" stroke-width="1.5" vector-effect="non-scaling-stroke" points="{% for c in convictions %}{{ (loop.index0 * step)|round(1) }},{{ (36 - c * 3.2)|round(1) }} {% endfor %}"/>
+          <circle class="tv-spark-dot" r="2.5" vector-effect="non-scaling-stroke" cx="{{ ((n-1)*step)|round(1) }}" cy="{{ (36 - convictions[-1] * 3.2)|round(1) }}"/>
+        </svg>
+        {% endif %}
+      </div>
+      <div class="tv-card-delta {% if delta > 0 %}up{% elif delta < 0 %}down{% else %}flat{% endif %}">
+        {% if delta > 0 %}&#9650;+{{ delta }}{% elif delta < 0 %}&#9660;{{ delta }}{% else %}—{% endif %}
+      </div>
+      <div class="tv-card-chevron">&#9654;</div>
+    </div>
+  </div>
+
+  <div class="tv-card-body">
+    <!-- Conviction history chart -->
+    {% set _entries = r.history.entries if r.history and r.history.entries else [] %}
+    {% set _cn = _entries|length %}
+    {% if _cn >= 2 %}
+    <div class="tv-chart-wrap"
+         data-points='[{% for e in _entries %}{"d":"{{ e.date[5:] }}","v":{{ e.conviction }},"b":"{{ e.bias }}"}{% if not loop.last %},{% endif %}{% endfor %}]'
+         data-direction="{{ r.direction }}">
+      <div class="tv-chart-header">
+        <span class="tv-chart-label">Conviction History</span>
+        <span class="tv-chart-sub">14-day score trend &mdash; hover to inspect</span>
+      </div>
+      <div class="tv-chart-area">
+        <div class="tv-chart-yscale"><span>10</span><span>5</span><span>0</span></div>
+        <div class="tv-chart-main">
+          <svg class="tv-chart"></svg>
+          <div class="tv-chart-tip"></div>
+          <div class="tv-chart-cross"></div>
+          <div class="tv-chart-dates"></div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    <!-- Summary stats -->
+    <div class="tv-card-summary">
+      <div class="tv-card-stat">
+        <div class="tv-card-stat-label">Conviction</div>
+        <div class="tv-card-stat-val">{{ r.conviction }} / 10</div>
+      </div>
+      <div class="tv-card-stat">
+        <div class="tv-card-stat-label">Timeframe</div>
+        <div class="tv-card-stat-val">{{ r.timeframe or '—' }}</div>
+      </div>
+      <div class="tv-card-stat">
+        <div class="tv-card-stat-label">Data Points</div>
+        <div class="tv-card-stat-val">{{ r.history.n_entries if r.history else 0 }} days</div>
+      </div>
+      <div class="tv-card-stat">
+        <div class="tv-card-stat-label">Trend</div>
+        <div class="tv-card-stat-val" style="color:{% if delta > 0 %}var(--bull){% elif delta < 0 %}var(--bear){% else %}var(--text-dim){% endif %}">
+          {% if delta > 0 %}Improving{% elif delta < 0 %}Declining{% else %}Stable{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Probability bar -->
+    {% if r.p_bull > 0 or r.p_bear > 0 %}
+    <div class="tv-prob-wrap">
+      <div class="tv-prob-bar">
+        <div class="seg-bull" style="width:{{ r.p_bull }}%"></div>
+        <div class="seg-flat" style="width:{{ r.p_flat }}%"></div>
+        <div class="seg-bear" style="width:{{ r.p_bear }}%"></div>
+      </div>
+      <div class="tv-prob-labels">
+        <span>Bull {{ r.p_bull|int }}%</span>
+        <span>Sideways {{ r.p_flat|int }}%</span>
+        <span>Bear {{ r.p_bear|int }}%</span>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Thesis callouts — bull + bear side by side -->
+    {% if r.bull_thesis or r.bear_thesis %}
+    <div class="tv-card-theses">
+      {% if r.bull_thesis %}
+      <div class="tv-thesis bull">
+        <div class="tv-thesis-label">&#9650; Bull Thesis</div>
+        <div class="tv-thesis-text">{{ r.bull_thesis }}</div>
+      </div>
+      {% endif %}
+      {% if r.bear_thesis %}
+      <div class="tv-thesis bear">
+        <div class="tv-thesis-label">&#9660; Bear Thesis</div>
+        <div class="tv-thesis-text">{{ r.bear_thesis }}</div>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Tabbed reasoning -->
+    <div class="tv-card-tabs">
+      <button class="tv-card-tab active" data-tab="judge-{{ r.symbol }}" onclick="switchCardTab(this)">Judge Verdict</button>
+      <button class="tv-card-tab" data-tab="bull-{{ r.symbol }}" onclick="switchCardTab(this)">Bull Case</button>
+      <button class="tv-card-tab" data-tab="bear-{{ r.symbol }}" onclick="switchCardTab(this)">Bear Case</button>
+    </div>
+    <div class="tv-card-pane active" id="judge-{{ r.symbol }}">
+      <div class="tv-prose">{{ r.judge_html | safe }}</div>
+    </div>
+    <div class="tv-card-pane" id="bull-{{ r.symbol }}">
+      <div class="tv-prose">{{ r.bull_html | safe }}</div>
+    </div>
+    <div class="tv-card-pane" id="bear-{{ r.symbol }}">
+      <div class="tv-prose">{{ r.bear_html | safe }}</div>
+    </div>
+  </div>
+</div>
+{% if loop.index == 3 or loop.index == 6 %}
+<div class="tv-ad-slot tv-ad-infeed">Ad Slot &mdash; In-Feed Native</div>
+{% endif %}
+{% endfor %}
+</div>
+
+<!-- Ad: Bottom Banner -->
+<div class="tv-ad-row">
+  <div class="tv-ad-slot tv-ad-banner tv-ad-desktop">Ad Slot &mdash; Bottom Banner (970&times;90)</div>
+  <div class="tv-ad-slot tv-ad-mobile-banner tv-ad-mobile">Ad Slot &mdash; Mobile (320&times;50)</div>
+</div>
+
+<section class="tv-brief" id="briefSection">
+  <button class="tv-brief-btn" onclick="document.getElementById('briefSection').classList.toggle('open')">
+    <span class="tv-brief-chevron">&#9654;</span>
+    Today's Full Analysis
+  </button>
+  <div class="tv-brief-body">
+    <div class="tv-prose">{{ brief_md | markdown | safe }}</div>
+  </div>
+</section>
+
+<footer class="tv-footer">
+  <a href="/">PIPTHEORY</a>
+  <span class="tv-footer-sep">&middot;</span>
+  <a href="/about">About</a>
+  <span class="tv-footer-sep">&middot;</span>
+  <span>AI-powered macro research</span>
+  <span class="tv-footer-sep">&middot;</span>
+  <a href="/about">Not investment advice</a>
+</footer>
+
+<div class="tv-cookie" id="cookieBar">
+  <span>This site uses cookies for analytics.</span>
+  <button class="tv-cookie-btn" onclick="document.getElementById('cookieBar').hidden=true;localStorage.setItem('cookie_ok','1')">Got it</button>
+</div>
+
+<!-- Adblock detection bait (adblockers hide elements with these class names) -->
+<div id="adblockBait" class="ad-banner adsbox doubleclick" style="height:1px;width:1px;position:absolute;left:-9999px;top:-9999px"></div>
+
+<!-- Soft adblock notice -->
+<div class="tv-adblock-notice" id="adblockNotice" hidden>
+  <span class="tv-adblock-icon">&#9888;</span>
+  <span>PIPTHEORY is 100% free, supported by ads. Please consider whitelisting us to keep this research available.</span>
+  <button class="tv-adblock-dismiss" onclick="document.getElementById('adblockNotice').hidden=true;localStorage.setItem('adblock_dismissed',Date.now())">&times;</button>
+</div>
+
+<script>
+(function(){
+  if(localStorage.getItem('cookie_ok'))document.getElementById('cookieBar').hidden=true;
+
+  // Adblock detection (check after 1.5s to let adblockers act)
+  setTimeout(function(){
+    var bait=document.getElementById('adblockBait');
+    var blocked=!bait||bait.offsetHeight===0||bait.offsetWidth===0||getComputedStyle(bait).display==='none';
+    if(blocked){
+      var dismissed=localStorage.getItem('adblock_dismissed');
+      // Re-show after 7 days if previously dismissed
+      if(!dismissed||Date.now()-parseInt(dismissed,10)>604800000){
+        document.getElementById('adblockNotice').hidden=false;
+      }
+    }
+  },1500);
+
+  // Theme toggle
+  var tb=document.getElementById('themeToggle');
+  function uti(){var d=document.documentElement.getAttribute('data-theme')==='dark';tb.innerHTML=d?'&#9788;':'&#9790;';tb.title=d?'Light mode':'Dark mode';document.getElementById('metaTheme').content=d?'#0f1117':'#f0f1f3'}
+  uti();
+  tb.addEventListener('click',function(){var d=document.documentElement.getAttribute('data-theme')==='dark';if(d){document.documentElement.removeAttribute('data-theme');localStorage.removeItem('pt_theme')}else{document.documentElement.setAttribute('data-theme','dark');localStorage.setItem('pt_theme','dark')}uti();if(window.initCharts)setTimeout(initCharts,50)});
+
+  // Date picker
+  document.getElementById('datePicker').addEventListener('change',function(){location.href='/run/'+this.value});
+
+  // Sync time
+  var st=document.getElementById('syncTime');
+  if(st){try{var d=new Date(st.getAttribute('datetime'));if(!isNaN(d))st.textContent=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}catch(e){}}
+
+  // Card expand/collapse
+  window.toggleCard=function(card){card.classList.toggle('open')};
+  // Default first card expanded
+  var firstCard=document.querySelector('.tv-card');
+  if(firstCard)firstCard.classList.add('open');
+
+  // Expand all / Collapse all
+  window.toggleAllCards=function(){
+    var cards=document.querySelectorAll('.tv-card');
+    var btn=document.getElementById('expandToggle');
+    var anyOpen=[].some.call(cards,function(c){return c.classList.contains('open')});
+    cards.forEach(function(c){
+      if(anyOpen)c.classList.remove('open');
+      else c.classList.add('open');
+    });
+    btn.textContent=anyOpen?'Expand All':'Collapse All';
+  };
+
+  // Tab switching within cards
+  window.switchCardTab=function(btn){
+    var card=btn.closest('.tv-card');
+    card.querySelectorAll('.tv-card-tab').forEach(function(t){t.classList.remove('active')});
+    card.querySelectorAll('.tv-card-pane').forEach(function(p){p.classList.remove('active')});
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  };
+
+  // Chart — JS-rendered for pixel-perfect sizing (no SVG distortion)
+  window.initCharts=function(){
+    var cs=getComputedStyle(document.documentElement);
+    var bullC=cs.getPropertyValue('--bull').trim();
+    var bearC=cs.getPropertyValue('--bear').trim();
+    var flatC=cs.getPropertyValue('--text-faint').trim();
+    var borderC=cs.getPropertyValue('--border').trim();
+    var bg1C=cs.getPropertyValue('--bg-1').trim();
+
+    document.querySelectorAll('.tv-chart-wrap').forEach(function(wrap){
+      var points;
+      try{points=JSON.parse(wrap.dataset.points)}catch(e){return}
+      if(points.length<2)return;
+      var dir=wrap.dataset.direction;
+      var color=dir==='long'?bullC:(dir==='short'?bearC:flatC);
+      var main=wrap.querySelector('.tv-chart-main');
+      var svg=main.querySelector('.tv-chart');
+      var tip=main.querySelector('.tv-chart-tip');
+      var cross=main.querySelector('.tv-chart-cross');
+      var datesEl=main.querySelector('.tv-chart-dates');
+      var W=main.offsetWidth,H=120,padX=16,padY=10;
+      var plotW=W-padX*2,plotH=H-padY*2;
+      var n=points.length;
+      svg.setAttribute('width',W);svg.setAttribute('height',H);
+      svg.setAttribute('viewBox','0 0 '+W+' '+H);
+
+      // compute positions
+      points.forEach(function(p,i){
+        p.px=padX+(i/(n-1))*plotW;
+        p.py=padY+(1-p.v/10)*plotH;
+      });
+
+      // build SVG content
+      var s='';
+      // grid
+      [padY,padY+plotH*.25,padY+plotH*.5,padY+plotH*.75,padY+plotH].forEach(function(y,i){
+        var dash=(i===0||i===4)?'':' stroke-dasharray="4,4"';
+        s+='<line x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="'+borderC+'" stroke-width="0.5"'+dash+'/>';
+      });
+      // gradient
+      var gid='cg'+Math.random().toString(36).substr(2,6);
+      s+='<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+color+'" stop-opacity="0.18"/><stop offset="100%" stop-color="'+color+'" stop-opacity="0.02"/></linearGradient></defs>';
+      // fill
+      var fd='M '+points[0].px+','+points[0].py;
+      points.forEach(function(p){fd+=' L '+p.px+','+p.py});
+      fd+=' L '+points[n-1].px+','+(padY+plotH)+' L '+points[0].px+','+(padY+plotH)+' Z';
+      s+='<path fill="url(#'+gid+')" d="'+fd+'"/>';
+      // line
+      s+='<polyline fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="'+points.map(function(p){return p.px+','+p.py}).join(' ')+'"/>';
+      // dots
+      points.forEach(function(p){
+        s+='<circle class="tv-chart-dot" cx="'+p.px+'" cy="'+p.py+'" r="4" fill="'+color+'" stroke="'+bg1C+'" stroke-width="2"/>';
+      });
+      // overlay
+      s+='<rect class="tv-chart-overlay" x="0" y="0" width="'+W+'" height="'+H+'" fill="transparent" style="cursor:crosshair"/>';
+      svg.innerHTML=s;
+
+      // date labels
+      var dh='';
+      points.forEach(function(p,i){
+        if(i===0||i===n-1||n<=7||(n<=14&&i%2===0)||(n>14&&i%3===0))
+          dh+='<span style="left:'+(p.px/W*100)+'%">'+p.d+'</span>';
+      });
+      datesEl.innerHTML=dh;
+
+      // unified mouse + touch interaction
+      var overlay=svg.querySelector('.tv-chart-overlay');
+      var dots=svg.querySelectorAll('.tv-chart-dot');
+      var _hideTimer;
+      function showPt(clientX){
+        var rect=svg.getBoundingClientRect();
+        var mx=clientX-rect.left;
+        var best=0,bestD=9999;
+        points.forEach(function(p,i){
+          var sx=p.px/W*rect.width;
+          if(Math.abs(mx-sx)<bestD){bestD=Math.abs(mx-sx);best=i}
+        });
+        var pt=points[best];
+        var pct=(pt.px/W*100)+'%';
+        dots.forEach(function(d,i){d.setAttribute('r',i===best?'6':'4')});
+        cross.style.display='block';cross.style.left=pct;
+        tip.style.display='block';tip.style.left=pct;
+        var bL=pt.b==='long'?'▲ Bullish':pt.b==='short'?'▼ Bearish':'— Neutral';
+        var bC=pt.b==='long'?bullC:pt.b==='short'?bearC:flatC;
+        var chg=best>0?pt.v-points[best-1].v:0;
+        var cs2=chg>0?'<span style="color:'+bullC+'">+'+chg+'</span>':chg<0?'<span style="color:'+bearC+'">'+chg+'</span>':'';
+        tip.innerHTML='<strong>'+pt.v+'/10</strong> '+cs2+'<br><span style="color:'+bC+'">'+bL+'</span><br><span style="opacity:.6">'+pt.d+'</span>';
+      }
+      function hidePt(){tip.style.display='none';cross.style.display='none';dots.forEach(function(d){d.setAttribute('r','4')})}
+      // mouse
+      overlay.addEventListener('mousemove',function(e){showPt(e.clientX)});
+      overlay.addEventListener('mouseleave',hidePt);
+      // touch: tap to show, auto-hide after 2.5s
+      overlay.addEventListener('touchstart',function(e){e.preventDefault();clearTimeout(_hideTimer);showPt(e.touches[0].clientX)},{passive:false});
+      overlay.addEventListener('touchmove',function(e){e.preventDefault();showPt(e.touches[0].clientX)},{passive:false});
+      overlay.addEventListener('touchend',function(){_hideTimer=setTimeout(hidePt,2500)});
+    });
+  };
+  initCharts();
+  var _crt;window.addEventListener('resize',function(){clearTimeout(_crt);_crt=setTimeout(initCharts,200)});
+
+  // Sort cards
+  window.sortCards=function(btn){
+    document.querySelectorAll('.tv-sort-btn').forEach(function(b){b.classList.remove('active')});
+    btn.classList.add('active');
+    var container=document.getElementById('cardsContainer');
+    var cards=[].slice.call(container.querySelectorAll('.tv-card'));
+    var mode=btn.dataset.sort;
+    cards.sort(function(a,b){
+      if(mode==='conviction')return parseInt(b.dataset.conviction)-parseInt(a.dataset.conviction)||a.dataset.symbol.localeCompare(b.dataset.symbol);
+      if(mode==='alpha')return a.dataset.symbol.localeCompare(b.dataset.symbol);
+      if(mode==='bulls'){
+        var da=a.dataset.direction==='long'?0:(a.dataset.direction==='short'?2:1);
+        var db=b.dataset.direction==='long'?0:(b.dataset.direction==='short'?2:1);
+        return da-db||parseInt(b.dataset.conviction)-parseInt(a.dataset.conviction);
+      }
+      if(mode==='bears'){
+        var da=a.dataset.direction==='short'?0:(a.dataset.direction==='long'?2:1);
+        var db=b.dataset.direction==='short'?0:(b.dataset.direction==='long'?2:1);
+        return da-db||parseInt(b.dataset.conviction)-parseInt(a.dataset.conviction);
+      }
+      return 0;
+    });
+    // Re-insert in sorted order and update ranks
+    cards.forEach(function(c,i){
+      container.appendChild(c);
+      c.querySelector('.tv-card-rank').textContent=i+1;
+    });
+  };
+  // ── Mobile-specific adjustments ──
+  if(window.innerWidth<768){
+    // Collapse intro on mobile
+    var ic=document.querySelector('.tv-intro-collapse');
+    if(ic)ic.removeAttribute('open');
+    // Swipe hint on sidebar panels
+    var sb=document.querySelector('.tv-sidebar');
+    if(sb)setTimeout(function(){sb.scrollTo({left:60,behavior:'smooth'});setTimeout(function(){sb.scrollTo({left:0,behavior:'smooth'})},400)},800);
+  }
+  // Touch devices: change "hover" to "tap"
+  if('ontouchstart' in window||navigator.maxTouchPoints>0){
+    document.querySelectorAll('.tv-chart-sub').forEach(function(el){
+      el.textContent=el.textContent.replace('hover to inspect','tap to inspect');
+    });
+  }
+  // Re-init charts when a card is expanded (container may have had 0 width)
+  var _origToggle=window.toggleCard;
+  window.toggleCard=function(btn){
+    _origToggle(btn);
+    setTimeout(initCharts,50);
+  };
+})();
+</script>
+</body>
+</html>
