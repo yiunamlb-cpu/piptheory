@@ -1552,26 +1552,27 @@ def _is_run_alive(pid: int | None) -> bool:
 
 
 def _spawn_pipeline_run() -> int | None:
-    """Start scripts/run_daily.bat in a detached process. Returns PID.
+    """Start the pipeline in a detached process. Returns PID.
 
-    Returns None if a run is already in progress (no double-start). The
-    scheduled-task path and this admin path share the same .bat, so output
-    goes to the same logs/bias_engine.log and the UI is consistent.
+    Uses scripts/run_daily.sh on Linux and run_daily.bat on Windows so
+    each platform gets the correct shell syntax, paths and venv activation.
+
+    Returns None if a run is already in progress (no double-start).
     """
     detected = _detect_running_pipeline()
     if detected:
         return None
-    bat = PROJECT_ROOT / "scripts" / "run_daily.bat"
-    if not bat.exists():
-        raise RuntimeError(f"run_daily.bat not found at {bat}")
 
     if sys.platform == "win32":
+        script = PROJECT_ROOT / "scripts" / "run_daily.bat"
+        if not script.exists():
+            raise RuntimeError(f"run_daily.bat not found at {script}")
         # DETACHED_PROCESS (0x08) + CREATE_NEW_PROCESS_GROUP (0x200) so the
         # child survives if uvicorn exits. CREATE_NO_WINDOW (0x08000000)
         # suppresses the console flash that .bat normally creates.
         flags = 0x00000008 | 0x00000200 | 0x08000000
         proc = subprocess.Popen(
-            ["cmd.exe", "/c", str(bat)],
+            ["cmd.exe", "/c", str(script)],
             cwd=str(PROJECT_ROOT),
             creationflags=flags,
             stdin=subprocess.DEVNULL,
@@ -1580,8 +1581,11 @@ def _spawn_pipeline_run() -> int | None:
             close_fds=True,
         )
     else:
+        script = PROJECT_ROOT / "scripts" / "run_daily.sh"
+        if not script.exists():
+            raise RuntimeError(f"run_daily.sh not found at {script}")
         proc = subprocess.Popen(
-            ["bash", str(bat)],
+            ["bash", str(script)],
             cwd=str(PROJECT_ROOT),
             stdin=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,
