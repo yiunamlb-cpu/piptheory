@@ -26,9 +26,9 @@
 # AdSense (active provider) — leave empty until approved
 adsense_publisher_id: "ca-pub-6708879321883192"    # new piptheory.com AdSense account
 slots:
-  top: ""                    # TODO: create ad unit in AdSense dashboard
-  sidebar: ""                # TODO: create ad unit in AdSense dashboard
-  in_article: ""             # TODO: create ad unit in AdSense dashboard
+  top: "8853852889"           # leaderboard 728x90
+  sidebar: "3684075232"       # medium rectangle 300x250
+  in_article: "7431748554"    # in-article native (responsive)
 
 # Carbon Ads (alternative) — apply at carbonads.net when you have ~10k
 # monthly visitors. Replace the AdSense ad unit with Carbon's <script>
