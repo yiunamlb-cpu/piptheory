@@ -22,7 +22,7 @@ If there are merge conflicts, resolve them carefully and never discard remote ch
 - **Hosting**: Render.com (free tier), auto-deploys from GitHub on push
 - **Keep-alive**: GitHub Actions pings every 10 min to prevent cold starts
 - **Pipeline**: Runs locally, generates analysis data → `scripts/push_state.ps1` pushes state to GitHub → triggers Render redeploy
-- **Repo**: github.com/yiunamlb-cpu/nam-hedgefund (main branch)
+- **Repo**: github.com/yiunamlb-cpu/piptheory (main branch)
 
 ## Architecture
 

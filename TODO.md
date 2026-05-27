@@ -18,7 +18,7 @@
 ## To do (manual steps)
 
 - [ ] Sign up at [render.com](https://render.com) and connect GitHub account
-- [ ] Create Web Service — select `nam-hedgefund` repo (auto-detects render.yaml)
+- [ ] Create Web Service — select `piptheory` repo (auto-detects render.yaml)
 - [ ] Set Render env var: `ADMIN_TOKEN` (pick a strong password for /admin panel)
 - [ ] Add custom domain in Render — Settings > Custom Domains > `piptheory.com`
 - [ ] Point DNS — set CNAME record at domain registrar to the value Render gives you
@@ -28,4 +28,4 @@
 - [ ] Verify site is live at piptheory.com
 - [ ] Apply for [AdSense](https://adsense.google.com) once you have traffic
 - [ ] Replace placeholder ad slots with real AdSense code
-- [ ] (Optional) Rename GitHub repo from `nam-hedgefund` to `piptheory`
+- [x] Rename GitHub repo from `nam-hedgefund` to `piptheory`
