@@ -1,0 +1,17 @@
+Read and follow CONTRIBUTING.md — it contains the full project context, architecture, and rules.
+
+CRITICAL: Always sync with GitHub first.
+This project is worked on from multiple devices. Before ANY work:
+1. Run `git pull origin main`
+2. Make changes
+3. Commit + push when done — never leave uncommitted work
+
+Quick Reference:
+- Stack: Python 3.11, FastAPI, Jinja2, vanilla JS/CSS
+- Main template: app/templates/dashboard_tv.html
+- Styles: app/static/dashboard.css (light/dark themes, 3 responsive breakpoints)
+- Routes: app/main.py
+- Hosting: Render.com free tier, auto-deploys from GitHub
+- Public site is read-only — no user accounts, no personal data exposed
+- Never expose model names or mention AI/agents in public-facing content
+- Color palette: Bull #3BE8B0, Bear #FD636B, Accent #1BAFD0, Amber #FFB900
