@@ -175,10 +175,9 @@
   </aside>
 </div>
 
-<!-- Ad: Leaderboard -->
+<!-- Ad: Leaderboard (top slot) - responsive via AdSense auto-sizing -->
 <div class="tv-ad-row">
-  <div class="tv-ad-slot tv-ad-leaderboard tv-ad-desktop">Ad Slot &mdash; Leaderboard (728&times;90)</div>
-  <div class="tv-ad-slot tv-ad-mobile-banner tv-ad-mobile">Ad Slot &mdash; Mobile (320&times;50)</div>
+  {% include '_ad_slot.html' %}
 </div>
 
 <!-- Sort toolbar -->
@@ -344,15 +343,14 @@
   </div>
 </div>
 {% if loop.index == 3 or loop.index == 6 %}
-<div class="tv-ad-slot tv-ad-infeed">Ad Slot &mdash; In-Feed Native</div>
+<div class="tv-ad-slot tv-ad-infeed">{% with ad_slot = 'in_article' %}{% include '_ad_slot.html' %}{% endwith %}</div>
 {% endif %}
 {% endfor %}
 </div>
 
 <!-- Ad: Bottom Banner -->
 <div class="tv-ad-row">
-  <div class="tv-ad-slot tv-ad-banner tv-ad-desktop">Ad Slot &mdash; Bottom Banner (970&times;90)</div>
-  <div class="tv-ad-slot tv-ad-mobile-banner tv-ad-mobile">Ad Slot &mdash; Mobile (320&times;50)</div>
+  {% include '_ad_slot.html' %}
 </div>
 
 <section class="tv-brief" id="briefSection">

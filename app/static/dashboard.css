@@ -299,9 +299,13 @@ select{font-family:inherit}
 .tv-adblock-dismiss{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;font-size:18px;color:var(--text-dim);flex-shrink:0;transition:background .15s;line-height:1}
 .tv-adblock-dismiss:hover{background:var(--bg-3)}
 
-/* ad slots (mockup placeholders) */
+/* ad slots */
 .tv-ad-row{max-width:1480px;margin:0 auto;padding:12px 24px}
 .tv-ad-slot{display:flex;align-items:center;justify-content:center;border:2px dashed var(--border-3);border-radius:8px;color:var(--text-faint);font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;background:var(--bg-2)}
+/* .ad-slot wrapper rendered by _ad_slot.html partial — same base look */
+.ad-slot{width:100%}
+.ad-slot .adsbygoogle{display:block}
+.ad-slot-placeholder{display:flex;align-items:center;justify-content:center;height:90px}
 .tv-ad-leaderboard{height:90px;max-width:728px;margin:0 auto}
 .tv-ad-infeed{height:100px}
 .tv-ad-banner{height:90px;max-width:970px;margin:0 auto}
