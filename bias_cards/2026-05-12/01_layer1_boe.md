@@ -1,0 +1,30 @@
+INSTITUTION: BoE
+DATE: 2026-05-12
+
+CURRENT STANCE: hawkish‑hold (conditional on the March‑meeting information; April decision missing — see note)
+LANGUAGE DRIFT SCORE (vs prior statement, February 2026): +1 (mild hawkish shift — from “disinflation continuing” to explicit second‑round effect alert, emergency‑ready language)
+VOTE SPLIT (latest): 9‑0 hold (March meeting) — **but** Ramsden, Breeden, Dhingra and Taylor all explicitly stated they would have voted for a 25bp cut in the absence of the Middle East shock. The vote is therefore a “false unanimous”; the underlying constellation is deeply split. April vote unknown — likely still hold, but without minutes true split cannot be confirmed.
+
+RATE PATH:
+  Current Bank Rate: 3.75% (set March, held through April – not yet confirmed for April meeting)
+  Market pricing — next meeting: Not available (lack of SONIA OIS futures data). At the March meeting the market‑implied path for Bank Rate was sloping slightly upward over 2026, having increased significantly since February. Probability of a hike was non‑zero but limited; hold was dominant.
+  6m forward: implied rate roughly 3.80–3.85% (based on March‑meeting staff description “slopes slightly up,” no fresh data)
+  12m forward: implied rate ~3.85–4.00% (uncertain)
+  QT pace: Active gilt sales. The stock of UK government bonds held for monetary policy purposes was £528bn on 18 March. An explicit current monthly run‑rate is not provided; the usual pace is ~£80bn per year. In the absence of a change statement, assume the existing programme continues.
+
+KEY OBSERVATIONS:
+  • The March statement reveals a sharp narrative break: “Prior to this, there had been continued disinflation… The conflict will cause CPI inflation to be higher in the near term… The MPC is alert to the increased risk of second‑round effects.” This language is a clear hawkish shift from the likely dovish, cut‑leaning stance of the February meeting.
+  • The unanimous hold masks a deeply divided MPC. Ramsden, Breeden, Dhingra and Taylor each indicated they would have cut in absence of the energy shock. Mann, Pill and Greene see material upside persistence risks, with Mann explicitly contemplating a “longer hold, or even a hike at some point.” Bailey and Lombardelli sit cautiously between. This dispersion means the path of policy is highly contingent on the duration of the Strait of Hormuz disruption; a short‑lived shock could swiftly unlock a rate‑cutting cycle, while a protracted one could force a hike from the hawkish faction.
+  • Services CPI and wages were disinflating, but only modestly: January services CPI 4.4%, wage growth 3.3% 3m/y. The Agents’ estimate of 2026 average pay settlements was revised up to 3.6%, making second‑round effects very plausible if energy prices stay elevated. The labour market is slack (unemployment 5.2%), which might cap wage pass‑through but not eliminate it.
+  • Sterling effective exchange rate was little changed during the shock, and the US dollar strengthened. For now, GBP is not a separate transmission channel adding to inflation, but any material weakness would immediately import more price pressure and constrict the MPC’s room to hold or cut.
+  • The QT programme continued (gilt stock £528bn) with no signal of a change. The gilt 10‑year yield rose to 4.70% in early March, reflecting both higher rate expectations and possibly term‑premia from QT. The gilt‑Bund spread likely widened, reflecting UK‑specific energy exposure.
+
+GAP vs MARKET:
+  The March meeting showed the MPC to be significantly more concerned about inflation persistence than pre‑conflict market pricing (which had expected cuts). After the shock, the market‑implied rate path adjusted upward; at the time the MPC and market were more closely aligned—but with the MPC’s risk assessment still skewed hawkish. Without April data, it is unclear whether the market has since moved to price an even tighter path or pulled back. The current gap is therefore ambiguous; my best guess is that the BoE remains marginally more hawkish than the market’s central expectation, but conviction is low.
+  Trade implication: In the near term, elevated uncertainty and a hawkish‑skewed BoE could be modestly supportive for GBP/USD, especially if the Fed is easing (FFR effective 3.63%). Gilts are likely to underperform Bunds on energy‑premium and QT supply. However, any rapid resolution of the Mideast conflict would see a sharp repricing lower in UK rates, boosting gilts and weakening sterling. Position cautiously.
+
+NEXT CATALYST: The April MPC meeting (29‑30 April) has already taken place; the minutes should be available. If they are not yet in the input, they are the immediate catalyst to watch — they could confirm a dovish or hawkish tilt. The subsequent scheduled meeting is in June (likely mid‑June 2026). Key speeches by Bailey, Pill, or Ramsden between now and then could clarify how the Committee interprets the April data.
+
+INVALIDATION: A swift diplomatic settlement that re‑opens the Strait of Hormuz, causing oil to fall back toward $75‑80, would gut the upside inflation risk and would rapidly shift the MPC bias back to cut‑and‑soon (voiced by Dhingra, Taylor). Conversely, a further escalation (e.g., Iran shutting the Strait entirely, sustained Brent above $120) would convert the hawkish‑hold into a live hike‑bias, challenging the “high bar to hiking” expressed by Taylor. Also, any UK labour market numbers showing accelerating wages alongside falling unemployment would tighten the trade‑off powerfully.
+
+CONVICTION: LOW — The input data is critically incomplete. The latest MPC statement is the March meeting (19 March); the April 29‑30 meeting and its minutes are not provided. FRED UK data (CPI, unemployment, gilt yields) are stale and unreliable. All rate‑path and stance conclusions are contingent on the unknown April outcome and the evolution of energy prices over the last six weeks. Once the April minutes and updated market pricing are available, conviction can be raised.

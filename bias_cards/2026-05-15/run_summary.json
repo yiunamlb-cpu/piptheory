@@ -1,0 +1,14 @@
+{
+  "run_date": "2026-05-15",
+  "council_instruments": [
+    "EURUSD",
+    "USDJPY",
+    "GBPUSD",
+    "ES",
+    "NQ",
+    "GC",
+    "CL"
+  ],
+  "total_cost_usd": 0.397652178,
+  "spent_today": 0.397652178
+}

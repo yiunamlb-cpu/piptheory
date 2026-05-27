@@ -1,0 +1,23 @@
+{
+  "NQ": {
+    "verdict": "watch"
+  },
+  "ES": {
+    "verdict": "watch"
+  },
+  "GC": {
+    "verdict": "tradable_now"
+  },
+  "EURUSD": {
+    "verdict": "tradable_now"
+  },
+  "CL": {
+    "verdict": "below_threshold"
+  },
+  "USDJPY": {
+    "verdict": "below_threshold"
+  },
+  "DXY": {
+    "verdict": "pass_despite_bias"
+  }
+}

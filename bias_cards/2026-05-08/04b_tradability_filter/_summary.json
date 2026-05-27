@@ -1,0 +1,26 @@
+{
+  "DXY": {
+    "verdict": "below_threshold"
+  },
+  "ES": {
+    "verdict": "below_threshold"
+  },
+  "USDJPY": {
+    "verdict": "below_threshold"
+  },
+  "CL": {
+    "verdict": "watch"
+  },
+  "NQ": {
+    "verdict": "watch"
+  },
+  "GBPUSD": {
+    "verdict": "below_threshold"
+  },
+  "EURUSD": {
+    "verdict": "watch"
+  },
+  "GC": {
+    "verdict": "watch"
+  }
+}

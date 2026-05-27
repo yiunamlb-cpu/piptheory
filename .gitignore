@@ -57,8 +57,8 @@ state/
 !state/score_history.json
 !state/thesis_tracker.json
 
-# --- Bias cards (agent outputs revealing current positioning thinking) ---
-bias_cards/
+# --- Bias cards (agent outputs — committed so deploys don't wipe data) ---
+# bias_cards/
 
 # --- Trade journal & positions (sensitive trading data) ---
 # These ignore the *runtime data*. The code lives at src/positions/ and

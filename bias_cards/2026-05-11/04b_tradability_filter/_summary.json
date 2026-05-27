@@ -1,0 +1,14 @@
+{
+  "EURUSD": {
+    "verdict": "watch"
+  },
+  "AUDUSD": {
+    "verdict": "below_threshold"
+  },
+  "GC": {
+    "verdict": "watch"
+  },
+  "CL": {
+    "verdict": "watch"
+  }
+}

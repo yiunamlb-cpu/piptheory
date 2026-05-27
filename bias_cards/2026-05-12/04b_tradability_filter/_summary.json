@@ -1,0 +1,26 @@
+{
+  "AUDUSD": {
+    "verdict": "below_threshold"
+  },
+  "GC": {
+    "verdict": "tradable_now"
+  },
+  "NQ": {
+    "verdict": "below_threshold"
+  },
+  "ES": {
+    "verdict": "below_threshold"
+  },
+  "DXY": {
+    "verdict": "below_threshold"
+  },
+  "EURUSD": {
+    "verdict": "pass_despite_bias"
+  },
+  "USDJPY": {
+    "verdict": "below_threshold"
+  },
+  "CL": {
+    "verdict": "watch"
+  }
+}

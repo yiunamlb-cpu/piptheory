@@ -1,0 +1,13 @@
+{
+  "run_date": "2026-05-10",
+  "council_instruments": [
+    "EURUSD",
+    "GBPUSD",
+    "AUDUSD",
+    "NQ",
+    "GC",
+    "CL"
+  ],
+  "total_cost_usd": 0.167003019,
+  "spent_today": 0.167003019
+}

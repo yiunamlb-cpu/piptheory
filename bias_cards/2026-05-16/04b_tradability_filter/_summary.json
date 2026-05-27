@@ -1,0 +1,17 @@
+{
+  "GC": {
+    "verdict": "watch"
+  },
+  "NQ": {
+    "verdict": "below_threshold"
+  },
+  "AUDUSD": {
+    "verdict": "unparseable"
+  },
+  "CL": {
+    "verdict": "watch"
+  },
+  "EURUSD": {
+    "verdict": "tradable_now"
+  }
+}
