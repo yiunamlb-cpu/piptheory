@@ -1,0 +1,736 @@
+{
+  "DXY": [
+    {
+      "date": "2026-05-27",
+      "bias": "short",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-26",
+      "bias": "short",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-16",
+      "bias": "short",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-15",
+      "bias": "long",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-14",
+      "bias": "long",
+      "conviction": 6,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-13",
+      "bias": "short",
+      "conviction": 3,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-12",
+      "bias": "short",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-11",
+      "bias": "short",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-10",
+      "bias": "short",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-09",
+      "bias": "short",
+      "conviction": 3,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-08",
+      "bias": "short",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-07",
+      "bias": "short",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-06",
+      "bias": "short",
+      "conviction": 4,
+      "source": "strategist"
+    }
+  ],
+  "EURUSD": [
+    {
+      "date": "2026-05-27",
+      "bias": "long",
+      "conviction": 7,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-26",
+      "bias": "long",
+      "conviction": 6,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-16",
+      "bias": "long",
+      "conviction": 7,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-15",
+      "bias": "long",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-14",
+      "bias": "long",
+      "conviction": 6,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-13",
+      "bias": "long",
+      "conviction": 6,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-12",
+      "bias": "long",
+      "conviction": 6,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-11",
+      "bias": "long",
+      "conviction": 6,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-10",
+      "bias": "long",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-09",
+      "bias": "long",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-08",
+      "bias": "long",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-07",
+      "bias": "long",
+      "conviction": 6,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-06",
+      "bias": "long",
+      "conviction": 8,
+      "source": "strategist"
+    }
+  ],
+  "USDJPY": [
+    {
+      "date": "2026-05-27",
+      "bias": "short",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-26",
+      "bias": "short",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-16",
+      "bias": "short",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-15",
+      "bias": "long",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-14",
+      "bias": "short",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-13",
+      "bias": "long",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-12",
+      "bias": "short",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-11",
+      "bias": "short",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-10",
+      "bias": "long",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-09",
+      "bias": "long",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-08",
+      "bias": "long",
+      "conviction": 3,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-07",
+      "bias": "long",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-06",
+      "bias": "long",
+      "conviction": 5,
+      "source": "strategist"
+    }
+  ],
+  "GBPUSD": [
+    {
+      "date": "2026-05-27",
+      "bias": "long",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-26",
+      "bias": "no view",
+      "conviction": 2,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-16",
+      "bias": "long",
+      "conviction": 3,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-15",
+      "bias": "long",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-14",
+      "bias": "long",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-13",
+      "bias": "long",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-12",
+      "bias": "long",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-11",
+      "bias": "long",
+      "conviction": 3,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-10",
+      "bias": "short",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-09",
+      "bias": "long",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-08",
+      "bias": "no view",
+      "conviction": 3,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-07",
+      "bias": "long",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-06",
+      "bias": "long",
+      "conviction": 5,
+      "source": "strategist"
+    }
+  ],
+  "AUDUSD": [
+    {
+      "date": "2026-05-27",
+      "bias": "short",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-26",
+      "bias": "short",
+      "conviction": 3,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-16",
+      "bias": "long",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-15",
+      "bias": "short",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-14",
+      "bias": "short",
+      "conviction": 3,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-13",
+      "bias": "long",
+      "conviction": 3,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-12",
+      "bias": "short",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-11",
+      "bias": "no view",
+      "conviction": 3,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-10",
+      "bias": "short",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-09",
+      "bias": "no view",
+      "conviction": 2,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-08",
+      "bias": "short",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-07",
+      "bias": "short",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-06",
+      "bias": "no view",
+      "conviction": 3,
+      "source": "strategist"
+    }
+  ],
+  "ES": [
+    {
+      "date": "2026-05-27",
+      "bias": "long",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-26",
+      "bias": "no view",
+      "conviction": 3,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-16",
+      "bias": "long",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-15",
+      "bias": "no view",
+      "conviction": 2,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-14",
+      "bias": "long",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-13",
+      "bias": "short",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-12",
+      "bias": "short",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-11",
+      "bias": "long",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-10",
+      "bias": "long",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-09",
+      "bias": "short",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-08",
+      "bias": "short",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-07",
+      "bias": "long",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-06",
+      "bias": "long",
+      "conviction": 4,
+      "source": "strategist"
+    }
+  ],
+  "NQ": [
+    {
+      "date": "2026-05-27",
+      "bias": "long",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-26",
+      "bias": "short",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-16",
+      "bias": "short",
+      "conviction": 3,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-15",
+      "bias": "long",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-14",
+      "bias": "long",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-13",
+      "bias": "long",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-12",
+      "bias": "long",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-11",
+      "bias": "long",
+      "conviction": 4,
+      "source": "strategist"
+    },
+    {
+      "date": "2026-05-10",
+      "bias": "no view",
+      "conviction": 3,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-09",
+      "bias": "long",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-08",
+      "bias": "long",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-07",
+      "bias": "no view",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-06",
+      "bias": "long",
+      "conviction": 5,
+      "source": "strategist"
+    }
+  ],
+  "GC": [
+    {
+      "date": "2026-05-27",
+      "bias": "long",
+      "conviction": 6,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-26",
+      "bias": "long",
+      "conviction": 7,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-16",
+      "bias": "long",
+      "conviction": 7,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-15",
+      "bias": "long",
+      "conviction": 7,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-14",
+      "bias": "long",
+      "conviction": 8,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-13",
+      "bias": "long",
+      "conviction": 7,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-12",
+      "bias": "long",
+      "conviction": 7,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-11",
+      "bias": "long",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-10",
+      "bias": "long",
+      "conviction": 6,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-09",
+      "bias": "long",
+      "conviction": 7,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-08",
+      "bias": "long",
+      "conviction": 7,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-07",
+      "bias": "long",
+      "conviction": 6,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-06",
+      "bias": "long",
+      "conviction": 9,
+      "source": "strategist"
+    }
+  ],
+  "CL": [
+    {
+      "date": "2026-05-27",
+      "bias": "long",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-26",
+      "bias": "long",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-16",
+      "bias": "long",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-15",
+      "bias": "long",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-14",
+      "bias": "long",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-13",
+      "bias": "long",
+      "conviction": 6,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-12",
+      "bias": "long",
+      "conviction": 6,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-11",
+      "bias": "long",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-10",
+      "bias": "long",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-09",
+      "bias": "long",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-08",
+      "bias": "long",
+      "conviction": 6,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-07",
+      "bias": "long",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-06",
+      "bias": "long",
+      "conviction": 7,
+      "source": "strategist"
+    }
+  ],
+  "ZN": [
+    {
+      "date": "2026-05-07",
+      "bias": "no view",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
+      "date": "2026-05-06",
+      "bias": "long",
+      "conviction": 5,
+      "source": "strategist"
+    }
+  ]
+}

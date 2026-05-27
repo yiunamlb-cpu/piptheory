@@ -1,0 +1,854 @@
+{
+  "DXY": {
+    "history": [
+      {
+        "date": "2026-05-27",
+        "drivers": [
+          "ECB Hawkish Pivot (Theme 2) \u2014 rate differential compression",
+          "Fed Stuck-at-Neutral (Theme 3) \u2014 path less hawkish than ECB"
+        ]
+      },
+      {
+        "date": "2026-05-26",
+        "drivers": [
+          "ECB Hawkish Pivot (rate differential compressing against USD)",
+          "Fed Stuck-at-Neutral (path less hawkish than peers)"
+        ]
+      },
+      {
+        "date": "2026-05-16",
+        "drivers": [
+          "Theme\u202f2 (ECB Hawkish Pivot) \u2014 EUR strength weighs on DXY",
+          "Theme\u202f3 (Fed Stuck\u2011at\u2011Neutral) \u2014 rate\u2011differential compression vs. ECB; Iran safe\u2011haven bid provides offset"
+        ]
+      },
+      {
+        "date": "2026-05-15",
+        "drivers": [
+          "Fed Stuck\u2011at\u2011Neutral, Skewed\u2011to\u2011Hike (Theme\u202f3) \u2013 if CPI forces Fed hawkish drift, DXY benefits",
+          "Energy\u2011Driven Reflation (Theme\u202f1) \u2013 safe\u2011haven bid from Iran conflict supports USD against risk\u2011sensitive pairs, but also amplifies ECB hawkishness (bearish USD)"
+        ]
+      },
+      {
+        "date": "2026-05-14",
+        "drivers": [
+          "Fed Dovish Pivot (new, not in THEMES.md; derived from Fed-Watcher) \u2014 bearish USD",
+          "ECB Hawkish Pivot (Theme 2) \u2014 bearish USD; Iran safe-haven bid (Theme 1) \u2014 bullish USD, offsetting"
+        ]
+      },
+      {
+        "date": "2026-05-13",
+        "drivers": [
+          "ECB Hawkish Pivot (Theme 2) \u2014 bearish DXY via EUR strength",
+          "Fed Stuck-at-Neutral (Theme 3) \u2014 ambiguous; safe-haven bid from Iran (Theme 1) provides offsetting support"
+        ]
+      },
+      {
+        "date": "2026-05-12",
+        "drivers": [
+          "Theme\u202f2 (ECB Hawkish Pivot) \u2014 bearish USD via EUR\u2011rate\u2011differential compression",
+          "Theme\u202f3 (Fed Stuck\u2011at\u2011Neutral) \u2014 but today\u2019s Fed\u2011Watcher flags an explicit easing bias, softening the \u201cskewed\u2011to\u2011hike\u201d narrative"
+        ]
+      },
+      {
+        "date": "2026-05-11",
+        "drivers": [
+          "Theme 2 \u2013 ECB Hawkish Pivot (bullish EUR \u2192 DXY headwind)",
+          "Theme 3 \u2013 Fed Stuck\u2011at\u2011Neutral (dovish\u2011hold bias now confirmed, eroding dollar\u2011supportive rate differential)"
+        ]
+      },
+      {
+        "date": "2026-05-10",
+        "drivers": [
+          "Theme 2 \u2013 ECB Hawkish Pivot (EUR strength weighs on DXY)",
+          "Theme 3 \u2013 Fed Stuck\u2011at\u2011Neutral (compression of rate\u2011differential vs. DXY basket)"
+        ]
+      },
+      {
+        "date": "2026-05-09",
+        "drivers": [
+          "Theme 2 \u2014 ECB Hawkish Pivot (rate differential compression bearish USD)",
+          "Theme 1 \u2014 Energy\u2011Driven Reflation (safe\u2011haven bid supportive; net mixed)"
+        ]
+      },
+      {
+        "date": "2026-05-08",
+        "drivers": [
+          "Theme 2 (ECB Hawkish Pivot) \u2013 EUR strength = DXY weakness",
+          "Theme 3 (Fed Stuck\u2011at\u2011Neutral) \u2013 rate\u2011differential decay vs. ECB; offset by Iran safe\u2011haven bid"
+        ]
+      },
+      {
+        "date": "2026-05-07",
+        "drivers": [
+          "Theme 2 (ECB hawkish pivot) \u2013 EUR strength weighs on DXY",
+          "Theme 3 (Fed stuck\u2011at\u2011neutral) \u2013 limits USD upside; Theme 1 (energy\u2011driven reflation) \u2013 safe\u2011haven bid supports DXY, creating two\u2011way pull"
+        ]
+      },
+      {
+        "date": "2026-05-06",
+        "drivers": [
+          "ECB Hawkish Pivot (bearish USD)",
+          "Fed Stuck\u2011at\u2011Neutral (neutral, but relative hawkish decay)"
+        ]
+      }
+    ]
+  },
+  "EURUSD": {
+    "history": [
+      {
+        "date": "2026-05-27",
+        "drivers": [
+          "ECB Hawkish Pivot (Theme 2) \u2014 June hike priced, rate differential compression",
+          "Energy-Driven Reflation (Theme 1) \u2014 ECB forced to hike, Fed stuck"
+        ]
+      },
+      {
+        "date": "2026-05-26",
+        "drivers": [
+          "ECB Hawkish Pivot (rate differential compressing against USD)",
+          "Fed Stuck-at-Neutral (path less hawkish than peers)"
+        ]
+      },
+      {
+        "date": "2026-05-16",
+        "drivers": [
+          "Theme\u202f2 (ECB Hawkish Pivot) \u2014 ECB hike path > Fed, compressing rate differential",
+          "Theme\u202f1 (Energy\u2011Driven Reflation) \u2014 reinforces ECB hawkishness"
+        ]
+      },
+      {
+        "date": "2026-05-15",
+        "drivers": [
+          "ECB Hawkish Pivot (Theme\u202f2) \u2013 ECB on track for June hike, rate\u2011differential compression vs Fed",
+          "Energy\u2011Driven Reflation (Theme\u202f1) \u2013 Energy shock feeds eurozone inflation harder, reinforcing ECB urgency, while Fed is initially slower to react"
+        ]
+      },
+      {
+        "date": "2026-05-14",
+        "drivers": [
+          "ECB Hawkish Pivot (Theme 2) \u2014 bullish EUR",
+          "Fed Dovish Pivot (new) \u2014 bullish EURUSD via rate differential compression"
+        ]
+      },
+      {
+        "date": "2026-05-13",
+        "drivers": [
+          "ECB Hawkish Pivot (Theme 2) \u2014 widening rate differential in EUR\u2019s favor",
+          "Energy-Driven Reflation (Theme 1) \u2014 amplifies ECB hawkishness via energy-cost pass-through"
+        ]
+      },
+      {
+        "date": "2026-05-12",
+        "drivers": [
+          "Theme\u202f2 (ECB Hawkish Pivot) \u2014 unambiguous hiking bias with near\u2011certainty of a June hike",
+          "Theme\u202f3 (Fed Stuck\u2011at\u2011Neutral) \u2014 easing bias + downbeat inflation dynamics \u2192 rate\u2011differential compression in EUR\u2019s favour"
+        ]
+      },
+      {
+        "date": "2026-05-11",
+        "drivers": [
+          "Theme 2 \u2013 ECB Hawkish Pivot (rate\u2011path convergence favours EUR)",
+          "Theme 3 \u2013 Fed Dovish Hold (easing bias reinforces USD underperformance)"
+        ]
+      },
+      {
+        "date": "2026-05-10",
+        "drivers": [
+          "Theme 2 \u2013 ECB Hawkish Pivot (bullish EUR via rate\u2011differential compression)",
+          "Theme 1 \u2013 Energy\u2011Driven Reflation (supports ECB hiking path)"
+        ]
+      },
+      {
+        "date": "2026-05-09",
+        "drivers": [
+          "Theme 2 \u2014 ECB Hawkish Pivot (ECB hiking, rate differential narrowing)",
+          "Theme 1 \u2014 Energy\u2011Driven Reflation (lifts EUR via energy\u2011importing inflation forcing ECB)"
+        ]
+      },
+      {
+        "date": "2026-05-08",
+        "drivers": [
+          "Theme 2 (ECB Hawkish Pivot) \u2013 June hike all but inevitable, ECB path exceeds Fed\u2019s stall",
+          "Theme 1 (Energy\u2011Driven Reflation) \u2013 reinforces ECB urgency; also Theme 3 (Fed Stuck) relative hawkishness gap narrows"
+        ]
+      },
+      {
+        "date": "2026-05-07",
+        "drivers": [
+          "Theme 2 (ECB hawkish pivot) \u2013 rate differential compression favors EUR",
+          "Theme 1 (energy\u2011driven reflation) \u2013 ECB forced to hike, widening EUR\u2011USD rate spread"
+        ]
+      },
+      {
+        "date": "2026-05-06",
+        "drivers": [
+          "ECB Hawkish Pivot (ECB hike path > Fed)",
+          "Energy\u2011Driven Reflation (fuels ECB urgency)"
+        ]
+      }
+    ]
+  },
+  "USDJPY": {
+    "history": [
+      {
+        "date": "2026-05-27",
+        "drivers": [
+          "Fed Stuck-at-Neutral (Theme 3) \u2014 but BoJ hawkish tilt challenges the \"Fed > BoJ\" assumption",
+          "(none directly; theme map says \"BoJ stuck\" which is outdated \u2014 see contradictions)"
+        ]
+      },
+      {
+        "date": "2026-05-26",
+        "drivers": [
+          "ECB Hawkish Pivot (rate differential compressing against USD)",
+          "Fed Stuck-at-Neutral (path less hawkish than peers)"
+        ]
+      },
+      {
+        "date": "2026-05-16",
+        "drivers": [
+          "Theme\u202f3 (Fed Stuck) vs. BoJ hike\u2011bias \u2014 rate differential may narrow",
+          "Iran risk\u2011off could boost JPY safe\u2011haven demand"
+        ]
+      },
+      {
+        "date": "2026-05-15",
+        "drivers": [
+          "Fed Stuck\u2011at\u2011Neutral, Skewed\u2011to\u2011Hike (Theme\u202f3) \u2013 wide rate differential (UST 4.46% vs JGB 2.345%) favours carry",
+          "BoJ Hawkish Pivot (emergent, not yet in THEMES.md but flagged by BoJ\u2011Watcher output) \u2013 rising JGB yields would slowly erode the carry advantage; currently offset by still\u2011wide spread"
+        ]
+      },
+      {
+        "date": "2026-05-14",
+        "drivers": [
+          "Fed Dovish Pivot (new) \u2014 bearish USDJPY via narrowing rate spread",
+          "BoJ Hawkish Skew (new, derived from BoJ specialist) \u2014 bearish USDJPY; intervention risk (two-way) adds uncertainty"
+        ]
+      },
+      {
+        "date": "2026-05-13",
+        "drivers": [
+          "Fed Stuck-at-Neutral (Theme 3) \u2014 US rates higher than BoJ, carry trade attractive",
+          "BoJ Hawkish Dissent (not a full theme, but emerging risk) \u2014 could narrow rate differential"
+        ]
+      },
+      {
+        "date": "2026-05-12",
+        "drivers": [
+          "BoJ Hawkish Drift (emerging, not yet a full THEMES.md theme) \u2014 internal dissent and near\u2011certain June hike adding Yen\u2011strengthening pressure",
+          "Theme\u202f3 (Fed dovish hold) \u2014 if US rate expectations soften, carry trade attractiveness wanes"
+        ]
+      },
+      {
+        "date": "2026-05-11",
+        "drivers": [
+          "Theme 3 \u2013 Fed Dovish Hold (easing bias reduces rate\u2011advantage support for USDJPY)",
+          "BoJ Hike Bias (fresh dissent; market already pricing 1.0%+ \u2014 narrowing US\u2011JP rate differential)",
+          "(Note: THEMES.md had a bullish USDJPY bias predicated on Fed>BoJ; the April FOMC statement shifts the framework, making this a two\u2011way risk.)"
+        ]
+      },
+      {
+        "date": "2026-05-10",
+        "drivers": [
+          "Theme 3 \u2013 Fed Stuck\u2011at\u2011Neutral / Skewed\u2011to\u2011Hike (rate differential supports USD)",
+          "Theme 1 \u2013 Energy\u2011Driven Reflation (higher global yields widen differential vs. BoJ)"
+        ]
+      },
+      {
+        "date": "2026-05-09",
+        "drivers": [
+          "Theme 3 \u2014 Fed Stuck\u2011at\u2011Neutral (US rates still far above Japan\u2019s)",
+          "Theme 1 \u2014 Energy\u2011Driven Reflation (higher global yields widen carry advantage for USD)"
+        ]
+      },
+      {
+        "date": "2026-05-08",
+        "drivers": [
+          "Theme 3 (Fed Stuck\u2011at\u2011Neutral) \u2013 US yields relatively firm vs. BoJ\u2019s YCC; modest carry support",
+          "Theme 1 (Energy\u2011Driven Reflation) \u2013 global yields higher, BoJ cannot follow, widens differential"
+        ]
+      },
+      {
+        "date": "2026-05-07",
+        "drivers": [
+          "Theme 3 (Fed stuck\u2011at\u2011neutral, skewed\u2011to\u2011hike) \u2013 US rates higher than Japan, carry advantage",
+          "Theme 1 (energy shock) \u2013 higher oil prices hurt Japan\u2019s terms of trade, JPY negative"
+        ]
+      },
+      {
+        "date": "2026-05-06",
+        "drivers": [
+          "Fed Stuck\u2011at\u2011Neutral (US yields remain elevated vs. BoJ\u2019s YCC)",
+          "none directly; indirect energy\u2011cost drag on Japan adds a mild bearish JPY undertone"
+        ]
+      }
+    ]
+  },
+  "GBPUSD": {
+    "history": [
+      {
+        "date": "2026-05-27",
+        "drivers": [
+          "(none explicitly; BoE similar to ECB but weaker conviction)",
+          "Energy-Driven Reflation (Theme 1) \u2014 BoE forced to hold/hike"
+        ]
+      },
+      {
+        "date": "2026-05-26",
+        "drivers": [
+          "ECB Hawkish Pivot (rate differential compressing against USD)",
+          "Fed Stuck-at-Neutral (path less hawkish than peers)"
+        ]
+      },
+      {
+        "date": "2026-05-16",
+        "drivers": [
+          "BoE in similar boat to ECB (hawkish hold) \u2014 but conviction weak due to missing data"
+        ]
+      },
+      {
+        "date": "2026-05-15",
+        "drivers": [
+          "ECB Hawkish Pivot (Theme\u202f2) \u2013 BoE is in a similar position; energy\u2011driven inflation pressure keeps them hiking, albeit with lower conviction than ECB",
+          "Energy\u2011Driven Reflation (Theme\u202f1) \u2013 lifts UK inflation, forces restrictive hold/tightening"
+        ]
+      },
+      {
+        "date": "2026-05-14",
+        "drivers": [
+          "Fed Dovish Pivot (new) \u2014 bullish GBPUSD via USD weakness",
+          "BoE conditional hawkish hold (stale) \u2014 slight bullish GBP if energy shock persists"
+        ]
+      },
+      {
+        "date": "2026-05-13",
+        "drivers": [
+          "ECB Hawkish Pivot (Theme 2) spillover \u2014 BoE likely to follow hawkish path, but conviction lower",
+          "Fed Stuck-at-Neutral (Theme 3) \u2014 USD softness"
+        ]
+      },
+      {
+        "date": "2026-05-12",
+        "drivers": [
+          "Theme\u202f2/Piggyback (ECB hawkish pivot) \u2014 Euro\u2011zone tightening and Fed easing bias create a broad USD\u2011weakness backdrop; GBP may benefit as a tailcoat"
+        ]
+      },
+      {
+        "date": "2026-05-11",
+        "drivers": [
+          "Theme 2 \u2013 ECB Hawkish Pivot (spill\u2011over to BoE via energy\u2011inflation, but UK path less certain)",
+          "None clearly defined; UK austerity/energy mix keeps BoE ambiguous"
+        ]
+      },
+      {
+        "date": "2026-05-10",
+        "drivers": [
+          "Theme 1 \u2013 Energy\u2011Driven Reflation (global reflation lifts BoE rate\u2011expectations, supports GBP)",
+          "none specifically tracked for BoE, but ECB\u2011style hawkish drift plausible given energy shock"
+        ]
+      },
+      {
+        "date": "2026-05-09",
+        "drivers": [
+          "Theme 2 \u2014 ECB Hawkish Pivot (spillover to BoE expected to follow hawkish path, narrowing differential vs USD)"
+        ]
+      },
+      {
+        "date": "2026-05-08",
+        "drivers": [
+          "Mirror of ECB hawkish pivot (BoE in similar reflation boat) \u2013 steady to slightly hawkish BoE vs. stuck Fed",
+          "Theme 1 (Energy\u2011Driven Reflation) \u2013 BoE will have to remain tight"
+        ]
+      },
+      {
+        "date": "2026-05-07",
+        "drivers": [
+          "Theme 2 (ECB hawkish pivot) \u2013 spillover to BoE; UK also facing energy\u2011driven inflation, BoE likely to hold or hike, supporting GBP",
+          "None clear"
+        ]
+      },
+      {
+        "date": "2026-05-06",
+        "drivers": [
+          "ECB Hawkish Pivot (BoE similarly hawkish; UK energy imports make inflation sticky)"
+        ]
+      }
+    ]
+  },
+  "AUDUSD": {
+    "history": [
+      {
+        "date": "2026-05-27",
+        "drivers": [
+          "China Deflationary Quagmire (Theme 4) \u2014 bearish via demand channel",
+          "Energy-Driven Reflation (Theme 1) \u2014 RBA hiking supports AUD, but positioning overrides"
+        ]
+      },
+      {
+        "date": "2026-05-26",
+        "drivers": [
+          "ECB Hawkish Pivot (rate differential compressing against USD)",
+          "Fed Stuck-at-Neutral (path less hawkish than peers)"
+        ]
+      },
+      {
+        "date": "2026-05-16",
+        "drivers": [
+          "Theme\u202f4 (China Deflationary Quagmire) \u2014 bearish AUD demand channel",
+          "Theme\u202f1 (RBA hiking) \u2014 bullish AUD, but overwhelmed by positioning extreme"
+        ]
+      },
+      {
+        "date": "2026-05-15",
+        "drivers": [
+          "China Deflationary Quagmire (Theme\u202f4) \u2013 structural headwind for Australian exports",
+          "Energy\u2011Driven Reflation (Theme\u202f1) \u2013 RBA hiking supports AUD, but that is secondary to China demand"
+        ]
+      },
+      {
+        "date": "2026-05-14",
+        "drivers": [
+          "China Deflationary Quagmire (Theme 4) \u2014 bearish AUD",
+          "Energy-Driven Reflation / RBA Hiking (Theme 1) \u2014 bullish AUD; Fed Dovish Pivot \u2014 bullish AUD (risk appetite)"
+        ]
+      },
+      {
+        "date": "2026-05-13",
+        "drivers": [
+          "China Deflationary Quagmire (Theme 4) \u2014 bearish AUD via demand channel",
+          "Energy-Driven Reflation (Theme 1) \u2014 bullish AUD via RBA hiking, but conflicting"
+        ]
+      },
+      {
+        "date": "2026-05-12",
+        "drivers": [
+          "Theme\u202f4 (China Deflation) \u2014 structural headwind for Australian exports",
+          "Crowded positioning contra\u2011signal (not a theme per se, but a dominant near\u2011term factor)"
+        ]
+      },
+      {
+        "date": "2026-05-11",
+        "drivers": [
+          "Theme 4 \u2013 China Deflationary Quagmire (bearish AUD via demand channel)",
+          "Contra\u2011signal from Positioning (extreme crowded long)"
+        ]
+      },
+      {
+        "date": "2026-05-10",
+        "drivers": [
+          "Positioning contra\u2011signal (extreme crowded long = bearish; not a structural theme but a tactical driver)",
+          "Theme 4 \u2013 China Deflationary Quagmire (bearish AUD via demand channel)"
+        ]
+      },
+      {
+        "date": "2026-05-09",
+        "drivers": [
+          "Theme 4 \u2014 China Deflationary Quagmire (bearish AUD)",
+          "Theme 1 \u2014 RBA hiking (bullish) \u2014 cross\u2011currents neutralize direction"
+        ]
+      },
+      {
+        "date": "2026-05-08",
+        "drivers": [
+          "Theme 1 (Energy\u2011Driven Reflation) \u2013 RBA hiking (bullish AUD)"
+        ]
+      },
+      {
+        "date": "2026-05-07",
+        "drivers": [
+          "Theme 4 (China deflationary quagmire) \u2013 bearish for AUD via demand channel",
+          "Positioning contra\u2011signal (see below)"
+        ]
+      },
+      {
+        "date": "2026-05-06",
+        "drivers": [
+          "(bullish): Energy\u2011Driven Reflation \u2192 RBA hiking (three consecutive hikes)",
+          "(bearish): China Deflationary Quagmire \u2192 demand drag on Australian exports",
+          "Weight of the two themes is almost equal; hence \u201cmixed\u201d per THEMES.md instrument bias map"
+        ]
+      }
+    ]
+  },
+  "ES": {
+    "history": [
+      {
+        "date": "2026-05-27",
+        "drivers": [
+          "AI Capex as Equity Anchor (Theme 5) \u2014 supports dips",
+          "Energy-Driven Reflation (Theme 1) \u2014 caps upside via stagflation headwinds"
+        ]
+      },
+      {
+        "date": "2026-05-26",
+        "drivers": [
+          "ECB Hawkish Pivot (rate differential compressing against USD)",
+          "Fed Stuck-at-Neutral (path less hawkish than peers)"
+        ]
+      },
+      {
+        "date": "2026-05-16",
+        "drivers": [
+          "Theme\u202f5 (AI Capex as Equity Anchor) \u2014 structural bid",
+          "Theme\u202f1 (Energy\u2011Driven Reflation) \u2014 caps upside via margin pressure and rate fears"
+        ]
+      },
+      {
+        "date": "2026-05-15",
+        "drivers": [
+          "AI Capex as Equity Anchor (Theme\u202f5) \u2013 structural bid that keeps ES supported",
+          "(None; the inflation/oil shock is a headwind, not a driver of upside.)"
+        ]
+      },
+      {
+        "date": "2026-05-14",
+        "drivers": [
+          "AI Capex as Equity Anchor (Theme 5) \u2014 bullish",
+          "Fed Dovish Pivot (new) \u2014 bullish (lower rates); Energy-Driven Reflation (Theme 1) \u2014 bearish (margin pressure, stagflation)"
+        ]
+      },
+      {
+        "date": "2026-05-13",
+        "drivers": [
+          "AI Capex as Equity Anchor (Theme 5) \u2014 structural bid",
+          "Fed Stuck-at-Neutral (Theme 3) \u2014 no imminent hike, supportive for equities"
+        ]
+      },
+      {
+        "date": "2026-05-12",
+        "drivers": [
+          "Theme\u202f5 (AI Capex) \u2014 structural bid for US equities, especially large\u2011cap tech",
+          "Theme\u202f1 (Energy\u2011Driven Reflation) \u2014 caps upside via margin compression and possible Fed hawkishness"
+        ]
+      },
+      {
+        "date": "2026-05-11",
+        "drivers": [
+          "Theme 5 \u2013 AI Capex Anchor",
+          "No clear second theme; Fed easing bias could support, but not yet confirmed"
+        ]
+      },
+      {
+        "date": "2026-05-10",
+        "drivers": [
+          "Theme 5 \u2013 AI Capex as Equity Anchor (anchors equity bid)",
+          "Theme 1 \u2013 Energy\u2011Driven Reflation (caps upside via cost\u2011push and rates sensitivity)"
+        ]
+      },
+      {
+        "date": "2026-05-09",
+        "drivers": [
+          "Theme 5 \u2014 AI Capex as Equity Anchor",
+          "Theme 1 \u2014 Energy\u2011Driven Reflation (capping upside via margin pressure/oil spike)"
+        ]
+      },
+      {
+        "date": "2026-05-08",
+        "drivers": [
+          "Theme 5 (AI Capex as Equity Anchor) \u2013 structural bid for US equities, spreads beyond tech"
+        ]
+      },
+      {
+        "date": "2026-05-07",
+        "drivers": [
+          "Theme 5 (AI capex as equity anchor) \u2013 structural bid",
+          "Theme 1 (energy\u2011driven reflation) \u2013 caps upside via margin pressure and rate fears"
+        ]
+      },
+      {
+        "date": "2026-05-06",
+        "drivers": [
+          "AI Capex as Equity Anchor (buy dips)",
+          "Energy\u2011Driven Reflation (capping upside via higher rates)"
+        ]
+      }
+    ]
+  },
+  "NQ": {
+    "history": [
+      {
+        "date": "2026-05-27",
+        "drivers": [
+          "AI Capex as Equity Anchor (Theme 5) \u2014 most direct expression",
+          "Energy-Driven Reflation (Theme 1) \u2014 headwind via duration sensitivity"
+        ]
+      },
+      {
+        "date": "2026-05-26",
+        "drivers": [
+          "ECB Hawkish Pivot (rate differential compressing against USD)",
+          "Fed Stuck-at-Neutral (path less hawkish than peers)"
+        ]
+      },
+      {
+        "date": "2026-05-16",
+        "drivers": [
+          "Theme\u202f5 (AI Capex) \u2014 most direct expression",
+          "Theme\u202f1 (Energy Reflation) \u2014 caps upside, but NQ less energy\u2011sensitive than ES"
+        ]
+      },
+      {
+        "date": "2026-05-15",
+        "drivers": [
+          "AI Capex as Equity Anchor (Theme\u202f5) \u2013 NQ is the most direct beneficiary of the AI infrastructure buildout",
+          "(None)"
+        ]
+      },
+      {
+        "date": "2026-05-14",
+        "drivers": [
+          "AI Capex as Equity Anchor (Theme 5) \u2014 most direct expression",
+          "Fed Dovish Pivot (new) \u2014 bullish for duration-sensitive tech"
+        ]
+      },
+      {
+        "date": "2026-05-13",
+        "drivers": [
+          "AI Capex as Equity Anchor (Theme 5) \u2014 most direct expression",
+          "Fed Stuck-at-Neutral (Theme 3) \u2014 supportive"
+        ]
+      },
+      {
+        "date": "2026-05-12",
+        "drivers": [
+          "Theme\u202f5 (AI Capex) \u2014 most direct equity expression",
+          "Theme\u202f3 (Fed easing bias) \u2014 lower rate expectations benefit long\u2011duration growth equities"
+        ]
+      },
+      {
+        "date": "2026-05-11",
+        "drivers": [
+          "Theme 5 \u2013 AI Capex Anchor (most direct expression)"
+        ]
+      },
+      {
+        "date": "2026-05-10",
+        "drivers": [
+          "Theme 5 \u2013 AI Capex as Equity Anchor (most direct expression via tech)",
+          "Theme 1 \u2013 Energy\u2011Driven Reflation (caps upside, particularly for long\u2011duration tech)"
+        ]
+      },
+      {
+        "date": "2026-05-09",
+        "drivers": [
+          "Theme 5 \u2014 AI Capex"
+        ]
+      },
+      {
+        "date": "2026-05-08",
+        "drivers": [
+          "Theme 5 (AI Capex) \u2013 NQ the most direct equity expression"
+        ]
+      },
+      {
+        "date": "2026-05-07",
+        "drivers": [
+          "Theme 5 (AI capex) \u2013 NQ is the most direct expression"
+        ]
+      },
+      {
+        "date": "2026-05-06",
+        "drivers": [
+          "AI Capex as Equity Anchor (NQ is the most direct expression)",
+          "Energy\u2011Driven Reflation (same cap as ES, but AI may be more resilient to energy\u2011intensive industries)"
+        ]
+      }
+    ]
+  },
+  "GC": {
+    "history": [
+      {
+        "date": "2026-05-27",
+        "drivers": [
+          "Energy-Driven Reflation (Theme 1) \u2014 inflation hedge",
+          "China Deflationary Quagmire (Theme 4) \u2014 PBoC buying, store-of-value bid",
+          "Geopolitical risk (Iran tail)"
+        ]
+      },
+      {
+        "date": "2026-05-26",
+        "drivers": [
+          "ECB Hawkish Pivot (rate differential compressing against USD)",
+          "Fed Stuck-at-Neutral (path less hawkish than peers)"
+        ]
+      },
+      {
+        "date": "2026-05-16",
+        "drivers": [
+          "Theme\u202f1 (Energy\u2011Driven Reflation) \u2014 inflation hedge",
+          "Theme\u202f4 (China Deflation) \u2014 PBoC buying, store\u2011of\u2011value bid; Iran safe\u2011haven tail"
+        ]
+      },
+      {
+        "date": "2026-05-15",
+        "drivers": [
+          "Energy\u2011Driven Reflation (Theme\u202f1) \u2013 inflation hedge demand",
+          "China Deflationary Quagmire (Theme\u202f4) \u2013 PBoC gold buying; global deflation fear supports store\u2011of\u2011value",
+          "(2):** Policy uncertainty / geopolitical tail (Iran, Theme\u202f1\u2011adjacent)"
+        ]
+      },
+      {
+        "date": "2026-05-14",
+        "drivers": [
+          "Energy-Driven Reflation (Theme 1) \u2014 inflation hedge",
+          "China Deflationary Quagmire (Theme 4) \u2014 PBoC buying, store of value; Fed Dovish Pivot (new) \u2014 lower real yields; Geopolitical uncertainty (Iran)"
+        ]
+      },
+      {
+        "date": "2026-05-13",
+        "drivers": [
+          "Energy-Driven Reflation (Theme 1) \u2014 inflation hedge",
+          "China Deflationary Quagmire (Theme 4) \u2014 PBoC buying, store-of-value bid; Fed Stuck (Theme 3) \u2014 real yields not rising aggressively"
+        ]
+      },
+      {
+        "date": "2026-05-12",
+        "drivers": [
+          "Theme\u202f1 (Energy\u2011Driven Reflation) \u2014 inflation uncertainty + geopolitical premium",
+          "Theme\u202f4 (China Deflation) \u2014 PBoC gold buying, store\u2011of\u2011value bid"
+        ]
+      },
+      {
+        "date": "2026-05-11",
+        "drivers": [
+          "Theme 1 \u2013 Energy\u2011Driven Reflation (inflation hedge)",
+          "Theme 4 \u2013 China Deflationary Quagmire (PBoC buying, store\u2011of\u2011value bid); Geopolitical Risk premium"
+        ]
+      },
+      {
+        "date": "2026-05-10",
+        "drivers": [
+          "Theme 1 \u2013 Energy\u2011Driven Reflation (inflation hedge, stagflation bid)",
+          "Theme 4 \u2013 China Deflationary Quagmire (PBoC gold buying, store\u2011of\u2011value demand) + geopolitical Iran tail"
+        ]
+      },
+      {
+        "date": "2026-05-09",
+        "drivers": [
+          "Theme 1 \u2014 Energy\u2011Driven Reflation (inflation hedge)",
+          "Theme 4 \u2014 China Deflationary Quagmire (PBoC buying, store\u2011of\u2011value bid)"
+        ]
+      },
+      {
+        "date": "2026-05-08",
+        "drivers": [
+          "Theme 1 (Energy\u2011Driven Reflation) \u2013 inflation hedge demand",
+          "Theme 4 (China Deflation) \u2013 PBoC gold buying, store of value; also Theme 3 (Fed Stuck) \u2013 policy uncertainty premium"
+        ]
+      },
+      {
+        "date": "2026-05-07",
+        "drivers": [
+          "Theme 1 (energy\u2011driven reflation) \u2013 inflation hedge",
+          "Theme 4 (China deflation) \u2013 PBoC buying, store\u2011of\u2011value bid; Iran geopolitical tail (unconfirmed)"
+        ]
+      },
+      {
+        "date": "2026-05-06",
+        "drivers": [
+          "Energy\u2011Driven Reflation (inflation hedge, stagflation)",
+          "China Deflationary Quagmire (PBoC buying, store\u2011of\u2011value bid)",
+          "Geopolitical uncertainty (Iran tail risk)"
+        ]
+      }
+    ]
+  },
+  "CL": {
+    "history": [
+      {
+        "date": "2026-05-27",
+        "drivers": [
+          "Energy-Driven Reflation (Theme 1) \u2014 direct expression"
+        ]
+      },
+      {
+        "date": "2026-05-26",
+        "drivers": [
+          "ECB Hawkish Pivot (rate differential compressing against USD)",
+          "Fed Stuck-at-Neutral (path less hawkish than peers)"
+        ]
+      },
+      {
+        "date": "2026-05-16",
+        "drivers": [
+          "Theme\u202f1 (Energy\u2011Driven Reflation) \u2014 direct expression"
+        ]
+      },
+      {
+        "date": "2026-05-15",
+        "drivers": [
+          "Energy\u2011Driven Reflation (Theme\u202f1) \u2013 Iran conflict underlays structural supply risk"
+        ]
+      },
+      {
+        "date": "2026-05-14",
+        "drivers": [
+          "Energy-Driven Reflation (Theme 1) \u2014 directly bullish"
+        ]
+      },
+      {
+        "date": "2026-05-13",
+        "drivers": [
+          "Energy-Driven Reflation (Theme 1) \u2014 direct expression",
+          "Geopolitical risk premium (Iran)"
+        ]
+      },
+      {
+        "date": "2026-05-12",
+        "drivers": [
+          "Theme\u202f1 (Energy\u2011Driven Reflation) \u2014 structural supply risk from Iran conflict"
+        ]
+      },
+      {
+        "date": "2026-05-11",
+        "drivers": [
+          "Theme 1 \u2013 Energy\u2011Driven Reflation"
+        ]
+      },
+      {
+        "date": "2026-05-10",
+        "drivers": [
+          "Theme 1 \u2013 Energy\u2011Driven Reflation (supply\u2011side disruption from Iran/Middle East conflict)"
+        ]
+      },
+      {
+        "date": "2026-05-09",
+        "drivers": [
+          "Theme 1 \u2014 Energy\u2011Driven Reflation (supply disruption premium)"
+        ]
+      },
+      {
+        "date": "2026-05-08",
+        "drivers": [
+          "Theme 1 (Energy\u2011Driven Reflation) \u2013 Iran/Middle East supply risk keeps structural bid"
+        ]
+      },
+      {
+        "date": "2026-05-07",
+        "drivers": [
+          "Theme 1 (energy\u2011driven reflation) \u2013 structural bid from Iran/Middle East"
+        ]
+      },
+      {
+        "date": "2026-05-06",
+        "drivers": [
+          "Energy\u2011Driven Reflation (directly)",
+          "Geopolitical (Iran supply risk)"
+        ]
+      }
+    ]
+  },
+  "ZN": {
+    "history": [
+      {
+        "date": "2026-05-06",
+        "drivers": [
+          "Energy\u2011Driven Reflation (inflation keeps yields elevated)",
+          "Fed Stuck\u2011at\u2011Neutral (no cuts, upside yield risk)",
+          "ECB Hawkish Pivot (global yields rising, spillover)"
+        ]
+      }
+    ]
+  }
+}
