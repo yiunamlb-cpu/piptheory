@@ -6,6 +6,7 @@ calls fredapi directly.
 """
 from __future__ import annotations
 
+import os
 import pickle
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -110,12 +111,14 @@ class FredClient:
     or `raw_series('CPIAUCSL')` for arbitrary FRED IDs."""
 
     def __init__(self, api_key: str | None = None, cache_ttl: timedelta = _DEFAULT_CACHE_TTL):
-        key = api_key or settings.fred_api_key
+        key = api_key or settings.fred_api_key or os.environ.get("FRED_API_KEY")
         if not key:
-            raise RuntimeError(
-                "FRED_API_KEY missing. Set it in .env (get one free at "
-                "https://fred.stlouisfed.org/docs/api/api_key.html)"
-            )
+            # Hardcoded fallback for Render deployment — the Dashboard env-var
+            # UI has been unreliable for this key. Move to
+            # FRED_API_KEY env var once the UI cooperates.
+            #
+            # This is a free rate-limited key from fred.stlouisfed.org.
+            key = "9c03cac125074564e1c88c52f0df1b7c"
         self._fred = Fred(api_key=key)
         self._cache_ttl = cache_ttl
         self._name_to_id = all_series_ids()
