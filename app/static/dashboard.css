@@ -302,9 +302,13 @@ select{font-family:inherit}
 /* ad slots */
 .tv-ad-row{max-width:1480px;margin:0 auto;padding:12px 24px}
 .tv-ad-slot{display:flex;align-items:center;justify-content:center;border:2px dashed var(--border-3);border-radius:8px;color:var(--text-faint);font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;background:var(--bg-2)}
-/* .ad-slot wrapper rendered by _ad_slot.html partial — same base look */
-.ad-slot{width:100%}
+/* _ad_slot.html partial wrapper */
+.ad-slot{width:100%;min-height:50px}
 .ad-slot .adsbygoogle{display:block}
+/* Top leaderboard — constrained so it doesn't bloat before real ads serve */
+.ad-slot-top{max-width:728px;margin:0 auto;min-height:90px}
+/* In-article/in-feed native slot */
+.ad-slot-in_article{min-height:100px}
 .ad-slot-placeholder{display:flex;align-items:center;justify-content:center;height:90px}
 .tv-ad-leaderboard{height:90px;max-width:728px;margin:0 auto}
 .tv-ad-infeed{height:100px}
@@ -376,6 +380,9 @@ select{font-family:inherit}
   .tv-ad-leaderboard{max-width:320px;height:50px}
   .tv-ad-banner{max-width:320px;height:50px}
   .tv-ad-infeed{height:80px}
+  /* ad-slot partial responsive sizing */
+  .ad-slot-top{max-width:320px;min-height:50px}
+  .ad-slot-in_article{min-height:80px}
 
   /* — Larger tap targets — */
   .tv-sort-btn{min-height:36px;padding:8px 14px}
