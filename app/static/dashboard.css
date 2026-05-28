@@ -51,7 +51,7 @@
 /* ── RESET ─────────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-body{font-family:var(--font);background:var(--bg-0);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
+body{font-family:var(--font);background:var(--bg-0);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh;overflow-x:hidden}
 a{color:var(--accent);text-decoration:none}
 a:hover{text-decoration:underline}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
@@ -66,7 +66,7 @@ select{font-family:inherit}
 .tv-date-pick{background:var(--bg-2);color:var(--text);border:1px solid var(--border-2);border-radius:4px;padding:4px 10px;font-family:var(--mono);font-size:13px;cursor:pointer;outline:none}
 .tv-date-pick:hover{border-color:var(--border-3)}
 .tv-date-pick:focus{border-color:var(--accent)}
-.tv-topbar-right{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text-dim);flex-shrink:0;margin-left:auto}
+.tv-topbar-right{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text-dim);flex-shrink:1;min-width:0;margin-left:auto}
 .tv-sync-dot{width:6px;height:6px;border-radius:50%;background:var(--bull);display:inline-block}
 .tv-theme-toggle{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:16px;transition:background .15s}
 .tv-theme-toggle:hover{background:var(--bg-3)}
@@ -432,6 +432,11 @@ select{font-family:inherit}
   /* — Cookie bar + adblock notice full-width — */
   .tv-cookie{bottom:0;left:0;right:0;transform:none;border-radius:0;max-width:100%;flex-direction:column;text-align:center;gap:10px}
   .tv-adblock-notice{top:auto;bottom:60px;left:10px;right:10px;transform:none;max-width:100%;font-size:12px}
+
+  /* — Topbar: hide verbose sync text, keep green dot — */
+  .tv-topbar-right{gap:4px}
+  .tv-topbar-div{display:none}
+  .tv-sync-dot + span{display:none}
 
   /* — Sort buttons scroll if too many — */
   .tv-toolbar{overflow-x:auto;flex-wrap:nowrap}
