@@ -115,12 +115,13 @@ class PriceClient:
     def __init__(self, cache_ttl: timedelta = _CACHE_TTL):
         self._cache_ttl = cache_ttl
 
-    def _cache_path(self, ticker: str) -> Path:
+    def _cache_path(self, ticker: str, period: str = "90d") -> Path:
+        # Key by ticker AND period — a 30d fetch must not satisfy a 1y request.
         safe = ticker.replace("=", "_").replace(".", "_")
-        return _CACHE_DIR / f"{safe}.pkl"
+        return _CACHE_DIR / f"{safe}__{period}.pkl"
 
-    def _load_cache(self, ticker: str) -> pd.DataFrame | None:
-        p = self._cache_path(ticker)
+    def _load_cache(self, ticker: str, period: str = "90d") -> pd.DataFrame | None:
+        p = self._cache_path(ticker, period)
         if not p.exists():
             return None
         age = datetime.now() - datetime.fromtimestamp(p.stat().st_mtime)
@@ -132,8 +133,8 @@ class PriceClient:
         except (pickle.PickleError, EOFError):
             return None
 
-    def _save_cache(self, ticker: str, df: pd.DataFrame) -> None:
-        with self._cache_path(ticker).open("wb") as f:
+    def _save_cache(self, ticker: str, period: str, df: pd.DataFrame) -> None:
+        with self._cache_path(ticker, period).open("wb") as f:
             pickle.dump(df, f)
 
     @retry(
@@ -160,11 +161,11 @@ class PriceClient:
         if not ticker:
             raise KeyError(f"No ticker mapping for instrument '{instrument}'. "
                            f"Known: {sorted(INSTRUMENT_TO_TICKER)}")
-        cached = self._load_cache(ticker)
+        cached = self._load_cache(ticker, period)
         if cached is not None:
             return cached
         df = self._fetch_remote(ticker, period)
-        self._save_cache(ticker, df)
+        self._save_cache(ticker, period, df)
         return df
 
     def get_latest_close(self, instrument: str) -> float | None:
