@@ -129,6 +129,13 @@ body.cs-page .tv-topbar{padding:0 max(24px, calc((100% - 1440px) / 2 + 24px))}
 .cs-footer-links a{font-size:12px;font-weight:600;color:var(--text-dim)}
 .cs-footer-links a:hover{color:var(--accent);text-decoration:none}
 
+/* cookie consent (shared, every page) */
+.cs-cookie{position:fixed;left:0;right:0;bottom:0;z-index:300;display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;background:#0d0f14;color:#dfe3ea;padding:13px 22px;font-size:13px;line-height:1.45;border-top:1px solid #2a2e39}
+.cs-cookie[hidden]{display:none}
+.cs-cookie a{color:var(--accent)}
+.cs-cookie-btn{flex-shrink:0;background:#fff;color:#111;font-weight:600;font-size:12px;padding:8px 18px;white-space:nowrap}
+.cs-cookie-btn:hover{background:#e8eaed}
+
 /* article / legal prose */
 .cs-prose{max-width:760px;font-size:15px;line-height:1.75;color:var(--text-dim)}
 .cs-prose h1{font-family:var(--display);font-size:29px;font-weight:700;letter-spacing:-.02em;line-height:1.15;color:var(--text);margin-bottom:16px}

@@ -62,5 +62,6 @@
   tb.addEventListener('click',function(){var d=document.documentElement.getAttribute('data-theme')==='dark';if(d){document.documentElement.removeAttribute('data-theme');localStorage.removeItem('pt_theme');}else{document.documentElement.setAttribute('data-theme','dark');localStorage.setItem('pt_theme','dark');}uti();});
 })();
 </script>
+{% include "_cs_cookie.html" %}
 </body>
 </html>

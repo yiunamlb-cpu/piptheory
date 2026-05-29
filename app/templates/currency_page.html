@@ -166,5 +166,6 @@ window.CHIST = {{ history_json|safe }};
   draw(); var rt; window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(draw,150);});
 })();
 </script>
+{% include "_cs_cookie.html" %}
 </body>
 </html>

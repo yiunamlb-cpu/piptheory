@@ -59,12 +59,13 @@
     {% endif %}
     <p class="cs-lead">
       The Macro Currency Strength Meter is a <strong>100% free</strong>, systematic gauge of
-      how strong or weak each major currency is right now. It mechanically synthesises five
-      macro pillars &mdash; <em>interest-rate differentials, economic growth, institutional
-      positioning, risk sentiment and commodity terms-of-trade</em> &mdash; each measured
-      against its own history and ranked across the eight majors. <strong>Updated free every
-      day</strong>, it reflects the slow macro tide rather than intraday noise &mdash; an
-      objective, jargon-free read on which currencies are fundamentally strong or weak.
+      how strong or weak each major currency is right now. It distils a broad spectrum of
+      macroeconomic and market data &mdash; <em>interest rates, growth, capital flows, risk
+      regime and global trade</em> &mdash; into a single, reproducible score, using a
+      proprietary framework grounded in decades of research on what moves exchange rates.
+      <strong>Updated free every day</strong>, it reflects the slow macro tide rather than
+      intraday noise &mdash; an objective, jargon-free read on which currencies are
+      fundamentally strong or weak.
     </p>
     <div class="cs-pillars-intro">
       <div class="cs-pintro"><span class="cs-pintro-num">01</span><span class="cs-pintro-h">Interest&nbsp;Rates</span><span class="cs-pintro-d">Carry &amp; yield that rewards holders</span></div>
@@ -294,5 +295,6 @@ window.SHIST = {{ history_json|safe }};
   var rt; window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(drawChart,150);});
 })();
 </script>
+{% include "_cs_cookie.html" %}
 </body>
 </html>

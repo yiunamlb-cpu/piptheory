@@ -37,32 +37,43 @@
     updated every day. Strength is always <em>relative</em>: a currency is only strong or weak
     compared to the others.</p>
 
-    <h2>It's mechanical, not opinion</h2>
-    <p>The score is calculated by a fixed, transparent formula from real economic and market
-    data. There is no AI writing the numbers, no analyst's view, and nothing subjective. That
-    means it's <strong>fully reproducible</strong> — the same inputs always produce the same
-    score, so it never contradicts itself from one day to the next.</p>
+    <h2>A research-grounded model</h2>
+    <p>The score is the output of a <strong>proprietary quantitative framework</strong> that
+    synthesises a broad spectrum of macroeconomic and market data into a single number. The
+    methodology is grounded in decades of established academic research on the fundamental
+    drivers of exchange rates, and has been refined and stress-tested against years of
+    historical data across the full basket of major currencies.</p>
+    <p>Crucially, it is <strong>mechanical, not opinion</strong> — there is no AI writing the
+    numbers and nothing subjective. That makes it <strong>fully reproducible</strong>: the same
+    inputs always produce the same score, so it never contradicts itself from one day to the next.</p>
 
-    <h2>The five pillars</h2>
-    <p>Each currency's score blends five fundamental forces, each measured against its own
-    history and ranked across the eight majors:</p>
+    <h2>What it weighs</h2>
+    <p>Rather than relying on any single indicator, the model evaluates each currency across
+    five broad dimensions, each contextualised against its own history:</p>
     <ul>
-      <li><strong>Interest Rates</strong> — the short-term rate and 10-year bond yield. Currencies that pay more tend to attract global capital.</li>
-      <li><strong>Growth</strong> — the labour market and the health of the underlying economy.</li>
-      <li><strong>Positioning</strong> — how large institutional funds are positioned, from CFTC futures data.</li>
-      <li><strong>Risk Mood</strong> — safe-haven currencies (USD, JPY, CHF) versus risk-on currencies (AUD, NZD, CAD), scaled by the current market mood.</li>
-      <li><strong>Commodities</strong> — terms-of-trade tailwinds for commodity exporters.</li>
+      <li><strong>Interest Rates</strong> — the yield a currency offers relative to its peers.</li>
+      <li><strong>Growth</strong> — the strength and momentum of the underlying economy.</li>
+      <li><strong>Positioning</strong> — how the world's largest investors are positioned.</li>
+      <li><strong>Risk Regime</strong> — safe-haven versus risk-seeking capital flows.</li>
+      <li><strong>Commodities</strong> — global trade and terms-of-trade dynamics.</li>
     </ul>
-    <p>These are combined into a single composite, ranked, and tracked over time. A currency
-    pair's reading is simply the difference between the two currencies' scores
-    (EUR/USD = EUR score &minus; USD score).</p>
+    <p>These are distilled into one comparable, reproducible score and tracked over time. A
+    currency pair's reading follows from the relationship between the two currencies' scores.
+    The model also surfaces supplementary signals — such as how stretched a currency looks and
+    whether the market has already moved — as additional context.</p>
 
-    <h2>Context signals</h2>
-    <p>Two extra signals are shown for context but deliberately <em>not</em> folded into the
-    score: a <strong>valuation</strong> read (whether a currency looks stretched versus its own
-    recent range) and a <strong>price-vs-fundamental</strong> check (whether spot has already
-    moved in line with the fundamentals, i.e. how much is "priced in"). We tested adding these
-    to the score and they didn't improve it, so they stay as context only.</p>
+    <h2>Research foundations</h2>
+    <p>The model is our own synthesis, but every dimension it weighs is drawn from the
+    established academic literature on what moves exchange rates. A few foundational examples:</p>
+    <ul>
+      <li><strong>Interest rates &amp; carry</strong> — Lustig, Roussanov &amp; Verdelhan (2011), "Common Risk Factors in Currency Markets," <em>Review of Financial Studies</em>; Fama (1984), "Forward and Spot Exchange Rates," <em>Journal of Monetary Economics</em>.</li>
+      <li><strong>Fundamentals &amp; horizon</strong> — Meese &amp; Rogoff (1983), "Empirical Exchange Rate Models of the Seventies," <em>Journal of International Economics</em>; Mark (1995), "Exchange Rates and Fundamentals: Evidence on Long-Horizon Predictability," <em>American Economic Review</em>.</li>
+      <li><strong>Positioning</strong> — Klitgaard &amp; Weir (2004), "Exchange Rate Changes and Net Positions of Speculators in the Futures Market," <em>FRBNY Economic Policy Review</em>.</li>
+      <li><strong>Risk &amp; safe havens</strong> — Ranaldo &amp; Söderlind (2010), "Safe Haven Currencies," <em>Review of Finance</em>; Brunnermeier, Nagel &amp; Pedersen (2008), "Carry Trades and Currency Crashes," <em>NBER Macroeconomics Annual</em>.</li>
+      <li><strong>Commodities</strong> — Chen &amp; Rogoff (2003), "Commodity Currencies," <em>Journal of International Economics</em>.</li>
+      <li><strong>Valuation &amp; momentum</strong> — Asness, Moskowitz &amp; Pedersen (2013), "Value and Momentum Everywhere," <em>Journal of Finance</em>; Menkhoff, Sarno, Schmeling &amp; Schrimpf (2012), "Currency Momentum Strategies," <em>Journal of Financial Economics</em>.</li>
+    </ul>
+    <p><em>PIPTHEORY is an independent synthesis and is not affiliated with or endorsed by these authors.</em></p>
 
     <h2>How to read it — honestly</h2>
     <p>Treat the meter as <strong>macro context, not a trading signal</strong>. A high score
@@ -112,5 +123,6 @@
   tb.addEventListener('click',function(){var d=document.documentElement.getAttribute('data-theme')==='dark';if(d){document.documentElement.removeAttribute('data-theme');localStorage.removeItem('pt_theme');}else{document.documentElement.setAttribute('data-theme','dark');localStorage.setItem('pt_theme','dark');}uti();});
 })();
 </script>
+{% include "_cs_cookie.html" %}
 </body>
 </html>
