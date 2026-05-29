@@ -50,6 +50,7 @@ jobs:
           fi
 
       - name: Compute currency strength meter
+        continue-on-error: true   # a data hiccup here must not block the research commit
         env:
           PYTHONPATH: ${{ github.workspace }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
