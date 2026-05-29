@@ -12,7 +12,8 @@ Set-Location $root
 # Push state + bias_cards so they persist across Render deploys
 $stateFiles = @(
     "state/score_history.json",
-    "state/thesis_tracker.json"
+    "state/thesis_tracker.json",
+    "state/currency_strength.json"
 )
 
 $changed = $false

@@ -108,8 +108,17 @@ def _clip(x: float, lo: float = -3.0, hi: float = 3.0) -> float:
     return max(lo, min(hi, x))
 
 
-def _age_days(d: date) -> int:
-    return (date.today() - d).days
+def _age_days(d: date, ref: date | None = None) -> int:
+    """Age of an observation relative to `ref` (default today). For historical
+    backfill, ref = the as-of date so freshness is judged as-of THEN."""
+    return ((ref or date.today()) - d).days
+
+
+def _slice(s: pd.Series | None, as_of: date | None) -> pd.Series | None:
+    """Restrict a series to observations on/before as_of (no-op if None)."""
+    if s is None or as_of is None:
+        return s
+    return s[s.index <= pd.Timestamp(as_of)]
 
 
 def _fred_series(fred: FredClient, name: str, *, yoy: bool = False, periods: int = 12) -> pd.Series | None:
@@ -177,34 +186,38 @@ def _xsection_z(values: dict[str, float]) -> dict[str, float]:
 
 # ── data gathering ────────────────────────────────────────────────────────
 
-def _gather(fred: FredClient, cot: CotClient, prices: PriceClient) -> dict[str, dict]:
+def _gather(fred: FredClient, cot: CotClient, prices: PriceClient,
+            *, as_of: date | None = None, price_period: str = "1y") -> dict[str, dict]:
     """Collect raw, freshness-gated factor inputs per currency.
 
     Returns {ccy: {factor_key: {"value": float, "as_of": iso|None, "stale": bool}}}.
     Cross-sectional standardisation happens later in compute_strength().
+
+    `as_of` slices every source to that date (and judges freshness relative to
+    it) so the SAME logic computes historical snapshots for the backfill.
     """
     raw: dict[str, dict] = {c: {} for c in CURRENCIES}
 
     for code, cfg in CURRENCIES.items():
         # --- Monetary: short rate level + trajectory, 10y bond level ---
-        rs = _fred_series(fred, cfg.rate_short)
+        rs = _slice(_fred_series(fred, cfg.rate_short), as_of)
         lt = _latest(rs)
-        if lt and _age_days(lt[1]) <= MAX_AGE["rate"]:
+        if lt and _age_days(lt[1], as_of) <= MAX_AGE["rate"]:
             raw[code]["rate_level"] = {"value": lt[0], "as_of": lt[1].isoformat(), "stale": False}
             chg = _change_over(rs, 90)
             if chg is not None:
                 raw[code]["rate_traj"] = {"value": chg, "as_of": lt[1].isoformat(), "stale": False}
 
-        bd = _fred_series(fred, cfg.bond_10y)
+        bd = _slice(_fred_series(fred, cfg.bond_10y), as_of)
         lt = _latest(bd)
-        if lt and _age_days(lt[1]) <= MAX_AGE["bond"]:
+        if lt and _age_days(lt[1], as_of) <= MAX_AGE["bond"]:
             raw[code]["bond_level"] = {"value": lt[0], "as_of": lt[1].isoformat(), "stale": False}
 
         # --- Growth: unemployment level (inverted) + trajectory (inverted) ---
         if cfg.unrate:
-            ur = _fred_series(fred, cfg.unrate)
+            ur = _slice(_fred_series(fred, cfg.unrate), as_of)
             lt = _latest(ur)
-            if lt and _age_days(lt[1]) <= MAX_AGE["unrate"]:
+            if lt and _age_days(lt[1], as_of) <= MAX_AGE["unrate"]:
                 raw[code]["unrate_level"] = {"value": -lt[0], "as_of": lt[1].isoformat(), "stale": False}
                 chg = _change_over(ur, 180)
                 if chg is not None:
@@ -213,7 +226,7 @@ def _gather(fred: FredClient, cot: CotClient, prices: PriceClient) -> dict[str, 
         # --- Positioning: COT percentile + 4-week trend (USD derived later) ---
         if cfg.cot:
             try:
-                s = cot.summary(cfg.cot)
+                s = cot.summary(cfg.cot, as_of=as_of)
                 if s.get("status") == "ok" and s.get("data_age_days") is not None \
                         and s["data_age_days"] <= MAX_AGE["cot"]:
                     raw[code]["cot_pctile"] = {"value": float(s["percentile_3yr"]) - 50.0,
@@ -230,12 +243,12 @@ def _gather(fred: FredClient, cot: CotClient, prices: PriceClient) -> dict[str, 
             asof = None
             for ticker, weight in cfg.commodity.items():
                 try:
-                    df = prices.get_ohlc(ticker, period="1y")
-                    z = _momentum_z(df["Close"])
+                    closes = _slice(prices.get_ohlc(ticker, period=price_period)["Close"], as_of)
+                    z = _momentum_z(closes)
                     if z is not None:
                         mom += weight * z
                         ok = True
-                        asof = df["Close"].dropna().index[-1].date().isoformat()
+                        asof = closes.dropna().index[-1].date().isoformat()
                 except Exception as e:
                     log.warning("cs_commod_failed", ccy=code, ticker=ticker, error=str(e)[:60])
             if ok:
@@ -244,10 +257,11 @@ def _gather(fred: FredClient, cot: CotClient, prices: PriceClient) -> dict[str, 
     return raw
 
 
-def _risk_intensity(prices: PriceClient) -> float:
+def _risk_intensity(prices: PriceClient, *, as_of: date | None = None,
+                    price_period: str = "1y") -> float:
     """Risk-off intensity: +z when VIX is elevated vs its trailing year."""
     try:
-        vix = prices.get_ohlc("VIX", period="1y")["Close"]
+        vix = _slice(prices.get_ohlc("VIX", period=price_period)["Close"], as_of)
         return _level_z(vix)
     except Exception as e:
         log.warning("cs_vix_failed", error=str(e)[:80])
@@ -256,14 +270,20 @@ def _risk_intensity(prices: PriceClient) -> float:
 
 # ── core computation ──────────────────────────────────────────────────────
 
-def compute_strength(*, persist: bool = True) -> dict:
-    """Compute current strength for all 8 majors. Pure + deterministic."""
+def compute_strength(*, persist: bool = True, as_of: date | None = None,
+                     price_period: str = "1y") -> dict:
+    """Compute strength for all 8 majors. Pure + deterministic.
+
+    `as_of` computes a HISTORICAL snapshot (all sources sliced to that date,
+    freshness judged as-of then) — used by the backfill. `price_period` should
+    be long enough (e.g. "3y") when backfilling so momentum windows have data.
+    """
     fred = FredClient()
     cot = CotClient()
     prices = PriceClient()
 
-    raw = _gather(fred, cot, prices)
-    risk_intensity = _risk_intensity(prices)
+    raw = _gather(fred, cot, prices, as_of=as_of, price_period=price_period)
+    risk_intensity = _risk_intensity(prices, as_of=as_of, price_period=price_period)
 
     # USD positioning is derived: inverse of the average foreign COT percentile.
     foreign_pctiles = [raw[c]["cot_pctile"]["value"] for c in raw

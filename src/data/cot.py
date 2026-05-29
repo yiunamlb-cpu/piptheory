@@ -180,10 +180,14 @@ class CotClient:
 
         return filtered
 
-    def summary(self, instrument: str) -> dict:
+    def summary(self, instrument: str, as_of=None) -> dict:
         """Return a structured positioning summary for an instrument.
 
         Output matches the schema fed into the Positioning Analyst agent.
+
+        `as_of` (a datetime.date): if given, only consider reports up to and
+        including that date — used by the strength-meter historical backfill
+        so percentile/trend reflect what was knowable then.
         """
         df = self.for_instrument(instrument)
         if df.empty:
@@ -192,6 +196,12 @@ class CotClient:
                 "status": "no_data",
                 "note": "COT data not available for this instrument or report type.",
             }
+
+        if as_of is not None and "report_date" in df.columns:
+            df = df[df["report_date"].dt.date <= as_of].copy()
+            if df.empty:
+                return {"instrument": instrument, "status": "no_data",
+                        "note": f"No COT reports on/before {as_of}."}
 
         # Try common column names for "Leveraged Funds" net position
         # TFF format: "Lev_Money_Positions_Long_All", "Lev_Money_Positions_Short_All"

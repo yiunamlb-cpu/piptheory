@@ -56,6 +56,7 @@ state/
 # Allow public-safe state files the dashboard needs (pushed by scripts/push_state.ps1)
 !state/score_history.json
 !state/thesis_tracker.json
+!state/currency_strength.json
 
 # --- Bias cards (agent outputs — committed so deploys don't wipe data) ---
 # bias_cards/
