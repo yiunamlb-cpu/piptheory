@@ -32,11 +32,17 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: python -m src.data.currency_strength --persist
 
+      - name: Compute price-based currency performance
+        continue-on-error: true
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: python -m src.data.price_strength --persist
+
       - name: Commit and push results
         run: |
           git config user.name "piptheory-bot"
           git config user.email "bot@piptheory.com"
-          git add --force state/currency_strength.json state/currency_strength_latest.json 2>/dev/null || true
+          git add --force state/currency_strength.json state/currency_strength_latest.json state/price_strength.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0

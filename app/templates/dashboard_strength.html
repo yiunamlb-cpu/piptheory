@@ -101,6 +101,34 @@
     <div class="cs-legend" id="csLegend"></div>
   </section>
 
+  <!-- 1b. CURRENCY PERFORMANCE (price-based, market's verdict) -->
+  <section class="cs-block" id="psSection">
+    <div class="cs-block-head cs-block-head-2">
+      <div class="cs-head-titles">
+        <h2>Currency Performance</h2>
+        <span class="cs-sub">The market's verdict — actual price action, each currency measured against the basket and rebased to the start of the window</span>
+      </div>
+      <div class="cs-ctrls">
+        <div class="cs-range" id="psRes" title="Hover-point resolution">
+          <button data-int="4h">4H</button>
+          <button data-int="1d" class="active">1D</button>
+        </div>
+        <span class="cs-ctrl-div"></span>
+        <div class="cs-range" id="psRange">
+          <button data-days="30" class="active">1M</button>
+          <button data-days="90">3M</button>
+          <button data-days="180">6M</button>
+          <button data-days="370">1Y</button>
+        </div>
+      </div>
+    </div>
+    <div class="cs-chart-wrap">
+      <div class="cs-chart-yscale" id="psYScale"></div>
+      <div class="cs-chart-main"><svg class="cs-chart" id="psChart"></svg><div class="cs-chart-tip" id="psTip"></div></div>
+    </div>
+    <div class="cs-legend" id="psLegend"></div>
+  </section>
+
   <!-- 2. STRENGTH RANKING (accordion w/ inline detail) -->
   <section class="cs-meter">
     <div class="cs-block-head"><h2>Strength Ranking</h2><span class="cs-sub">Click any currency to expand its full breakdown</span></div>
@@ -176,6 +204,7 @@
 <script>
 window.STRENGTH = {{ latest_json|safe }};
 window.SHIST = {{ history_json|safe }};
+window.PSTR = {{ price_strength_json|safe }};
 
 (function(){
   var CODES = Object.keys(window.STRENGTH.currencies);
@@ -293,6 +322,122 @@ window.SHIST = {{ history_json|safe }};
 
   buildLegend(); buildRange(); drawChart(); drawHeatmap();
   var rt; window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(drawChart,150);});
+})();
+
+// ---- CURRENCY PERFORMANCE (price-based) ----
+(function(){
+  var PS = window.PSTR || {};
+  var sec = document.getElementById('psSection');
+  if((!PS['1d'] || !PS['1d'].t || PS['1d'].t.length<2) && (!PS['4h'] || !PS['4h'].t || PS['4h'].t.length<2)){
+    if(sec) sec.style.display='none'; return;
+  }
+  var COLORS={USD:'#2563EB',EUR:'#0D9488',GBP:'#7C3AED',JPY:'#E11D48',
+              CHF:'#CA8A04',CAD:'#16A34A',AUD:'#DB2777',NZD:'#0891B2'};
+  var ORDER=['USD','EUR','GBP','JPY','CHF','CAD','AUD','NZD'];
+  var interval='1d', rangeDays=30, hidden={};
+
+  function curData(){return PS[interval]||{t:[],ix:{}};}
+  function niceMax(v){var p=Math.pow(10,Math.floor(Math.log10(v)));var f=v/p;var nf=f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10;return nf*p;}
+
+  // Rebase to window start, then subtract cross-sectional mean (fixed 8-ccy
+  // basket) so every line departs from 0 = relative price performance.
+  function computeWindow(){
+    var d=curData(); var t=d.t||[]; var ix=d.ix||{};
+    if(t.length<2) return null;
+    var cut=new Date(); cut.setDate(cut.getDate()-rangeDays); var cz=cut.toISOString().slice(0,10);
+    var startIdx=0,found=false; for(var k=0;k<t.length;k++){ if(t[k].slice(0,10)>=cz){startIdx=k;found=true;break;} }
+    if(!found) startIdx=Math.max(0,t.length-2);
+    if(t.length-startIdx<2) startIdx=Math.max(0,t.length-2);
+    var codes=ORDER.filter(function(c){return ix[c] && ix[c].length===t.length;});
+    if(codes.length<2) return null;
+    var dates=t.slice(startIdx), n=dates.length;
+    var reb={}; codes.forEach(function(c){var base=ix[c][startIdx];reb[c]=ix[c].slice(startIdx).map(function(v){return base?v/base-1:0;});});
+    var series={}; codes.forEach(function(c){series[c]=new Array(n);});
+    var maxAbs=0;
+    for(var i=0;i<n;i++){
+      var sum=0; codes.forEach(function(c){sum+=reb[c][i];}); var m=sum/codes.length;
+      codes.forEach(function(c){var val=(reb[c][i]-m)*100; series[c][i]=val; if(!hidden[c]&&Math.abs(val)>maxAbs)maxAbs=Math.abs(val);});
+    }
+    if(maxAbs<0.25) maxAbs=0.25;
+    return {dates:dates,series:series,codes:codes,n:n,maxAbs:maxAbs};
+  }
+
+  function fmtX(t){return interval==='1d'?t.slice(2,10):t.slice(5,10);}
+  function fmtTipD(t){return interval==='1d'?t:t.replace('T',' ');}
+
+  function draw(){
+    var svg=document.getElementById('psChart'); var main=svg.parentElement;
+    var W=main.offsetWidth,H=280,padR=8,padB=18; if(W<10)return;
+    svg.setAttribute('width',W);svg.setAttribute('height',H);svg.setAttribute('viewBox','0 0 '+W+' '+H);
+    var cs=getComputedStyle(document.documentElement);
+    var grid=cs.getPropertyValue('--border-3').trim()||'#bbb';
+    var faint=cs.getPropertyValue('--text-faint').trim()||'#999';
+    var crossC=cs.getPropertyValue('--border-3').trim()||'#999';
+    var bg=cs.getPropertyValue('--bg-1').trim()||'#fff';
+    var ys=document.getElementById('psYScale');
+    var win=computeWindow();
+    if(!win){svg.innerHTML='';ys.innerHTML='';return;}
+    var M=niceMax(win.maxAbs);
+    function y(v){return 4 + (M-v)/(2*M)*(H-padB-4);}
+    function x(i){return (i/(win.n-1))*(W-padR);}
+    function lbl(g){var r=Math.round(g*100)/100;return (g>0?'+':'')+r+'%';}
+    ys.innerHTML=[M,M/2,0,-M/2,-M].map(function(g){return '<span>'+lbl(g)+'</span>';}).join('');
+    var s='';
+    [M,M/2,0,-M/2,-M].forEach(function(g){s+='<line x1="0" y1="'+y(g).toFixed(1)+'" x2="'+(W-padR)+'" y2="'+y(g).toFixed(1)+'" stroke="'+grid+'" stroke-width="1" '+(g===0?'':'stroke-dasharray="3,3"')+' opacity="'+(g===0?1:0.6)+'"/>';});
+    var series=[];
+    win.codes.forEach(function(c){
+      if(hidden[c])return; var arr=win.series[c];
+      var dd=''; arr.forEach(function(v,i){dd+=(i?'L':'M')+x(i).toFixed(1)+','+y(v).toFixed(1)+' ';});
+      s+='<path d="'+dd+'" fill="none" stroke="'+COLORS[c]+'" stroke-width="2" stroke-linejoin="round" opacity="0.9"/>';
+      series.push({c:c,arr:arr});
+    });
+    [0,Math.floor(win.n/2),win.n-1].forEach(function(i){var t=win.dates[i]?fmtX(win.dates[i]):'';s+='<text x="'+x(i).toFixed(1)+'" y="'+(H-4)+'" fill="'+faint+'" font-size="9" font-family="monospace" text-anchor="'+(i===0?'start':i===win.n-1?'end':'middle')+'">'+t+'</text>';});
+    s+='<g id="psCross"></g>';
+    svg.innerHTML=s;
+    svg._win=win;svg._x=x;svg._y=y;svg._bottom=H-padB;svg._crossC=crossC;svg._bg=bg;svg._series=series;
+  }
+
+  function buildLegend(){
+    var L=document.getElementById('psLegend'); var d=curData(); var ix=d.ix||{};
+    var codes=ORDER.filter(function(c){return ix[c];});
+    L.innerHTML=codes.map(function(c){return '<button class="cs-leg'+(hidden[c]?' off':'')+'" data-code="'+c+'"><span class="cs-leg-dot" style="background:'+COLORS[c]+'"></span>'+c+'</button>';}).join('');
+    L.querySelectorAll('.cs-leg').forEach(function(b){b.addEventListener('click',function(){var c=b.dataset.code;hidden[c]=!hidden[c];b.classList.toggle('off',hidden[c]);draw();});});
+  }
+  function setActivePeriod(days){document.querySelectorAll('#psRange button').forEach(function(x){x.classList.toggle('active',parseInt(x.dataset.days,10)===days);});}
+  function syncPeriodAvail(){
+    document.querySelectorAll('#psRange button').forEach(function(b){var dd=parseInt(b.dataset.days,10);var dis=interval==='4h'&&dd>90;b.disabled=dis;b.classList.toggle('cs-dis',dis);});
+    if(interval==='4h'&&rangeDays>90){rangeDays=90;setActivePeriod(90);}
+  }
+  document.querySelectorAll('#psRes button').forEach(function(b){
+    b.addEventListener('click',function(){interval=b.dataset.int;document.querySelectorAll('#psRes button').forEach(function(x){x.classList.toggle('active',x===b);});syncPeriodAvail();buildLegend();draw();});
+  });
+  document.querySelectorAll('#psRange button').forEach(function(b){
+    b.addEventListener('click',function(){if(b.disabled)return;rangeDays=parseInt(b.dataset.days,10);setActivePeriod(rangeDays);draw();});
+  });
+
+  (function(){
+    var svg=document.getElementById('psChart'), tip=document.getElementById('psTip');
+    svg.addEventListener('mousemove',function(e){
+      if(!svg._win)return; var rect=svg.getBoundingClientRect();
+      var n=svg._win.n; var i=Math.round((e.clientX-rect.left)/rect.width*(n-1)); if(i<0)i=0; if(i>=n)i=n-1;
+      var xpos=svg._x(i);
+      var ch='<line x1="'+xpos.toFixed(1)+'" y1="0" x2="'+xpos.toFixed(1)+'" y2="'+svg._bottom+'" stroke="'+svg._crossC+'" stroke-width="1" stroke-dasharray="3,3" opacity="0.85"/>';
+      var rows=[];
+      svg._series.forEach(function(se){var v=se.arr[i];if(v!=null){ch+='<circle cx="'+xpos.toFixed(1)+'" cy="'+svg._y(v).toFixed(1)+'" r="3.2" fill="'+COLORS[se.c]+'" stroke="'+svg._bg+'" stroke-width="1.2"/>';rows.push({c:se.c,v:v});}});
+      var cg=document.getElementById('psCross'); if(cg)cg.innerHTML=ch;
+      rows.sort(function(a,b){return b.v-a.v;});
+      var html='<div class="cs-tip-d">'+fmtTipD(svg._win.dates[i]||'')+'</div>';
+      rows.forEach(function(r){html+='<div class="cs-tip-r"><span class="cs-leg-dot" style="background:'+COLORS[r.c]+'"></span>'+r.c+' <b>'+(r.v>=0?'+':'')+(Math.round(r.v*100)/100)+'%</b></div>';});
+      tip.innerHTML=html; tip.style.display='block';
+      tip.style.left=Math.min(rect.width-150,Math.max(0,xpos+8))+'px';
+    });
+    svg.addEventListener('mouseleave',function(){tip.style.display='none';var cg=document.getElementById('psCross');if(cg)cg.innerHTML='';});
+  })();
+
+  // theme toggle redraws this chart too
+  var tb2=document.getElementById('themeToggle'); if(tb2) tb2.addEventListener('click',function(){setTimeout(draw,0);});
+  syncPeriodAvail(); buildLegend(); draw();
+  var prt; window.addEventListener('resize',function(){clearTimeout(prt);prt=setTimeout(draw,150);});
 })();
 </script>
 {% include "_cs_cookie.html" %}

@@ -80,6 +80,12 @@ body.cs-page .tv-topbar{padding:0 max(24px, calc((100% - 1440px) / 2 + 24px))}
   padding:4px 10px;border:1px solid var(--border-2);border-radius:0;background:var(--bg-1);transition:all .15s}
 .cs-range button:hover{border-color:var(--border-3);color:var(--text)}
 .cs-range button.active{background:var(--accent-grad);border-color:transparent;color:#fff;box-shadow:var(--glow-accent)}
+.cs-range button.cs-dis,.cs-range button:disabled{opacity:.32;cursor:not-allowed;pointer-events:none}
+.cs-block-head-2{align-items:flex-start}
+.cs-head-titles{display:flex;flex-direction:column;gap:3px;min-width:0}
+.cs-head-titles .cs-sub{max-width:46ch;line-height:1.45}
+.cs-ctrls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0}
+.cs-ctrl-div{width:1px;align-self:stretch;background:var(--border-2);margin:2px 0}
 .cs-chart-wrap{display:flex;gap:0;align-items:stretch;background:var(--card-grad);border:1px solid var(--border-2);border-radius:0;padding:16px 16px 8px;box-shadow:var(--shadow-card)}
 .cs-chart-yscale{display:flex;flex-direction:column;justify-content:space-between;padding:0 8px 16px 0;
   font-size:9px;font-family:var(--mono);color:var(--text-faint);min-width:30px;text-align:right}

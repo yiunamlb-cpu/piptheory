@@ -55,6 +55,7 @@ from src.data.currency_strength import (  # noqa: E402
     all_history as cs_all_history,
     load_latest as cs_load_latest,
 )
+from src.data.price_strength import load_price_strength  # noqa: E402
 from src.orchestration.pipeline import ACTIVE_UNIVERSE  # noqa: E402  single source of truth
 
 # Public release: no position tracking, no chat, no manual events writes, no
@@ -1301,6 +1302,7 @@ def _build_strength_context(request: Request) -> dict | None:
         "currencies": ordered,
         "history_json": json.dumps(hist_compact, separators=(",", ":")),
         "latest_json": json.dumps({"currencies": cur_map}, separators=(",", ":")),
+        "price_strength_json": json.dumps(load_price_strength() or {}, separators=(",", ":")),
         "last_synced_iso": latest.get("as_of"),
         "run_date_nav": runs[0] if runs else "",
     }

@@ -58,6 +58,7 @@ state/
 !state/thesis_tracker.json
 !state/currency_strength.json
 !state/currency_strength_latest.json
+!state/price_strength.json
 
 # --- Bias cards (agent outputs — committed so deploys don't wipe data) ---
 # bias_cards/

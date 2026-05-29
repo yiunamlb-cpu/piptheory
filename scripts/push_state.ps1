@@ -14,7 +14,8 @@ $stateFiles = @(
     "state/score_history.json",
     "state/thesis_tracker.json",
     "state/currency_strength.json",
-    "state/currency_strength_latest.json"
+    "state/currency_strength_latest.json",
+    "state/price_strength.json"
 )
 
 $changed = $false
