@@ -78,7 +78,7 @@
 
   <section class="cs-block">
     <div class="cs-block-head">
-      <h2>Strength Trend</h2>
+      <h2>Historic Macro Strength Trend</h2>
       <div class="cs-range" id="csRange">
         <button data-days="30">1M</button>
         <button data-days="90">3M</button>
@@ -126,7 +126,7 @@ window.CHIST = {{ history_json|safe }};
     var W=main.offsetWidth, H=240, padR=8, padB=18; if(W<10) return;
     svg.setAttribute('width',W); svg.setAttribute('height',H); svg.setAttribute('viewBox','0 0 '+W+' '+H);
     var cs=getComputedStyle(document.documentElement);
-    var grid=cs.getPropertyValue('--border-2').trim()||'#ccc', faint=cs.getPropertyValue('--text-faint').trim()||'#999';
+    var grid=cs.getPropertyValue('--border-3').trim()||'#bbb', faint=cs.getPropertyValue('--text-faint').trim()||'#999';
     var acc=cs.getPropertyValue('--accent').trim()||'#1BAFD0';
     var crossC=cs.getPropertyValue('--border-3').trim()||'#999', bg=cs.getPropertyValue('--bg-1').trim()||'#fff';
     function y(v){return 4+(100-v)/200*(H-padB-4);}
@@ -137,7 +137,7 @@ window.CHIST = {{ history_json|safe }};
     var arr=all.slice(si); var n=arr.length;
     function x(i){return (i/(n-1))*(W-padR);}
     var s='';
-    [100,50,0,-50,-100].forEach(function(g){s+='<line x1="0" y1="'+y(g)+'" x2="'+(W-padR)+'" y2="'+y(g)+'" stroke="'+grid+'" stroke-width="1" '+(g===0?'':'stroke-dasharray="2,3"')+' opacity="'+(g===0?0.8:0.4)+'"/>';});
+    [100,50,0,-50,-100].forEach(function(g){s+='<line x1="0" y1="'+y(g)+'" x2="'+(W-padR)+'" y2="'+y(g)+'" stroke="'+grid+'" stroke-width="1" '+(g===0?'':'stroke-dasharray="3,3"')+' opacity="'+(g===0?1:0.6)+'"/>';});
     var d='',area=''; arr.forEach(function(p,i){d+=(i?'L':'M')+x(i).toFixed(1)+','+y(p[1]).toFixed(1)+' ';});
     area=d+'L'+x(n-1).toFixed(1)+','+y(0)+' L0,'+y(0)+' Z';
     s+='<path d="'+area+'" fill="'+acc+'" opacity="0.08"/>';

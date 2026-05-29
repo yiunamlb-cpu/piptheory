@@ -2,7 +2,9 @@
 body.cs-page{background:var(--bg-0)}
 body.cs-page::before{content:'';position:fixed;left:0;right:0;top:0;height:440px;
   background:var(--page-glow);pointer-events:none;z-index:0}
-.cs-main{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:28px 20px 64px}
+.cs-main{position:relative;z-index:1;max-width:1440px;margin:0 auto;padding:28px 24px 64px}
+/* Align the full-width header's content to the same 1440 column as the body */
+body.cs-page .tv-topbar{padding:0 max(24px, calc((100% - 1440px) / 2 + 24px))}
 .cs-nav{font-size:12px;color:var(--text-dim);font-weight:500}
 .cs-nav:hover{color:var(--accent);text-decoration:none}
 
@@ -25,7 +27,7 @@ body.cs-page::before{content:'';position:fixed;left:0;right:0;top:0;height:440px
 
 /* block heads */
 .cs-block,.cs-meter{margin:26px 0}
-.cs-block-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:8px}
+.cs-block-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px;border-bottom:1px solid var(--border-2);padding-bottom:8px}
 .cs-block-head h2{font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-.02em}
 .cs-sub{font-size:11px;color:var(--text-faint)}
 
@@ -65,7 +67,7 @@ body.cs-page::before{content:'';position:fixed;left:0;right:0;top:0;height:440px
   padding:4px 10px;border:1px solid var(--border-2);border-radius:6px;background:var(--bg-1);transition:all .15s}
 .cs-range button:hover{border-color:var(--border-3);color:var(--text)}
 .cs-range button.active{background:var(--accent-grad);border-color:transparent;color:#fff;box-shadow:var(--glow-accent)}
-.cs-chart-wrap{display:flex;gap:0;align-items:stretch}
+.cs-chart-wrap{display:flex;gap:0;align-items:stretch;background:var(--card-grad);border:1px solid var(--border-2);border-radius:12px;padding:16px 16px 8px;box-shadow:var(--shadow-card)}
 .cs-chart-yscale{display:flex;flex-direction:column;justify-content:space-between;padding:0 8px 16px 0;
   font-size:9px;font-family:var(--mono);color:var(--text-faint);min-width:30px;text-align:right}
 .cs-chart-main{position:relative;flex:1;min-width:0}
