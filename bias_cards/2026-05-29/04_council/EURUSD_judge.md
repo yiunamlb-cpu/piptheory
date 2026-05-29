@@ -1,33 +1,27 @@
-**INSTRUMENT:** EURUSD  
-**DATE:** 2026-05-06  
+INSTRUMENT: EURUSD
+DATE: 2026-05-29
 
-**FINAL BIAS:** slight long  
-**CONVICTION:** 5/10  
-**TIMEFRAME:** swing (weeks)  
+FINAL BIAS: long
+CONVICTION: 6/10
+TIMEFRAME: positional (months)
 
-**PROBABILITY DECOMPOSITION:**  
-  P(bull thesis): 55%  
-  P(bear thesis): 30%  
-  P(sideways/unclear): 15%  
+PROBABILITY DECOMPOSITION:
+  P(bull thesis): 65%
+  P(bear thesis): 25%
+  P(sideways/unclear): 10%
 
-**PRIMARY THEME (from THEMES.md):** Theme 2 – ECB Hawkish Pivot  
-  Theme alignment: supports bias (reinforced by Theme 1, Energy-Driven Reflation).  
+PRIMARY THEME (from THEMES.md): ECB Hawkish Pivot (Theme 2)
+  Theme alignment: supports bias, but partially moderated by stagflationary drag from Theme 1
 
-**JUDGMENT REASONING (3–5 sentences):**  
-The ECB’s June hike is explicitly telegraphed and the Fed remains paralysed by internal division, a genuine rate-differential compression that mildly favours the euro. The bull case is the cleaner story but rests on an energy‑inflation assumption that has no confirmation from the Inflation Tracker and hinges on a binary geopolitical variable. The contrarian’s 2011 analog is structurally imperfect yet rightly warns that ECB hawkishness driven by an oil shock creates an asymmetric fragility. With CPI and eurozone flash inflation data still pending, a slight long bias is appropriate, but conviction is limited until those data points either validate the hiking cycle or expose the narrative as premature.
+JUDGMENT REASONING (3-5 sentences):
+The structural case for EURUSD upside remains the cleanest rate-differential expression in G10: ECB is beginning a catch-up hiking cycle while the Fed is anchored with a dovish bias, and energy-driven inflation reinforces the ECB’s urgency. Specialist, cross-asset, and positioning inputs all broadly support the bull view. However, the contrarian’s growth-drag argument is well‑founded—the very oil shock that forces the ECB’s hand also taxes the net‑importer Eurozone economy, and a “dovish hike” (delivery of the hike coupled with a sharp GDP downgrade) is a realistic tactical risk with ~30% probability. The bull case is probabilistically favored and the positioning is not yet crowded, but the high event risk around the June meeting and the degree to which the first hike is already priced justify reducing conviction from the strategist’s original 7/10 to 6/10. The bias remains long, but pullback buyers, not chase.
 
-# NOTE: This output is rendered on a PUBLIC research website. Do NOT include specific price levels, entry zones, target zones, or invalidation prices. Invalidation is framed in macro terms (data prints, CB actions, time decay), never numeric price. The KEY LEVELS section is intentionally omitted in the public release.
+INVALIDATION CONDITIONS:
+  Data: Eurozone flash CPI May (June 5) prints core below 2.5% y/y, weakening the hike imperative; ECB June meeting (15-16) delivers a hike paired with staff projections cutting 2027 GDP below 1.0% and explicit “one‑and‑done” or prolonged pause guidance.
+  US: NFP >300k or core PCE spikes above 3.5%, forcing the FOMC to drop its easing bias and re‑price a near‑term hike, erasing the rate‑differential advantage.
+  Time: if EURUSD fails to sustain trade above the pre‑meeting range within three weeks of the ECB decision.
 
-**INVALIDATION CONDITIONS:**  
-  Data: Eurozone flash CPI (late May) prints materially softer than expected, removing urgency for a June hike; US CPI (May 12) drops toward 2.8–3.0%, softening the reflation narrative and potentially shifting Fed rhetoric.  
-  Central bank: ECB June meeting delivers no hike or explicitly signals only a single‑and‑done move, rather than a multi‑hike cycle.  
-  Geopolitics: A meaningful ceasefire in Iran or a sharp drop in oil prices materially reduces the energy‑shock component of European inflation.  
-  Time: If EURUSD fails to sustain any upside momentum over the next 2–3 weeks despite no bearish catalyst, the bullish thesis may be running on fumes.  
+CONTRADICTIONS / TENSIONS:
+  The core tension is stagflation: the same energy shock that drives ECB hawkishness simultaneously threatens Eurozone growth, making the “multi‑hike” assumption fragile. A dovish‑hike scenario would temporarily reverse the bullish trend, and the PM should size with this asymmetry in mind. No other major cross‑asset contradictions, but the inflation‑vs‑growth balance is delicate.
 
-**CONTRADICTIONS / TENSIONS:**  
-- The ECB hawkish pivot is high‑conviction *rhetoric* but lacks confirming inflation data; the PM should size with awareness that a soft CPI or ceasefire could unwind the trade rapidly.  
-- The 2011 analog, while structurally different in banking health and global rate dynamics, highlights the euro’s vulnerability to growth damage from an energy shock — a tension the bull case under‑weights.  
-- Positioning is building but not yet extreme, leaving room for both a trend extension and a sharp squeeze — the asymmetric risk in the near term tilts mildly higher, but the path could become violently two‑sided if the data turns.  
-
-**CONFIDENCE IN THIS JUDGMENT:** moderate  
-  The central‑bank signals are clean and the rate-differential logic is sound, but the absence of confirming inflation data and the binary geopolitical premium mean this is a judgment built on clay until the May 12 CPI and eurozone flash CPI harden it.
+CONFIDENCE IN THIS JUDGMENT: moderate‑high – the process synthesizes strong theme alignment, specialist consensus, and a deliberate contrarian adjustment. The primary uncertainty is the communication nuance around the June ECB meeting, which is inherently hard to forecast but is reflected in the reduced conviction.

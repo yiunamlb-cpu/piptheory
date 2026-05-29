@@ -12,8 +12,8 @@
 
 ## Council instruments
 
-EURUSD, USDJPY, AUDUSD, ES, NQ, GC, CL
+DXY, EURUSD, AUDUSD, GC, CL
 
 ## Cost
 
-Total spend today: $0.3133
+Total spend today: $0.3414

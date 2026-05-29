@@ -1,188 +1,195 @@
-**Positioning Analyst Report — 2026-05-29 (data from 2026-05-19 COT)**  
-All COT data 7 days old; considered recent and usable at normal conviction. No dealer gamma, ETF flows, or Asset Manager splits available.
+**POSITIONING ANALYST — REPORT DATE 2026-05-22 (COT obs 2026-05-19, data age 7 days)**  
+
+Freshness note: All primary COT data carries [recent · obs 2026-05-19 · released 2026-05-22 · 7d old].  This is within the normal weekly cadence; no staleness penalty applied.  Supplementary data (dealer gamma, ETF flows) are **not provided** in this batch; cross-confirmation absent.  DXY cannot be constructed (missing CAD, SEK, CHF component data).  ES/NQ have no COT feeds; their gamma/flow assessment is omitted.
 
 ---
 
 **INSTRUMENT: EURUSD**  
 DATE: 2026-05-19  
 DATA AGE: 7 days  
-FRESHNESS: [recent · obs 2026-05-19 · released 2026-05-22 · 7d old]
 
-**POSITIONING (Leveraged Funds, primary):**  
+POSITIONING (Leveraged Funds, primary):  
   Net position: +16,317 contracts  
   3-year percentile: 66.7th  
-  Direction: Neutral  
-  Trend (4-week change): +4,723 (increasing long)
+  Direction: neutral  
+  Trend (4-week change): +4,723 (increasing long)  
 
-**POSITIONING (Asset Managers, supplementary):**  
-  Not available.
+POSITIONING (Asset Managers, supplementary): Not available  
+  Notable divergence vs. Lev Funds: N  
 
-**DEALER GAMMA:** N/A  
-**ETF FLOWS:** Not available.
+DEALER GAMMA: N/A (FX)  
+ETF FLOWS: N/A  
 
-**CROWDED TRADE ASSESSMENT:**  
-  Crowded? No.  
-  Persistence: 0/6 weeks at extreme  
+CROWDED TRADE ASSESSMENT:  
+  Crowded? N  
+  Persistence: 0 of last 6 weeks at extreme  
   Stage of unwind: N/A  
 
-**CONTRA-SIGNAL STRENGTH:** None  
-  Rationale: Percentile within neutral band (20–80th), no extreme signal.
+CONTRA-SIGNAL STRENGTH: none  
+  Rationale: Position comfortably in mid-range; no extremes.  
 
-**INVALIDATION:** Move to >95th or <5th percentile with persistence would flip contra-signal.  
-**NEXT UPDATE:** 2026-06-05
+INVALIDATION: None — no signal to invalidate.  
+NEXT UPDATE: 2026-06-02 (after Friday COT release)
 
 ---
 
 **INSTRUMENT: USDJPY**  
 DATE: 2026-05-19  
 DATA AGE: 7 days  
-FRESHNESS: [recent · obs 2026-05-19 · released 2026-05-22 · 7d old]
 
-**POSITIONING (Leveraged Funds on JPY futures):**  
-  Net position: -64,945 contracts (short yen ↔ long USDJPY)  
+POSITIONING (Leveraged Funds, primary):  
+  Net position: –64,945 contracts (note: short JPY = long USDJPY)  
   3-year percentile: 18.6th  
-  Direction: Stretched short  
-  Trend (4-week change): +10,857 (reducing short)
+  Direction: stretched short  
+  Trend (4-week change): +10,857 (covering, i.e., less short)  
 
-**POSITIONING (Asset Managers, supplementary):**  
-  Not available.
+POSITIONING (Asset Managers): Not available  
+  Notable divergence: N  
 
-**DEALER GAMMA:** N/A  
-**ETF FLOWS:** Not available.
+DEALER GAMMA: N/A  
+ETF FLOWS: N/A  
 
-**CROWDED TRADE ASSESSMENT:**  
-  Crowded? No — percentile is stretched (5–20th) but not extreme (<5th).  
-  Persistence: 0/6 weeks at extreme  
+CROWDED TRADE ASSESSMENT:  
+  Crowded? N  
+  Persistence: 0 of last 6 weeks at extreme (<5th)  
   Stage of unwind: N/A  
 
-**CONTRA-SIGNAL STRENGTH:** None  
-  Rationale: Positioning is bearish on yen (18.6th %ile) but not at historic extremes. A push below 5th %ile would trigger a bullish contra-signal for JPY (bearish USDJPY). Currently no signal.
+CONTRA-SIGNAL STRENGTH: weak  
+  Rationale: 18.6th percentile just inside stretched-short territory (<20th), but no persistence and net short is actively reducing. A borderline reading; not a crowded trade.  
 
-**INVALIDATION:** If net drops <5th percentile with persistence, contra-signal activates.  
-**NEXT UPDATE:** 2026-06-05
+INVALIDATION: If net short resumes deepening (net position falls and breaks below recent lows), the stretched‑short label would strengthen.  
+NEXT UPDATE: 2026-06-02
 
 ---
 
 **INSTRUMENT: GBPUSD**  
 DATE: 2026-05-19  
 DATA AGE: 7 days  
-FRESHNESS: [recent · obs 2026-05-19 · released 2026-05-22 · 7d old]
 
-**POSITIONING (Leveraged Funds, primary):**  
+POSITIONING (Leveraged Funds, primary):  
   Net position: +31,369 contracts  
   3-year percentile: 48.6th  
-  Direction: Neutral  
-  Trend (4-week change): +2,487 (increasing long)
+  Direction: neutral  
+  Trend (4-week): +2,487 (modestly increasing long)  
 
-**POSITIONING (Asset Managers, supplementary):**  
-  Not available.
+POSITIONING (Asset Managers): Not available  
+  Notable divergence: N  
 
-**DEALER GAMMA:** N/A  
-**ETF FLOWS:** Not available.
+DEALER GAMMA: N/A  
+ETF FLOWS: N/A  
 
-**CROWDED TRADE ASSESSMENT:**  
-  Crowded? No.  
-  Persistence: 0/6 weeks at extreme  
-  Stage of unwind: N/A  
+CROWDED TRADE ASSESSMENT:  
+  Crowded? N  
+  Persistence: 0 of last 6 weeks at extreme  
+  Stage: N/A  
 
-**CONTRA-SIGNAL STRENGTH:** None  
-  Rationale: Percentile right at median, no excess.
+CONTRA-SIGNAL STRENGTH: none  
+  Rationale: Dead-centre positioning.  
 
-**INVALIDATION:** Extreme readings (>95/<5) would change the view.  
-**NEXT UPDATE:** 2026-06-05
+INVALIDATION: N/A  
+NEXT UPDATE: 2026-06-02
 
 ---
 
 **INSTRUMENT: AUDUSD**  
 DATE: 2026-05-19  
 DATA AGE: 7 days  
-FRESHNESS: [recent · obs 2026-05-19 · released 2026-05-22 · 7d old]
 
-**POSITIONING (Leveraged Funds, primary):**  
+POSITIONING (Leveraged Funds, primary):  
   Net position: +61,178 contracts  
   3-year percentile: 97.7th  
-  Direction: Extreme long  
-  Trend (4-week change): +13,323 (increasing long)
+  Direction: extreme long  
+  Trend (4-week): +13,323 (continuing to build longs)  
 
-**POSITIONING (Asset Managers, supplementary):**  
-  Not available.
+POSITIONING (Asset Managers): Not available  
+  Notable divergence: N  
 
-**DEALER GAMMA:** N/A  
-**ETF FLOWS:** Not available.
+DEALER GAMMA: N/A  
+ETF FLOWS: N/A  
 
-**CROWDED TRADE ASSESSMENT:**  
-  Crowded? **Yes.** Position at 97.7th percentile, extreme by definition.  
-  Persistence: 6/6 of the last 6 weeks at extreme (>90th percentile).  
-  Stage of unwind: **N/A (still peak accumulation)** — net position still rising, no distribution evident.
+CROWDED TRADE ASSESSMENT:  
+  Crowded? Y  
+  Persistence: 6 of last 6 weeks at extreme (>95th or >90th)  
+  Stage of unwind: **Indeterminate — price data missing.**  (If spot AUD/USD has already started declining, Stage 1 Distribution is possible; if still rallying, the build may be ongoing.  Without current price context, we cannot assign a stage.)
 
-**CONTRA-SIGNAL STRENGTH:** **Strong**  
-  Rationale: Record-high net long seen only 2.3% of the time over 3 years, sustained over 6 consecutive weeks. This is a textbook crowded long; predisposes to sharp reversal once catalyst arrives. No price action or flow data available to pinpoint stage, but the condition is unambiguous.
+CONTRA-SIGNAL STRENGTH: **strong**  
+  Rationale: 97.7th percentile, persistent for six consecutive weeks.  Historically, such extremes precede medium‑term reversals in AUD (a classic crowded “carry/risk‑on” trade).  No cross‑confirmation from ETF flows, but the condition alone is a high‑confidence contra‑signal.
 
-**INVALIDATION:** Net would need to fall back below 90th percentile with no price breakdown, or if fresh macro catalyst justifies structurally higher AUD.  
-**NEXT UPDATE:** 2026-06-05
+INVALIDATION:  If net long remains above the 95th percentile for another 2‑3 weeks without any spot weakness, the contra‑signal may be premature (rare but possible in trending markets).  Alternatively, a sudden further build while spot holds would raise the risk of a capitulation, but would not invalidate the existence of a crowded trade — only the timing.  
+NEXT UPDATE: 2026-06-02.  An on‑demand run is warranted if AUD/USD moves >2 standard deviations mid‑week.
 
 ---
 
 **INSTRUMENT: GC (Gold)**  
 DATE: 2026-05-19  
 DATA AGE: 7 days  
-FRESHNESS: [recent · obs 2026-05-19 · released 2026-05-22 · 7d old]
 
-**POSITIONING (Managed Money, primary):**  
-  Net position: -422 contracts  
+POSITIONING (Managed Money, primary):  
+  Net position: –422 contracts  
   3-year percentile: 2.9th  
-  Direction: Extreme short  
-  Trend (4-week change): -953 (increasing short)
+  Direction: extreme short  
+  Trend (4-week): –953 (adding to shorts)  
 
-**POSITIONING (Asset Managers, supplementary):**  
-  Not available.
+POSITIONING (Asset Managers): Not available  
+  Notable divergence: N  
 
-**DEALER GAMMA:** N/A  
-**ETF FLOWS:** Not available.
+DEALER GAMMA: N/A (commodity)  
+ETF FLOWS: GLD flow data not provided — cross‑confirmation absent  
 
-**CROWDED TRADE ASSESSMENT:**  
-  Crowded? **No** — percentile extreme (<5th) but lacks persistence.  
-  Persistence: 1/6 weeks at extreme (<10th percentile).  
-  Stage of unwind: N/A (fresh extreme, not a developed crowded trade)
+CROWDED TRADE ASSESSMENT:  
+  Crowded? **No** (single‑week extreme)  
+  Persistence: 1 of last 6 weeks at extreme (<5th) — insufficient for crowded‑trade flag  
+  Stage of unwind: N/A  
 
-**CONTRA-SIGNAL STRENGTH:** **Weak**  
-  Rationale: One‑week spike into the bottom 2.9% is statistically unusual but not enough to treat as a reliable contra‑signal. Per rules, single-week extremes are noise. If this persists another 3 weeks, it would graduate to a crowded short with a bullish contra-signal.
+CONTRA-SIGNAL STRENGTH: **moderate** (but low conviction due to lack of persistence)  
+  Rationale: 2.9th percentile is a genuine extreme, but the position has only been this stretched for one week.  Without persistence, the contra‑signal is less reliable; it could be a data quirk or a short‑lived flush.  If this extreme holds next week, crowded‑trade flag will be raised.
 
-**INVALIDATION:** If next week’s percentile remains <5th, persistence risk rises and contra-signal would strengthen.  
-**NEXT UPDATE:** 2026-06-05
+INVALIDATION:  If net short deepens further next week (and holds at <5th percentile), the contra‑signal strengthens and persistence starts to build.  If net short quickly rebounds to neutral, the signal was a false alarm.  
+NEXT UPDATE: 2026-06-02 (critical to see if GC persists in extreme territory)
 
 ---
 
 **INSTRUMENT: CL (Crude Oil)**  
 DATE: 2026-05-19  
 DATA AGE: 7 days  
-FRESHNESS: [recent · obs 2026-05-19 · released 2026-05-22 · 7d old]
 
-**POSITIONING (Managed Money, primary):**  
+POSITIONING (Managed Money, primary):  
   Net position: +98,219 contracts  
-  3-year percentile: 37.3rd  
-  Direction: Neutral  
-  Trend (4-week change): +17,888 (increasing long)
+  3-year percentile: 37.3th  
+  Direction: neutral  
+  Trend (4-week): +17,888 (increasing long)  
 
-**POSITIONING (Asset Managers, supplementary):**  
-  Not available.
+POSITIONING (Asset Managers): Not available  
+  Notable divergence: N  
 
-**DEALER GAMMA:** N/A  
-**ETF FLOWS:** Not available.
+DEALER GAMMA: N/A  
+ETF FLOWS: USO not provided  
 
-**CROWDED TRADE ASSESSMENT:**  
-  Crowded? No.  
-  Persistence: 0/6 weeks at extreme  
-  Stage of unwind: N/A  
+CROWDED TRADE ASSESSMENT:  
+  Crowded? N  
+  Persistence: 0 of last 6 weeks at extreme  
+  Stage: N/A  
 
-**CONTRA-SIGNAL STRENGTH:** None  
-  Rationale: Well within historical range, no opposing force.
+CONTRA-SIGNAL STRENGTH: none  
+  Rationale: Positioning well within 20‑80 range.  
 
-**INVALIDATION:** Move to >95th or <5th with persistence would activate contra-signal.  
-**NEXT UPDATE:** 2026-06-05
+INVALIDATION: N/A  
+NEXT UPDATE: 2026-06-02
 
 ---
 
-**Summary of most extreme positioning:**  
-- **AUDUSD** is at an extreme long (97.7th %ile, 6/6 weeks persistent) — strong contrarian bearish signal.  
-- **GC** touches an extreme short (2.9th %ile) but only for one week — weak bullish contra-signal pending further persistence.
+**INSTRUMENT: DXY (Dollar Index) — NOTE: incomplete**  
+The components provided (EUR, JPY, GBP) cover ~83% of the DXY basket, but CAD, SEK, CHF are missing.  No meaningful aggregate calculation can be done.  Qualitative directional lean: EUR/USD mid‑neutral, JPY/USD stretched short (but covering), GBP/USD neutral → no strong DXY signal.  
+
+---
+
+**INSTRUMENT: ES/NQ (Equity Index Futures)**  
+No COT data supplied.  Dealer gamma exposure and ETF flows (SPY/QQQ) were not provided.  Assessment cannot be made.
+
+---
+
+### Summary – Most Extreme Positioning
+
+**AUDUSD: Crowded long (97.7th percentile, 6‑week persistence) – strong bearish contra‑signal.**  
+**GC: Extreme short (2.9th percentile) but only one week – watch for persistence; contra‑signal moderate but not yet crowded.**  
+No other instruments approach extremes.  Missing data prevent assessment of DXY, ES/NQ.  All data 7‑day‑old, no staleness penalty.  No cross‑confirmation flows or gamma were available.

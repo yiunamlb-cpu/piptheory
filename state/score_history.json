@@ -4,7 +4,7 @@
       "date": "2026-05-29",
       "bias": "short",
       "conviction": 4,
-      "source": "strategist"
+      "source": "judge"
     },
     {
       "date": "2026-05-28",
@@ -95,7 +95,7 @@
     {
       "date": "2026-05-29",
       "bias": "long",
-      "conviction": 5,
+      "conviction": 6,
       "source": "judge"
     },
     {
@@ -188,7 +188,7 @@
       "date": "2026-05-29",
       "bias": "short",
       "conviction": 4,
-      "source": "judge"
+      "source": "strategist"
     },
     {
       "date": "2026-05-28",
@@ -279,7 +279,7 @@
     {
       "date": "2026-05-29",
       "bias": "long",
-      "conviction": 4,
+      "conviction": 3,
       "source": "strategist"
     },
     {
@@ -370,7 +370,7 @@
   "AUDUSD": [
     {
       "date": "2026-05-29",
-      "bias": "no view",
+      "bias": "short",
       "conviction": 4,
       "source": "judge"
     },
@@ -463,8 +463,8 @@
     {
       "date": "2026-05-29",
       "bias": "long",
-      "conviction": 4,
-      "source": "judge"
+      "conviction": 3,
+      "source": "strategist"
     },
     {
       "date": "2026-05-28",
@@ -555,8 +555,8 @@
     {
       "date": "2026-05-29",
       "bias": "long",
-      "conviction": 5,
-      "source": "judge"
+      "conviction": 4,
+      "source": "strategist"
     },
     {
       "date": "2026-05-28",
@@ -647,7 +647,7 @@
     {
       "date": "2026-05-29",
       "bias": "long",
-      "conviction": 4,
+      "conviction": 7,
       "source": "judge"
     },
     {

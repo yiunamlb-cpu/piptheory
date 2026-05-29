@@ -1,31 +1,50 @@
 INSTITUTION: BoJ
 DATE: 2026-05-29
 
-CURRENT STANCE: hike-bias (hold voted 6-3 with three hawkish dissents calling for 0.25pp hike to 1.0%)
-LANGUAGE DRIFT SCORE (vs prior statement, if available): not assessable on text alone (no prior statement provided), but the three explicit dissents for an immediate rate increase represent a material hawkish shift in voting patterns — effectively a +1.0 on the upward pressure signal without a formal language change.
-VOTE SPLIT (latest): 6-3. Nakagawa, Takata, Tamura dissented in favour of a 1.0% call rate. Tamura argued the rate should be “as close to the neutral rate as possible,” Takata said the price stability target had been “more or less achieved” and risks skewed up, Nakagawa saw upside price risks under accommodative conditions. No dovish dissent.
+CURRENT STANCE: **hike‑bias**  
+  (The Policy Board is holding at 0.75% but is deeply split; three dissenters explicitly demand an immediate 25bp hike.  
+   Pressure to tighten further is high, and the next meeting is a live decision.)
+
+LANGUAGE DRIFT SCORE: **N/A** — no previous statement available for sentence‑level comparison.  
+  (From the vote split and dissenting arguments alone, the bias is clearly hawkish; a full drift score would require the April statement text to be diffed against the prior (March) statement.)
+
+VOTE SPLIT (April 28): **6‑3** against maintaining 0.75%  
+  **Dissenters (all for a 25bp hike to 1.0%):**
+  - Nakagawa Junko — upside price risks, accommodative conditions despite Middle‑East uncertainty  
+  - Takata Hajime — price target “more or less achieved,” second‑round effects pushing inflation  
+  - Tamura Naoki — risks “significantly skewed to upside,” policy rate should be near neutral  
+
+  The three‑member dissent is the most hawkish at the BoJ since the start of post‑2024 normalisation.
 
 RATE PATH:
-  Current uncollateralized overnight call rate: 0.75%
-  Bond purchase pace: not explicitly updated in this statement (presumably unchanged from prior pace, but no fresh data to confirm)
-  Market pricing — next meeting: unavailable (no yield/swap data provided). Given the 6-3 vote, the probability of a hike at the next meeting (likely mid-June) is assessed as highly elevated if inflation and wage data remain supportive.
-  6m forward: no reliable market-implied level in today’s snapshot
-  12m forward: no reliable market-implied level
-  US-JP 10y spread: no data
+  - Current uncollateralized overnight call rate target: **0.75%** (set April 28, 2026)
+  - Bond purchase pace: no change indicated in the April statement; assumed unchanged at prior pace (specific JPY/month figure not available in today’s data)
+  - Market pricing (from available stale data):
+    - Call rate proxy (March 1): 1.269%, well above the 0.75% target → market was pricing in tightening even before the April meeting
+    - OIS / implied path: not available in today’s data snapshot; the high proxy suggests high expectations of further hikes
+  - 10‑year JGB yield: 2.515% (stale, April 1, 2026)
+  - US 10‑year yield: 4.480% (fresh, May 27, 2026)
+  - US‑JP 10‑year spread: **~196.5 bps** (stale JGB leg — current spread likely similar/different; flag as low‑confidence)
 
 KEY OBSERVATIONS:
-  - The 6-3 vote is the most hawkish tally since the lift-off from negative rates; three different rationales point to a consensus that policy is still too accommodative relative to price risks. Tamura’s “neutral rate” language implies the Board is actively debating the terminal rate, with some members eyeing a level above 1.0%.
-  - The dissenters’ emphasis on “risks to prices already skewed to the upside” and “second-round effects” suggests the Board is increasingly confident the 2% target is sustained — the very trigger for further normalisation. This goes beyond a simple hold.
-  - No mention of patient/cautious language in the publicly released statement; the hold was not justified by a softening outlook but by a majority decision that still sees room to wait, possibly for more wage or external clarity. That gap is closing fast.
-  - With MoF intervention thresholds (155-160 USDJPY last observed) and carry-trade dynamics missing today, we cannot gauge the currency whip yet — but a hawkish BoJ relative to a possibly peaking Fed would be sharply JPY-positive.
-  - The Summary of Opinions (released 12 May) should have elaborated on the dovish-majority’s reasoning; without it, we rely on the vote split itself as the cleanest signal.
+  - The April statement reveals a **sharply divided board**, shifting from past unanimity to open hawkish dissent.  
+  - Dissenters’ language — “risks skewed to the upside,” “price target more or less achieved,” “accommodative financial conditions” — directly challenges the majority’s caution. This is the strongest internal pressure to hike since the YCC exit.  
+  - While the decision itself is a hold, the arguments mirror the pre‑hike language used before the March 2024 lift‑off; the Board is likely near a trigger point for the next 25bp.  
+  - The wide US‑JP yield spread (≈196 bps, albeit based on a stale JGB) continues to pressure the yen, reinforcing the dissenters’ case. Fresh USDJPY is missing today, but any level near prior MoF intervention zones (155‑160+) would add urgency.  
+  - The Summary of Opinions released on May 12 would already be available, but its content is not provided; it would crystalise how broad the discomfort with the current rate actually is.
 
 GAP vs MARKET:
-  BoJ more hawkish than market likely priced; with three members explicitly voting for a hike, the hold is fragile. Market pricing (if available) would probably show a less than 50% chance of a June hike, but the dissent magnitude suggests a hike is now the baseline barring a negative surprise.
-  Trade implication: bullish JPY, bearish JGBs (higher yields), especially if upcoming wage data confirms the “virtuous cycle.” USDJPY downside risk is elevated around the next meeting.
+  **BoJ more hawkish than market before the April meeting, but the hold with 3 dissenters may still be viewed as slightly dovish relative to pre‑meeting pricing** (call rate proxy at 1.269 implied a high probability of an April hike). That said, the strong dissent forward‑loads June hike expectations, so the market‑perceived gap now likely tilts hawkish.  
+  **Trade implication:** Under these conditions, a June hike would be mildly JPY‑positive but largely priced; a surprise hold in June would be severely JPY‑negative, pushing USDJPY toward intervention thresholds. Stay positioned for a hike at the June meeting — the dissent lays the groundwork.
 
-NEXT_CATALYST: Next Monetary Policy Meeting (mid-June 2026, exact date TBC). Also watch for any unscheduled speeches by Ueda or the dissenters that signal growing urgency. Shunto wage data preliminary results for 2026 have likely been released by now — any upside surprise would cement the hike case.
+NEXT_CATALYST:
+  - **Next Policy Board meeting:** likely June 15‑16, 2026 (est. ‑ 6‑7‑week rhythm after April 28).  
+  - Any unscheduled speech by Governor Ueda or Deputy Governor Uchida before that date would be a major signal.  
+  - Shunto wage revision data for 2026 (preliminary Rengo tally ≈ March, final in June‑July) — if wage‑growth exceeds 5%+ for a second year, the hike‑case becomes overwhelming.  
+  - MoF intervention risk if USDJPY crosses 160 before the June meeting.
 
-INVALIDATION: A sharp drop in Tokyo core CPI (next print), a sudden strengthening of the yen that eases import price pressure, or weak Rengo wage growth that undermines the “sustained” narrative. A global risk-off shock that hits Japan’s export demand could also delay the hike.
+INVALIDATION:
+  A sharp, unanticipated decline in Japan’s core‑core CPI (below 2.5% y/y), a surprise drop in spring wage data, or a significant dovish turn in Ueda’s next speech (emphasising “patience” and “downside risks”) would force a re‑read and postpone hike expectations.
 
-CONVICTION: medium — the dissent signal is clear and strong, but market pricing and current macro data are missing, and the statement itself is 31 days old (released 28 April). Even though BoJ statements age slowly, conviction would increase to high with confirmation from fresh Summary of Opinions and updated USDJPY/JGB levels.
+CONVICTION: **Medium**  
+  (Reasoning rests on the strong dissent and stale‑yet‑supportive market data; missing fresh JGB yield and USDJPY level, and absence of the full statement text for language‑drift analysis, limit confidence. The directional signal — June hike increasingly likely — is clear, but the precise timing and the market’s current pricing are uncertain without updated cross‑asset data.)

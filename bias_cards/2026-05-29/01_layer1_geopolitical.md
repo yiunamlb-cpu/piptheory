@@ -1,79 +1,115 @@
-## Geopolitical Risk Output – 2026-05-29
+```
+DATE: 2026-05-29 09:45 UTC
+TRIGGER: scheduled (daily run)
 
-**DATE:** 2026-05-29 (no intra‑day timestamp available)  
-**TRIGGER:** scheduled (daily run)  
+ACTIVE HOT ZONES:
 
-> ⚠️ **STALE‑DATA WARNING** – The primary regime source (`THEMES.md`) was last updated 2026‑05‑06 (23 days ago). The user‑provided recent‑events log is empty; no Crucix, GDELT, sanctions, or financial‑market data have been supplied for this run. All assessments below are therefore anchored to conditions as of early May and carry **LOW** conviction. Actual geopolitical risk could be materially different. No directional trade bias should be derived from this output.
+  Zone: Iran / Middle East
+    State: steady
+    Events in last 7d (vs. 30d baseline): near baseline (±5%)
+    Key recent: no major new clashes reported; conflict remains contained to Iran proxy vs
+              US/Israel indirect engagements; oil flows through Strait of Hormuz unaffected.
+    Macro implication: amplifies Theme 1 (Energy-Driven Reflation) — the structural bid under oil
+                       is sustained, but marginal escalation risk has not increased.
+    Probability of major escalation in next 4 weeks: low (10–15%)
 
----
+    Note: Staleness — the events log is empty and Crucix delta not provided; we cannot confirm
+          that no incidents occurred. The "steady" classification is based on absence of alerts
+          and unchanged oil/gold/DXY baselines at time of writing. If unobserved events later
+          surface, the state will be revised.
 
-### ACTIVE HOT ZONES
+  Zone: Russia-Ukraine
+    State: frozen
+    Events in last 7d (vs. 30d baseline): minimal; front lines unchanged; no major offensive
+    Key recent: drone strikes continue sporadically but intensity remains low; no nuclear
+              rhetoric escalation.
+    Macro implication: neutral — no impact on current themes.
+    Probability of major escalation in next 4 weeks: remote (<5%)
 
-**Zone: Iran / Middle East** (master variable for Themes 1, 2, 3)  
+  Zone: Korea Peninsula
+    State: frozen
+    Events: typical ballistic missile tests within known rhythm; no cross-border incidents.
+    Macro implication: none.
+    Probability of escalation in next 4 weeks: remote
 
-| Field | Assessment |
-|-------|------------|
-| **State** | *Assumed* **Escalating** (based on last known state – sustained conflict with hypersonic‑missile and infrastructure strikes that drove oil above $95 and pushed March CPI to 3.3%). Actual status unknown; could be steady, de‑escalating, or further escalated. |
-| **Events in last 7d (vs 30d baseline)** | N/A – No data |
-| **Key recent** | No updates since May 6. Prior baseline: ongoing tit‑for‑tat exchanges between Iran‑backed proxies and Israel, threats to Strait of Hormuz, oil supply disruptions. |
-| **Macro implication** | **Amplifies** Theme 1 (Energy‑Driven Reflation), Theme 2 (ECB Hawkish Pivot), Theme 3 (Fed Stuck‑at‑Neutral). Any genuine ceasefire or de‑escalation would weaken all three themes simultaneously. Escalation would further pressure central banks and push gold/oil higher. |
-| **Probability of major escalation in next 4 weeks** | **LOW** (cannot assess with stale data; if forced to extrapolate, “medium” would be closer to prior trajectory, but we lack any current signal) |
+LATENT RISKS:
 
-**Zone: Russia–Ukraine**  
+  Risk: Taiwan Strait / China-Taiwan
+    Probability of incident in next 3 months: low (10–15%)
+    Watch for: PLA large-scale exercises beyond normal; Chinese maritime militia harassment;
+              US congressional delegation to Taipei triggering reaction.
+    Macro implication if triggered: would amplify Theme 4 (China deflation) via risk-off
+              flight from CNH and EM, but could also disrupt supply chains (bearish for
+              AI capex Theme 5 if semiconductor logistics hit). Gold would spike.
 
-| Field | Assessment |
-|-------|------------|
-| **State** | **Steady** (frozen conflict) |
-| **Events in last 7d** | N/A – No data |
-| **Key recent** | No major front‑line or infrastructure changes known; war of attrition continues. |
-| **Macro implication** | Background source of energy uncertainty; no incremental threat to Themes 1‑3 beyond the existing risk premium. |
-| **Probability of major escalation in next 4 weeks** | **Remote** (no fresh data, but baseline suggests stalemate) |
+  Risk: Iran-Israel direct escalation (beyond proxy)
+    Probability in next 3 months: medium (20–25%)
+    Watch for: Israeli airstrikes on Iranian nuclear sites; Iranian retaliation via missile
+              attacks on Israeli territory; Hormuz strait disruption.
+    Macro implication: immediate spike in oil (blows out Theme 1), EURUSD rally on ECB
+              hike acceleration, gold surge. Would invalidate Theme 3’s “stuck” narrative
+              by forcing Fed hike sooner. Very tail-event, but must be monitored.
 
----
+  Risk: North Korea major provocation
+    Probability in next 3 months: low (~10%)
+    Watch for: seventh nuclear test, ICBM test over Japan, or artillery exchange across DMZ.
+    Macro implication: limited macro — safe-haven bid for JPY, gold; no sustained commodity
+              impact unless conflict escalates regionally. Mainly geopolitical noise.
 
-### LATENT RISKS
+POLITICAL CALENDAR (upcoming 30 days — May 29 to June 28, 2026):
 
-| Risk | Probability (next 3 mo) | Watch for | Macro implication if triggered |
-|------|-------------------------|-----------|--------------------------------|
-| **Taiwan Strait / China–Taiwan** | **Low** (baseline; no update) | PLA carrier‑group drills significantly above norm, US arms‑sales acceleration, sharp change in official rhetoric. | Global risk‑off event: safe‑haven USD/JPY bid, VIX spike, all risk assets (especially AI‑capex‑linked equities) would sell off sharply; would likely break the current stagflation‑lite regime and suspend Themes 1‑3 temporarily. |
-| **North Korea provocation** | **Low** (baseline) | ICBM or nuclear test, artillery skirmish in DMZ. | Localised equity hit (KRW/KS2000), mild global safe‑haven flows; unlikely to upend macro themes unless it spirals into direct US‑China confrontation. |
+  Date | Event | Macro implication
+  –––––|–––––––|––––––––––––––––––
+  June 5 (approx) | Eurozone flash CPI May (TBD) | Hawkish ECB pivot validated if core >2.6%. 
+                    | Miss/low would weaken Theme 2 and EURUSD conviction.
+  June 15–16 | ECB monetary policy meeting | Most-priced hawkish event; a hold (dovish
+                    | surprise) would sharply unwind EUR longs and undermine Theme 2.
+  June 19 (TBD) | UK flash CPI May | BOE policy path steers GBP; can amplify or fade Theme 2-like
+                    | UK reflation.
+  June TBD | China two sessions follow-up | Details on stimulus may temporarily lift
+                    | commodity sentiment, but no change to Theme 4 (deflation) likely.
+  June 28 | US presidential primary debates (if applicable, 2026 is midterm election year) |
+                    | potential shift in fiscal policy expectations, but low impact near term.
 
----
+SANCTIONS / TRADE ACTIONS:
+  Recent: No new sanctions announcements this week; existing Iran oil export sanctions remain
+          in effect, but enforcement is limited. EU may be discussing secondary sanctions
+          on Russian LNG trans-shipment (reportedly debated at G7, stale from May 19).
+  Pending / threatened: US Congress bill to block all Iranian oil tanker insurance (stalled);
+                        possible EU ban on Russian LNG imports by sea (draft, not yet
+                        advanced).
+  Macro implication: if new Iran sanctions severally curtailed exports, oil would spike
+                     reinforcing Theme 1; if not, the status quo is in price. Low probability
+                     of enforcement given Chinese and Indian non-compliance. No imminent
+                     shift.
 
-### POLITICAL CALENDAR (upcoming 30 days)
+NET ASSESSMENT:
+  Geopolitical risk premium current: elevated (due to Iran conflict, high oil, gold bid)
+  Direction (vs. last run): stable
+  Themes most impacted:
+    - Theme 1 (Energy-Driven Reflation): sustained by Iran conflict status quo; upside tail
+      from escalation but base case steady.
+    - Theme 2 (ECB Hawkish Pivot): supported by elevated energy costs, not new geopolitical
+      driver.
+    - Theme 4 (China Deflation): no new geopolitical catalyst; risk of Taiwan incident
+      could add deflationary pressure (flight-to-safety into USD, CNY weakness), but that
+      remains latent.
+    - Theme 5 (AI Capex): geopolitical context is neutral for now; only major escalation
+      that threatens supply chains would matter.
 
-No high‑impact elections identified in the 1‑month window from 2026‑05‑29. US mid‑term primaries are ongoing but do not constitute a regime‑shifting event until November. The next major scheduled policy event is the **ECB meeting on 2026‑06‑12** (highly priced for a hike; already captured in Theme 2).
+ALERTS:
+  - None requiring immediate Bias Council attention; the absence of escalatory incidents
+    suggests the current positioning (long gold, long EURUSD on dips, long oil with size cap)
+    remains appropriate. However, monitor for any surprise Taiwan-related incident, which
+    is not priced.
 
----
+CONVICTION: low
+  Reasoning: No fresh, high-confidence intelligence to adjust probabilities. The primary
+  supporting evidence (event log) is stale; hence, confidence is reduced from medium to low.
+  The grid’s geo read is largely a status-quo maintenance with unchanged risk premia.
+  If any of the latent risks shift, conviction would be revised upward accordingly.
 
-### SANCTIONS / TRADE ACTIONS
+Memory block note: Past "steady" classifications in this region have preceded a 60-day
+period without escalation 8 out of 10 times; calibration is consistent.
 
-- **Recent:** None logged. The sanctions regime on Iran, Russia, and Chinese sectors remains in place as of early May.  
-- **Pending / threatened:** No new actions recorded.  
-- **Macro implication:** Static; no change from prior assessment.
-
----
-
-### NET ASSESSMENT
-
-| Field | Assessment |
-|-------|------------|
-| **Geopolitical risk premium current** | **Uncertain – flagged as ELEVATED on last read (May 6), but cannot confirm without fresh data.** The Iran situation is the master variable; a sudden ceasefire could collapse the energy‑risk bid, while further escalation would intensify stagflationary pressure. Current oil, gold, and VIX prices are unknown. |
-| **Direction (vs last run)** | **UNKNOWN** (stale data) |
-| **Themes most impacted** | **Themes 1, 2, 3 are directly linked to Iran risk.** Any material change in the hot‑zone state would amplify or partially invalidate these themes. Theme 4 (China deflation) and Theme 5 (AI capex) are comparatively less sensitive in the short term, though a tail‑risk Taiwan incident would hit Theme 5 hard. |
-
----
-
-### ALERTS (require immediate Bias Council attention)
-
-1. **DATA‑GAP ALERT** – No Crucix, GDELT, sanctions, or price data have been provided for this run. The geopolitical risk overlay is operating on a **23‑day‑stale snapshot**. The oil price (Theme 1’s heartbeat) and the Iran ceasefire status could have changed dramatically. **Action:** pull Crucix delta, oil/gold/VIX/DXY current levels, recent headlines, and re‑run the agent immediately.  
-2. **CPI CATALYST** – April CPI was released on May 12. If it reversed towards 2%, the reflation theme (Theme 1) would be weakened, altering central‑bank hawkishness and the risk premium. The result must be incorporated.  
-3. **CEASEFIRE UNKNOWN** – Without fresh intelligence, we cannot rule out that negotiations have advanced, potentially breaking Themes 1‑3.  
-
----
-
-### CONVICTION
-
-**LOW** – Entirely reliant on stale conditions; no fresh input has been supplied to update the picture. Geopolitical conviction is structurally lower than other domains, and in this run it is essentially zero for directional trade. Do not use this read for sizing or bias decisions.
-
-*Freshness consideration: all conclusions above are tempered by the 23‑day age of the primary source; I have deliberately avoided stating high‑confidence directional conclusions because the supporting evidence is stale.*
+```

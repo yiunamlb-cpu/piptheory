@@ -2,33 +2,36 @@
 
 ## Headline
 
-No high-conviction macro read today — the tug-of-war leaves the picture too fragmented to lean on.
+Gold is the only high-conviction macro expression right now; everything else hangs on the June ECB meeting.
 
 ## Today's read
 
-The macro regime remains a stalemate between an oil‑shock stagflationary impulse and the structural AI capex anchor. Neither side has gained a decisive edge. With the most recent Layer 4 Judge cards showing no conviction above 5/10 in the FTMO universe, and the data releases of the past two weeks failing to resolve the core tensions, today is a stand-aside day. Selectivity is the point — forcing a view in a fog produces noise, not edge.
+The stagflationary regime is still firmly in place: oil-driven reflation keeps inflation sticky and real rates deeply negative, the ECB is marching toward a June hike, and the Fed remains stuck at neutral. Today is a high‑conviction day — but only for gold. In FX, the EUR has a strong structural case, yet the risk of a “dovish hike” from the ECB two weeks out caps our confidence just below the threshold. Equities and other currencies sit in wait‑and‑see mode. The cleanest read is the precious metal.
 
 ## What the data favors
 
-No instrument cleared the bar today. The stagflation‑lite regime is intact but no single setup combines high conviction, clean theme alignment, and a near‑term catalyst. Most days are like this — selectivity is the point.
+### Gold — Long
 
-## What's driving today's picture
+The stagflationary backdrop leaves gold with a powerful tailwind: elevated oil sustains above‑trend inflation while central banks are reluctant to turn aggressively hawkish, so real rates stay deeply negative. PBoC accumulation provides a steady, price‑insensitive bid, and the extreme speculative short positioning (near record lows) creates a squeeze catalyst that amplifies any uptick. April’s CPI print did not shift the Fed’s neutral stance, and the dollar’s rate advantage is eroding against the hawkish ECB. The only credible threats are a sudden ceasefire that collapses oil or a hawkish Fed repricing — both remain lower‑probability events right now. The picture favors holding long exposure.
 
-- **Energy‑Driven Reflation** — The geopolitical risk premium remains but is increasingly stale; oil has not spiked on fresh escalation, and the next inflation‑print shock would be needed to re‑energise the narrative.
-- **ECB Hawkish Pivot** — Eurozone flash CPI is out, not materially accelerating, and the market is fully pricing a June hike. The rate‑differential story still favours EURUSD on paper, but the post‑hike path is unclear, capping upside conviction.
-- **China Deflationary Quagmire** — PPI still deeply negative and real‑estate weakness persists, dragging on industrial commodities and keeping the AUD heavy. This structural headwind offsets any RBA‑hike‑driven bid.
-- **AI Capex Anchor** — The secular AI spend continues to put a floor under equities, but without a fresh capex catalyst the bid is insufficient to override the macro ceiling from stubbornly elevated real yields.
+## What’s driving today’s picture
+
+- **Energy‑Driven Reflation:** Oil remains elevated on simmering Iran uncertainty, keeping headline inflation sticky and forcing central banks to maintain a hawkish tilt — this is the master variable behind gold, yields, and FX.
+- **ECB Hawkish Pivot:** The June meeting is just over two weeks away and a rate hike is fully priced; the risk is a dovish hike (delivery paired with downgraded GDP forecasts) that would cap EUR upside and temporarily lift the dollar.
+- **Fed Stuck at Neutral:** With the funds rate at 3.5–3.75% and no imminent cut on the table, the repricing of the Fed’s path from “next move is a cut” to “next move could be a hike” is already embedded, leaving little incremental dollar support.
+- **China Deflationary Quagmire:** Fourth consecutive year of deflation acts as a structural headwind for industrial commodities and AUD, reinforcing the safe‑haven appeal of gold.
+- **AI Capex as Equity Anchor:** US equities remain bid on dips due to AI‑related spending, but that bid sits in tension with rising rate sensitivity — NQ outperforms ES, but neither carries high‑conviction macro conviction today.
 
 ## Risks
 
-The first risk is a dovish ECB hike in June: a clear “one‑and‑done” signal would unwind the euro bid and compress rate differentials rapidly, flipping EURUSD and altering the FX‑carry landscape. The second is an abrupt re‑escalation in the Middle East — a supply‑side oil shock would instantly revive the reflation theme and break the current stand‑off across rates, equities, and commodities. Both are binary and imminent.
+The biggest thing that could break today’s picture is a credible Middle East ceasefire that collapses oil below $80/bbl and strips away gold’s safe‑haven bid. Such an event would simultaneously ease inflation fears and reduce the risk premium across assets, rapidly reversing the stagflationary narrative. A surprise hawkish turn from the Fed — triggered, for instance, by an unexpectedly hot May CPI — would be the second‑order risk, pushing real yields higher and squeezing gold longs.
 
-## What we're watching next
+## What we’re watching next
 
-- **ECB June meeting** (first week of June) — the single most important event for EURUSD, bund yields, and the risk‑on/risk‑off balance.
-- **Fed speakers** in the days ahead — any hint of a December dot move would upset the current calm and reprice the dollar.
-- **RBA decision** — the AUD‑short thesis rests on a crowded long; a hawkish surprise would squeeze that positioning quickly.
-- **Iran ceasefire/escalation status** — the binary macro variable; a genuine de‑escalation collapses energy‑driven reflation, while escalation inflates it.
+- Eurozone flash CPI for May (June 5) — the last critical data point before the ECB decision; a soft core print would weaken the multi‑hike assumption.
+- ECB meeting (June 15–16) — the hike itself is largely priced; the communication and staff projections will determine whether EUR resumes its uptrend or stalls.
+- Fed speakers in the coming days — any hint of a December dot‑plot shift would move the dollar and, by extension, gold.
+- Iran/Middle East ceasefire developments — the ultimate binary event for oil and the entire reflation trade.
 
 ---
 
