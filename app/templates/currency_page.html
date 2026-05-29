@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f0f1f3" id="metaTheme">
+  <script>(function(){var t=localStorage.getItem('pt_theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('metaTheme').content='#0f1117';}})();</script>
+  <title>{{ c.name }} ({{ c.code }}) Strength — {{ '%+.0f'|format(c.composite) }} | PIPTHEORY</title>
+  <meta name="description" content="Is the {{ c.name }} ({{ c.code }}) strong or weak right now? Macro strength score {{ '%+.0f'|format(c.composite) }} ({{ c.label }}), built from interest rates, growth, positioning, risk sentiment and commodities. Updated daily.">
+  <link rel="canonical" href="https://piptheory.com/currency/{{ c.code|lower }}">
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v={{ static_version }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/dashboard.css?v={{ static_version }}">
+  <link rel="stylesheet" href="/static/strength.css?v={{ static_version }}">
+</head>
+<body>
+<header class="tv-topbar">
+  <a href="/" class="tv-logo">
+    <img src="/static/logo-text.png?v={{ static_version }}" alt="PIPTHEORY" height="19"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+    <span class="tv-logo-text" style="display:none">PIPTHEORY</span>
+  </a>
+  <div class="tv-topbar-right">
+    <a class="cs-nav" href="/">Strength&nbsp;Meter</a>
+    <span class="tv-topbar-div"></span>
+    <a class="cs-nav" href="/run/{{ run_date_nav }}">Research&nbsp;Desk</a>
+    <button class="tv-theme-toggle" id="themeToggle" title="Toggle theme">&#9790;</button>
+  </div>
+</header>
+
+<main class="cs-main">
+  <a class="cs-breadcrumb" href="/">&larr; All currencies</a>
+
+  <div class="cs-hero">
+    <div class="cs-hero-code">{{ c.code }}</div>
+    <div class="cs-hero-body">
+      <h1 class="cs-h1">{{ c.name }}</h1>
+      <div class="cs-hero-meta">
+        <span class="cs-hero-score {{ 'pos' if c.composite >= 0 else 'neg' }}">{{ '%+.0f'|format(c.composite) }}</span>
+        <span class="cs-hero-label">{{ c.label }}</span>
+        <span class="cs-pill cs-{{ c.trend.label }}">
+          {% if c.trend.label == 'strengthening' %}&#9650;{% elif c.trend.label == 'weakening' %}&#9660;{% else %}&#8211;{% endif %}
+          {{ c.trend.label }}
+        </span>
+        <span class="cs-hero-rank">Rank #{{ c.rank }} of 8</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="cs-explain-text cs-lead-explain">{{ c.explanation }}</p>
+
+  <section class="cs-block">
+    <div class="cs-block-head"><h2>What's driving it</h2></div>
+    <div class="cs-detail-grid">
+      <div class="cs-detail-pillars">
+        <div class="cs-detail-h">Pillar breakdown</div>
+        {% for p in c.pillar_rows %}
+        <div class="cs-pl-row">
+          <span class="cs-pl-name">{{ p.label }}</span>
+          <span class="cs-pl-bar"><span class="cs-pl-zero"></span>
+            <span class="cs-pl-fill {{ 'pos' if p.score >= 0 else 'neg' }}"
+                  style="width:{{ [50, (p.score if p.score >= 0 else -p.score) / 2]|min }}%;{{ 'left:50%' if p.score >= 0 else 'right:50%' }}"></span>
+          </span>
+          <span class="cs-pl-val {{ 'pos' if p.score >= 0 else 'neg' }}">{{ '%+.0f'|format(p.score) }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="cs-detail-ind">
+        <div class="cs-detail-h">Underlying data</div>
+        {% for ind in c.display_indicators %}
+        <div class="cs-ind-row"><span class="cs-ind-l">{{ ind.label }}</span><span class="cs-ind-v">{{ ind.val }}</span>{% if ind.asof and ind.asof != 'derived' %}<span class="cs-ind-a">as of {{ ind.asof }}</span>{% endif %}</div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="cs-block">
+    <div class="cs-block-head"><h2>12-Month Strength Trend</h2></div>
+    <div class="cs-chart-wrap">
+      <div class="cs-chart-yscale"><span>+100</span><span>+50</span><span>0</span><span>&minus;50</span><span>&minus;100</span></div>
+      <div class="cs-chart-main"><svg class="cs-chart" id="csChart"></svg></div>
+    </div>
+  </section>
+
+  <div class="tv-ad-slot tv-ad-infeed">Ad Slot — In-Feed Native</div>
+
+  <section class="cs-block">
+    <div class="cs-block-head"><h2>{{ c.code }} vs the other majors</h2><span class="cs-sub">Strength gap — click for the full pair</span></div>
+    <div class="cs-pairs-list">
+      {% for p in pairs %}
+      <a class="cs-pair-link" href="/pair/{{ p.slug }}">
+        <span class="cs-pair-lbl">{{ p.label }}</span>
+        <span class="cs-pair-diff {{ 'pos' if p.diff >= 0 else 'neg' }}">{{ '%+.0f'|format(p.diff) }}</span>
+        <span class="cs-pair-note">{{ c.code }} {{ 'stronger' if p.diff >= 0 else 'weaker' }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <footer class="cs-footer">
+    <p><strong>PIPTHEORY</strong> &middot; Systematic macro research &middot; Updated daily</p>
+    <p class="cs-disclaimer">Educational macro context only — not investment advice.</p>
+  </footer>
+</main>
+
+<script>
+window.CHIST = {{ history_json|safe }};
+(function(){
+  var tb=document.getElementById('themeToggle');
+  function uti(){var d=document.documentElement.getAttribute('data-theme')==='dark';tb.innerHTML=d?'&#9788;':'&#9790;';document.getElementById('metaTheme').content=d?'#0f1117':'#f0f1f3';}
+  uti();
+  tb.addEventListener('click',function(){var d=document.documentElement.getAttribute('data-theme')==='dark';if(d){document.documentElement.removeAttribute('data-theme');localStorage.removeItem('pt_theme');}else{document.documentElement.setAttribute('data-theme','dark');localStorage.setItem('pt_theme','dark');}uti();draw();});
+  function draw(){
+    var svg=document.getElementById('csChart'); var main=svg.parentElement;
+    var W=main.offsetWidth, H=240, padR=8, padB=18; if(W<10) return;
+    svg.setAttribute('width',W); svg.setAttribute('height',H); svg.setAttribute('viewBox','0 0 '+W+' '+H);
+    var cs=getComputedStyle(document.documentElement);
+    var grid=cs.getPropertyValue('--border-2').trim()||'#ccc', faint=cs.getPropertyValue('--text-faint').trim()||'#999';
+    var acc=cs.getPropertyValue('--accent').trim()||'#1BAFD0';
+    function y(v){return 4+(100-v)/200*(H-padB-4);}
+    var arr=window.CHIST; var n=arr.length; if(n<2){return;}
+    function x(i){return (i/(n-1))*(W-padR);}
+    var s='';
+    [100,50,0,-50,-100].forEach(function(g){s+='<line x1="0" y1="'+y(g)+'" x2="'+(W-padR)+'" y2="'+y(g)+'" stroke="'+grid+'" stroke-width="1" '+(g===0?'':'stroke-dasharray="2,3"')+' opacity="'+(g===0?0.8:0.4)+'"/>';});
+    var d='',area=''; arr.forEach(function(p,i){d+=(i?'L':'M')+x(i).toFixed(1)+','+y(p[1]).toFixed(1)+' ';});
+    area=d+'L'+x(n-1).toFixed(1)+','+y(0)+' L0,'+y(0)+' Z';
+    s+='<path d="'+area+'" fill="'+acc+'" opacity="0.08"/>';
+    s+='<path d="'+d+'" fill="none" stroke="'+acc+'" stroke-width="2.2" stroke-linejoin="round"/>';
+    [0,Math.floor(n/2),n-1].forEach(function(i){var lbl=arr[i]?arr[i][0].slice(2):'';s+='<text x="'+x(i)+'" y="'+(H-4)+'" fill="'+faint+'" font-size="9" font-family="monospace" text-anchor="'+(i===0?'start':i===n-1?'end':'middle')+'">'+lbl+'</text>';});
+    svg.innerHTML=s;
+  }
+  draw(); var rt; window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(draw,150);});
+})();
+</script>
+</body>
+</html>

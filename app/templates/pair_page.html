@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f0f1f3" id="metaTheme">
+  <script>(function(){var t=localStorage.getItem('pt_theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('metaTheme').content='#0f1117';}})();</script>
+  <title>{{ base.code }}/{{ quote.code }} Macro Strength — fundamentals favour {{ stronger.code }} | PIPTHEORY</title>
+  <meta name="description" content="{{ base.code }}/{{ quote.code }} macro strength comparison: the {{ base.name }} scores {{ '%+.0f'|format(base.composite) }} vs the {{ quote.name }} at {{ '%+.0f'|format(quote.composite) }}. Systematic, updated daily.">
+  <link rel="canonical" href="https://piptheory.com/pair/{{ base.code|lower }}{{ quote.code|lower }}">
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v={{ static_version }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/dashboard.css?v={{ static_version }}">
+  <link rel="stylesheet" href="/static/strength.css?v={{ static_version }}">
+</head>
+<body>
+<header class="tv-topbar">
+  <a href="/" class="tv-logo">
+    <img src="/static/logo-text.png?v={{ static_version }}" alt="PIPTHEORY" height="19"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+    <span class="tv-logo-text" style="display:none">PIPTHEORY</span>
+  </a>
+  <div class="tv-topbar-right">
+    <a class="cs-nav" href="/">Strength&nbsp;Meter</a>
+    <span class="tv-topbar-div"></span>
+    <a class="cs-nav" href="/run/{{ run_date_nav }}">Research&nbsp;Desk</a>
+    <button class="tv-theme-toggle" id="themeToggle" title="Toggle theme">&#9790;</button>
+  </div>
+</header>
+
+<main class="cs-main">
+  <a class="cs-breadcrumb" href="/">&larr; All currencies</a>
+  <h1 class="cs-h1">{{ base.code }}/{{ quote.code }}</h1>
+  <p class="cs-pair-headline">
+    {% if diff|abs < 10 %}
+      Fundamentally <strong>balanced</strong> — the {{ base.name }} and {{ quote.name }} score within {{ '%.0f'|format(diff|abs) }} points of each other.
+    {% else %}
+      Fundamentals favour the <strong>{{ stronger.name }}</strong> by {{ '%.0f'|format(diff|abs) }} points.
+    {% endif %}
+  </p>
+
+  <div class="cs-pair-cards">
+    <a class="cs-pair-card" href="/currency/{{ base.code|lower }}">
+      <span class="cs-hero-code">{{ base.code }}</span>
+      <span class="cs-pair-card-name">{{ base.name }}</span>
+      <span class="cs-pair-card-score {{ 'pos' if base.composite >= 0 else 'neg' }}">{{ '%+.0f'|format(base.composite) }}</span>
+      <span class="cs-pair-card-lbl">{{ base.label }} · #{{ base.rank }}</span>
+    </a>
+    <div class="cs-pair-vs">vs</div>
+    <a class="cs-pair-card" href="/currency/{{ quote.code|lower }}">
+      <span class="cs-hero-code">{{ quote.code }}</span>
+      <span class="cs-pair-card-name">{{ quote.name }}</span>
+      <span class="cs-pair-card-score {{ 'pos' if quote.composite >= 0 else 'neg' }}">{{ '%+.0f'|format(quote.composite) }}</span>
+      <span class="cs-pair-card-lbl">{{ quote.label }} · #{{ quote.rank }}</span>
+    </a>
+  </div>
+
+  <p class="cs-explain-text">{{ explanation }}</p>
+
+  <section class="cs-block">
+    <div class="cs-block-head"><h2>Pillar comparison</h2><span class="cs-sub">Which currency wins each macro driver</span></div>
+    <table class="cs-cmp">
+      <tr><th>Driver</th><th>{{ base.code }}</th><th>{{ quote.code }}</th><th>Edge</th></tr>
+      {% for p in pillars %}
+      <tr>
+        <td class="cs-cmp-name">{{ p.label }}</td>
+        <td class="{{ 'pos' if (p.b or 0) >= 0 else 'neg' }}">{{ '%+.0f'|format(p.b) if p.b is not none else '—' }}</td>
+        <td class="{{ 'pos' if (p.q or 0) >= 0 else 'neg' }}">{{ '%+.0f'|format(p.q) if p.q is not none else '—' }}</td>
+        <td class="cs-cmp-edge">{{ base.code if p.gap > 2 else (quote.code if p.gap < -2 else '—') }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </section>
+
+  <div class="tv-ad-slot tv-ad-infeed">Ad Slot — In-Feed Native</div>
+
+  <footer class="cs-footer">
+    <p><strong>PIPTHEORY</strong> &middot; Systematic macro research &middot; Updated daily</p>
+    <p class="cs-disclaimer">Educational macro context only — not investment advice. A fundamental
+    strength gap does not predict short-term price moves; markets may already have priced it.</p>
+  </footer>
+</main>
+
+<script>
+(function(){
+  var tb=document.getElementById('themeToggle');
+  function uti(){var d=document.documentElement.getAttribute('data-theme')==='dark';tb.innerHTML=d?'&#9788;':'&#9790;';document.getElementById('metaTheme').content=d?'#0f1117':'#f0f1f3';}
+  uti();
+  tb.addEventListener('click',function(){var d=document.documentElement.getAttribute('data-theme')==='dark';if(d){document.documentElement.removeAttribute('data-theme');localStorage.removeItem('pt_theme');}else{document.documentElement.setAttribute('data-theme','dark');localStorage.setItem('pt_theme','dark');}uti();});
+})();
+</script>
+</body>
+</html>

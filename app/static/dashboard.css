@@ -70,6 +70,8 @@ select{font-family:inherit}
 .tv-sync-dot{width:6px;height:6px;border-radius:50%;background:var(--bull);display:inline-block}
 .tv-theme-toggle{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:16px;transition:background .15s}
 .tv-theme-toggle:hover{background:var(--bg-3)}
+.cs-nav{font-size:12px;font-weight:600;color:var(--text-dim);white-space:nowrap}
+.cs-nav:hover{color:var(--accent);text-decoration:none}
 
 /* ── BANNER ────────────────────────────────────────────── */
 /* scrolling ticker bar */

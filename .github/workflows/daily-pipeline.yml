@@ -49,12 +49,20 @@ jobs:
             python scripts/run_bias_engine.py
           fi
 
+      - name: Compute currency strength meter
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: |
+          python -m src.data.currency_strength --persist
+
       - name: Commit and push results
         run: |
           git config user.name "piptheory-bot"
           git config user.email "bot@piptheory.com"
 
-          git add --force state/score_history.json state/thesis_tracker.json 2>/dev/null || true
+          git add --force state/score_history.json state/thesis_tracker.json \
+            state/currency_strength.json state/currency_strength_latest.json 2>/dev/null || true
           git add bias_cards/ 2>/dev/null || true
 
           if git diff --cached --quiet; then

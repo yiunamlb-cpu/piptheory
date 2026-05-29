@@ -20,7 +20,7 @@ from datetime import datetime
 from pathlib import Path
 
 from fastapi import FastAPI, Form, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
@@ -1265,14 +1265,10 @@ def _build_strength_context(request: Request) -> dict | None:
     }
 
 
-@app.get("/strength", response_class=HTMLResponse)
-async def strength_page(request: Request):
-    ctx = _build_strength_context(request)
-    if not ctx:
-        return HTMLResponse(
-            "<h1>Currency strength data is being generated.</h1>"
-            "<p>Check back shortly.</p>", status_code=503)
-    return templates.TemplateResponse(request, "dashboard_strength.html", ctx)
+@app.get("/strength")
+async def strength_alias():
+    """The meter is the homepage; keep /strength as a 301 to the canonical URL."""
+    return RedirectResponse(url="/", status_code=301)
 
 
 @app.get("/api/strength")
@@ -1303,8 +1299,148 @@ async def api_strength_one(code: str):
     return JSONResponse({"currency": cur, "history": history})
 
 
+# Conventional FX base priority — the higher-priority currency is the base
+# (gives EURUSD, GBPUSD, AUDUSD, USDJPY, EURGBP, CADJPY ... canonical pairs).
+_PAIR_PRIORITY = ["EUR", "GBP", "AUD", "NZD", "USD", "CAD", "CHF", "JPY"]
+
+
+def _canonical_pair(a: str, b: str) -> tuple[str, str]:
+    return (a, b) if _PAIR_PRIORITY.index(a) < _PAIR_PRIORITY.index(b) else (b, a)
+
+
+def _all_pair_slugs() -> list[str]:
+    from itertools import combinations
+    return [(a + b).lower() for a, b in combinations(_PAIR_PRIORITY, 2)]
+
+
+def _pair_explanation(B: dict, Q: dict, diff: float, pillars: list[dict]) -> str:
+    bn, qn = B["name"], Q["name"]
+    strong = bn if diff >= 0 else qn
+    weak = qn if diff >= 0 else bn
+    s = [f"On the Macro Currency Strength Meter, the {bn} scores {B['composite']:+.0f} "
+         f"and the {qn} scores {Q['composite']:+.0f} — a gap of {abs(diff):.0f} points "
+         f"in favour of the {strong}."]
+    big = max(pillars, key=lambda p: abs(p["gap"]), default=None)
+    if big and abs(big["gap"]) >= 10:
+        fav = bn if big["gap"] > 0 else qn
+        s.append(f"The widest divergence is in {big['label'].lower()}, which favours the {fav}.")
+    if abs(diff) < 10:
+        s.append("With both currencies scoring similarly, the fundamental case here is broadly balanced.")
+    else:
+        s.append(f"All else equal that gap is a fundamental tailwind for the {strong} against "
+                 f"the {weak} — though markets may already have priced much of it in.")
+    return " ".join(s)
+
+
+def _currency_ctx(request: Request, code: str) -> dict | None:
+    latest = cs_load_latest()
+    if not latest:
+        return None
+    code = code.upper()
+    src = latest.get("currencies", {}).get(code)
+    if not src:
+        return None
+    c = dict(src)
+    c["explanation"] = _strength_explanation(c)
+    c["display_indicators"] = _display_indicators(c)
+    c["pillar_rows"] = _pillar_rows(c)
+    hist = cs_all_history().get(code, [])
+    pairs = []
+    for other in _PAIR_PRIORITY:
+        if other == code or other not in latest["currencies"]:
+            continue
+        oc = latest["currencies"][other]
+        d = round(c["composite"] - oc["composite"], 1)
+        base, quote = _canonical_pair(code, other)
+        pairs.append({"slug": (base + quote).lower(), "label": f"{base}/{quote}",
+                      "other": other, "diff": d, "stronger": code if d >= 0 else other})
+    pairs.sort(key=lambda p: -p["diff"])
+    return {
+        "surface": _detect_surface(request),
+        "c": c,
+        "pairs": pairs,
+        "run_date": latest.get("run_date"),
+        "as_of": latest.get("as_of"),
+        "last_synced_iso": latest.get("as_of"),
+        "run_date_nav": (list_runs() or [""])[0],
+        "history_json": json.dumps([[e["date"], e["composite"]] for e in hist],
+                                   separators=(",", ":")),
+    }
+
+
+def _pair_ctx(request: Request, base: str, quote: str) -> dict | None:
+    latest = cs_load_latest()
+    if not latest:
+        return None
+    B = latest.get("currencies", {}).get(base)
+    Q = latest.get("currencies", {}).get(quote)
+    if not B or not Q:
+        return None
+    diff = round(B["composite"] - Q["composite"], 1)
+    pillars = []
+    for k, lbl in _PILLAR_ORDER:
+        if k in B.get("pillars", {}) or k in Q.get("pillars", {}):
+            bv = B["pillars"].get(k)
+            qv = Q["pillars"].get(k)
+            pillars.append({"label": lbl, "b": bv, "q": qv,
+                            "gap": round((bv or 0) - (qv or 0), 1)})
+    return {
+        "surface": _detect_surface(request),
+        "base": B, "quote": Q, "diff": diff, "pillars": pillars,
+        "stronger": B if diff >= 0 else Q,
+        "explanation": _pair_explanation(B, Q, diff, pillars),
+        "run_date": latest.get("run_date"),
+        "as_of": latest.get("as_of"),
+        "last_synced_iso": latest.get("as_of"),
+        "run_date_nav": (list_runs() or [""])[0],
+    }
+
+
+@app.get("/currency/{code}", response_class=HTMLResponse)
+async def currency_page(request: Request, code: str):
+    ctx = _currency_ctx(request, code)
+    if not ctx:
+        raise HTTPException(404, f"Unknown currency '{code}'")
+    return templates.TemplateResponse(request, "currency_page.html", ctx)
+
+
+@app.get("/pair/{pair}")
+async def pair_page(request: Request, pair: str):
+    p = pair.upper().replace("/", "")
+    if len(p) != 6:
+        raise HTTPException(404, "Pair must be 6 letters, e.g. eurusd")
+    a, b = p[:3], p[3:]
+    if a not in _PAIR_PRIORITY or b not in _PAIR_PRIORITY or a == b:
+        raise HTTPException(404, f"Unknown pair '{pair}'")
+    base, quote = _canonical_pair(a, b)
+    if base + quote != p:  # normalise to canonical URL
+        return RedirectResponse(url=f"/pair/{(base + quote).lower()}", status_code=301)
+    ctx = _pair_ctx(request, base, quote)
+    if not ctx:
+        raise HTTPException(404, f"Pair data unavailable for '{pair}'")
+    return templates.TemplateResponse(request, "pair_page.html", ctx)
+
+
+@app.get("/sitemap.xml")
+async def sitemap():
+    base = "https://piptheory.com"
+    urls = ["/", "/about"]
+    urls += [f"/currency/{c.lower()}" for c in _PAIR_PRIORITY]
+    urls += [f"/pair/{slug}" for slug in _all_pair_slugs()]
+    body = ['<?xml version="1.0" encoding="UTF-8"?>',
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    body += [f"  <url><loc>{base}{u}</loc></url>" for u in urls]
+    body.append("</urlset>")
+    return Response(content="\n".join(body), media_type="application/xml")
+
+
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
+    """Homepage = the Macro Currency Strength Meter (the hero). Falls back to
+    the research desk if strength data hasn't been generated yet."""
+    ctx = _build_strength_context(request)
+    if ctx:
+        return templates.TemplateResponse(request, "dashboard_strength.html", ctx)
     runs = list_runs()
     if not runs:
         return templates.TemplateResponse(
@@ -1973,6 +2109,8 @@ async def robots():
         "Disallow: /admin\n"
         "Disallow: /api/\n"
         "Allow: /\n"
+        "\n"
+        "Sitemap: https://piptheory.com/sitemap.xml\n"
     )
     return HTMLResponse(content=body, media_type="text/plain")
 
