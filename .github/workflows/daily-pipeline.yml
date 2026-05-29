@@ -1,21 +1,8 @@
-# Runs the bias engine daily at 06:00 UTC, generates bias_cards/{date}/,
-# commits results, and pushes to main — triggering Render auto-deploy with fresh data.
-#
-# Also supports manual backfill via workflow_dispatch.inputs.date
-# (e.g., "2026-05-28" to fill a missed day).
-#
-# Required secrets (set in repo Settings > Secrets and variables > Actions):
-#   OPENROUTER_API_KEY  — OpenRouter API key for LLM calls
-#   FRED_API_KEY        — FRED API key for macro data
-#
-# Optional:
-#   OANDA_API_KEY, OANDA_ACCOUNT_ID — for live FX data (falls back to yfinance)
-#
 name: Daily Pipeline
 
 on:
   schedule:
-    - cron: "0 6 * * *"   # 06:00 UTC daily
+    - cron: "0 6 * * *"
   workflow_dispatch:
     inputs:
       date:
@@ -23,10 +10,13 @@ on:
         required: false
         default: ""
 
+permissions:
+  contents: write
+
 jobs:
   run-pipeline:
     runs-on: ubuntu-latest
-    timeout-minutes: 45   # liberal timeout for LLM calls
+    timeout-minutes: 45
 
     steps:
       - uses: actions/checkout@v4
@@ -63,17 +53,15 @@ jobs:
         run: |
           git config user.name "piptheory-bot"
           git config user.email "bot@piptheory.com"
-          
-          # Stage state files and bias cards
+
           git add --force state/score_history.json state/thesis_tracker.json 2>/dev/null || true
           git add bias_cards/ 2>/dev/null || true
-          
-          # Check if anything changed
+
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
-          
+
           DATE_LABEL="${{ github.event.inputs.date || 'today' }}"
           git commit -m "state: daily pipeline run for $DATE_LABEL"
           git push origin main
