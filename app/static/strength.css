@@ -40,7 +40,7 @@ body.cs-page .tv-topbar{padding:0 max(24px, calc((100% - 1440px) / 2 + 24px))}
 
 /* block heads */
 .cs-block,.cs-meter{margin:26px 0}
-.cs-block-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px;border-bottom:1px solid var(--border-2);padding-bottom:8px}
+.cs-block-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;border-bottom:1px solid var(--border-2);padding-bottom:8px}
 .cs-block-head h2{font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-.02em}
 .cs-sub{font-size:11px;color:var(--text-faint)}
 /* Info tooltips on section titles ("?" badge → hover/tap explanation) */
@@ -236,6 +236,22 @@ body.cs-page .tv-topbar{padding:0 max(24px, calc((100% - 1440px) / 2 + 24px))}
   .cs-name{display:none}
   .cs-row-inner{padding:4px 12px 16px}
   .cs-detail-grid{grid-template-columns:1fr;gap:18px}
+  /* Stack section headers: title on top, controls/subtitle full-width below */
+  .cs-block-head,.cs-block-head-2{flex-direction:column;align-items:stretch;gap:10px}
+  .cs-ctrls{width:100%;gap:14px}
+  .cs-ctrl-div{display:none}
+  /* Finger-sized tap targets */
+  .cs-range button{padding:9px 14px;min-height:40px}
+  .cs-leg{padding:8px 12px;min-height:38px}
+  .cs-info{width:20px;height:20px;font-size:11px}
+  .cs-fulllink,.cs-post-back,.cs-breadcrumb{display:inline-block;padding:8px 0;min-height:40px}
+  /* Heatmap: pin the row-label column so swiping the matrix keeps labels visible */
+  .cs-hm{font-size:10px;min-width:540px}
+  .cs-hm th,.cs-hm td{padding:7px 3px}
+  .cs-hm th:first-child{position:sticky;left:0;background:var(--bg-1);z-index:2;box-shadow:2px 0 5px rgba(0,0,0,.07)}
+  /* Pair page: stack the two currency cards + tighten the compare table */
+  .cs-pair-cards{grid-template-columns:1fr}
+  .cs-cmp th,.cs-cmp td{padding:7px 6px}
 }
 @media(max-width:420px){
   .cs-pillars-intro{grid-template-columns:1fr}
