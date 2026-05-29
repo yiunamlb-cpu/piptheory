@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f0f1f3" id="metaTheme">
+  <script>(function(){var t=localStorage.getItem('pt_theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('metaTheme').content='#0f1117';}})();</script>
+  <title>Research &amp; Macro Journal — PIPTHEORY</title>
+  <meta name="description" content="Macro research and educational articles on currency strength, interest rates, positioning and the forces that move FX.">
+  <link rel="canonical" href="https://piptheory.com/research">
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v={{ static_version }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/dashboard.css?v={{ static_version }}">
+  <link rel="stylesheet" href="/static/strength.css?v={{ static_version }}">
+</head>
+<body class="cs-page">
+<header class="tv-topbar">
+  <a href="/" class="tv-logo">
+    <img class="tv-logo-light" src="/static/logo-text.png?v={{ static_version }}" alt="PIPTHEORY" height="19">
+    <img class="tv-logo-dark" src="/static/logo-text-light.png?v={{ static_version }}" alt="PIPTHEORY" height="19">
+  </a>
+  <div class="tv-topbar-right">
+    <a class="cs-nav" href="/">Strength&nbsp;Meter</a>
+    <button class="tv-theme-toggle" id="themeToggle" title="Toggle theme">&#9790;</button>
+  </div>
+</header>
+
+<main class="cs-main">
+  <h1 class="cs-h1">Research &amp; Macro Journal</h1>
+  <p class="cs-lead" style="margin-bottom:22px">Educational articles on currency strength, interest rates, positioning and the macro forces that move FX. Free, like the rest of PIPTHEORY.</p>
+
+  {% if posts %}
+  <div class="cs-post-list">
+    {% for p in posts %}
+    <a class="cs-post" href="/research/{{ p.slug }}">
+      <span class="cs-post-date">{{ p.date }}</span>
+      <div class="cs-post-title">{{ p.title }}</div>
+      {% if p.summary %}<div class="cs-post-sum">{{ p.summary }}</div>{% endif %}
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="cs-lead">Articles are on the way — check back soon.</p>
+  {% endif %}
+
+  <footer class="cs-footer">
+    <div class="cs-footer-links">
+      <a href="/">Strength Meter</a>
+      <a href="/research">Research</a>
+      <a href="/about">About</a>
+      <a href="/privacy">Privacy</a>
+    </div>
+    <p class="cs-disclaimer">Educational macro context only — not investment advice.</p>
+  </footer>
+</main>
+
+<script>
+(function(){
+  var tb=document.getElementById('themeToggle');
+  function uti(){var d=document.documentElement.getAttribute('data-theme')==='dark';tb.innerHTML=d?'&#9788;':'&#9790;';document.getElementById('metaTheme').content=d?'#0f1117':'#f0f1f3';}
+  uti();
+  tb.addEventListener('click',function(){var d=document.documentElement.getAttribute('data-theme')==='dark';if(d){document.documentElement.removeAttribute('data-theme');localStorage.removeItem('pt_theme');}else{document.documentElement.setAttribute('data-theme','dark');localStorage.setItem('pt_theme','dark');}uti();});
+})();
+</script>
+</body>
+</html>

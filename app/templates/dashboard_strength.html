@@ -26,6 +26,8 @@
     <span class="tv-sync-dot"></span>
     <span>Updated <time id="syncTime" datetime="{{ as_of }}">{{ run_date }}</time></span>
     {% endif %}
+    <span class="tv-topbar-div"></span>
+    <a class="cs-nav" href="/research">Research</a>
     <button class="tv-theme-toggle" id="themeToggle" title="Toggle theme">&#9790;</button>
   </div>
 </header>
@@ -160,7 +162,11 @@
   </section>
 
   <footer class="cs-footer">
-    <p><strong>PIPTHEORY</strong> &middot; Systematic macro research &middot; Updated daily</p>
+    <div class="cs-footer-links">
+      <a href="/research">Research</a>
+      <a href="/about">About</a>
+      <a href="/privacy">Privacy</a>
+    </div>
     <p class="cs-disclaimer">Educational macro context only — not investment advice. Currency
     strength reflects fundamentals, which markets may have already priced; it does not predict short-term moves.</p>
   </footer>
@@ -172,8 +178,9 @@ window.SHIST = {{ history_json|safe }};
 
 (function(){
   var CODES = Object.keys(window.STRENGTH.currencies);
-  var COLORS = {USD:'#1BAFD0',EUR:'#3B82F6',GBP:'#8B5CF6',JPY:'#FD636B',
-                CHF:'#FFB900',CAD:'#3BE8B0',AUD:'#EC4899',NZD:'#14B8A6'};
+  // Uniform-weight categorical palette (deep, professional — not pastel)
+  var COLORS = {USD:'#2563EB',EUR:'#0D9488',GBP:'#7C3AED',JPY:'#E11D48',
+                CHF:'#CA8A04',CAD:'#16A34A',AUD:'#DB2777',NZD:'#0891B2'};
   var hidden = {};
 
   // THEME
@@ -275,8 +282,8 @@ window.SHIST = {{ history_json|safe }};
       order.forEach(function(c){
         if(r===c){h+='<td class="cs-hm-diag"></td>';return;}
         var diff=cur[r].composite-cur[c].composite, mag=Math.min(1,Math.abs(diff)/120);
-        var col=diff>=0?'59,232,176':'253,99,107';
-        h+='<td title="'+r+'/'+c+' '+(diff>=0?'+':'')+diff.toFixed(0)+'" style="background:rgba('+col+','+(0.12+mag*0.7).toFixed(2)+')">'+(diff>=0?'+':'')+diff.toFixed(0)+'</td>';
+        var col=diff>=0?'18,161,80':'226,54,54';
+        h+='<td title="'+r+'/'+c+' '+(diff>=0?'+':'')+diff.toFixed(0)+'" style="background:rgba('+col+','+(0.14+mag*0.66).toFixed(2)+')">'+(diff>=0?'+':'')+diff.toFixed(0)+'</td>';
       });
       h+='</tr>';
     });

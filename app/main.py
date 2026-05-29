@@ -1443,10 +1443,74 @@ async def pair_page(request: Request, pair: str):
     return templates.TemplateResponse(request, "pair_page.html", ctx)
 
 
+# ---------- Research / journal (file-based blog for SEO) ----------
+
+_RESEARCH_DIR = PROJECT_ROOT / "content" / "research"
+
+
+def _load_research_posts() -> list[dict]:
+    """Read markdown posts from content/research/*.md with `--- yaml ---` front
+    matter (title, date, summary). Newest first."""
+    posts: list[dict] = []
+    if not _RESEARCH_DIR.exists():
+        return posts
+    for p in _RESEARCH_DIR.glob("*.md"):
+        try:
+            raw = p.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        meta, body = {}, raw
+        if raw.lstrip().startswith("---"):
+            parts = raw.split("---", 2)
+            if len(parts) >= 3:
+                try:
+                    meta = _yaml.safe_load(parts[1]) or {}
+                except Exception:
+                    meta = {}
+                body = parts[2]
+        posts.append({
+            "slug": str(meta.get("slug") or p.stem),
+            "title": str(meta.get("title") or p.stem),
+            "date": str(meta.get("date") or ""),
+            "summary": str(meta.get("summary") or ""),
+            "body_md": body.strip(),
+        })
+    posts.sort(key=lambda x: x["date"], reverse=True)
+    return posts
+
+
+@app.get("/research", response_class=HTMLResponse)
+async def research_index(request: Request):
+    return templates.TemplateResponse(request, "research_index.html", {
+        "surface": _detect_surface(request),
+        "posts": _load_research_posts(),
+    })
+
+
+@app.get("/research/{slug}", response_class=HTMLResponse)
+async def research_post(request: Request, slug: str):
+    post = next((p for p in _load_research_posts() if p["slug"] == slug), None)
+    if not post:
+        raise HTTPException(404, "Article not found")
+    post = dict(post)
+    post["html"] = _render_markdown(post["body_md"])
+    return templates.TemplateResponse(request, "research_post.html", {
+        "surface": _detect_surface(request), "post": post,
+    })
+
+
+@app.get("/privacy", response_class=HTMLResponse)
+async def privacy_page(request: Request):
+    return templates.TemplateResponse(request, "privacy.html", {
+        "surface": _detect_surface(request),
+    })
+
+
 @app.get("/sitemap.xml")
 async def sitemap():
     base = "https://piptheory.com"
-    urls = ["/", "/about"]
+    urls = ["/", "/about", "/research", "/privacy"]
+    urls += [f"/research/{p['slug']}" for p in _load_research_posts()]
     urls += [f"/currency/{c.lower()}" for c in _PAIR_PRIORITY]
     urls += [f"/pair/{slug}" for slug in _all_pair_slugs()]
     body = ['<?xml version="1.0" encoding="UTF-8"?>',
