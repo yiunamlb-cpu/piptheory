@@ -1123,6 +1123,117 @@ def _strength_blurb(c: dict) -> str:
     return " ".join(parts)
 
 
+_PILLAR_ORDER = [
+    ("monetary", "Interest Rates"), ("growth", "Growth"),
+    ("positioning", "Positioning"), ("risk", "Risk Mood"),
+    ("commodity", "Commodities"),
+]
+
+
+def _asof_date(ind: dict) -> str | None:
+    a = ind.get("as_of")
+    return a[:10] if a and "T" in a else a
+
+
+def _display_indicators(c: dict) -> list[dict]:
+    """Human-readable underlying data with correct signs/units + as-of dates."""
+    ind = c.get("indicators", {})
+    rows = []
+    if "rate_level" in ind:
+        rows.append({"label": "Short-term rate", "val": f"{ind['rate_level']['value']:.2f}%", "asof": _asof_date(ind["rate_level"])})
+    if "bond_level" in ind:
+        rows.append({"label": "10-year yield", "val": f"{ind['bond_level']['value']:.2f}%", "asof": _asof_date(ind["bond_level"])})
+    if "unrate_level" in ind:
+        rows.append({"label": "Unemployment", "val": f"{-ind['unrate_level']['value']:.1f}%", "asof": _asof_date(ind["unrate_level"])})
+    if "cot_pctile" in ind:
+        rows.append({"label": "Fund positioning", "val": f"{ind['cot_pctile']['value'] + 50:.0f}th pctile", "asof": _asof_date(ind["cot_pctile"])})
+    if "commodity" in ind:
+        v = ind["commodity"]["value"]
+        rows.append({"label": "Commodity momentum", "val": f"{'+' if v >= 0 else ''}{v:.2f}σ", "asof": _asof_date(ind["commodity"])})
+    return rows
+
+
+def _pillar_rows(c: dict) -> list[dict]:
+    pills = c.get("pillars", {})
+    return [{"label": lbl, "score": pills[k]} for k, lbl in _PILLAR_ORDER if k in pills]
+
+
+def _strength_explanation(c: dict) -> str:
+    """A longer, jargon-free, data-grounded explanation (deterministic)."""
+    name, label, rank = c["name"], c["label"], c["rank"]
+    comp = c["composite"]
+    pills, ind, tr = c.get("pillars", {}), c.get("indicators", {}), c.get("trend", {})
+    s = []
+    if rank == 1:
+        pos = "the strongest of the eight majors"
+    elif rank == 8:
+        pos = "the weakest of the eight majors"
+    else:
+        pos = f"#{rank} of the eight majors"
+    s.append(f"The {name} is currently {pos}, with a macro strength score of "
+             f"{comp:+.0f} ({label.lower()}).")
+
+    m = pills.get("monetary", 0.0)
+    rate, bond = ind.get("rate_level"), ind.get("bond_level")
+    if rate is not None:
+        rl = rate["value"]
+        by = f" alongside a 10-year yield near {bond['value']:.2f}%" if bond else ""
+        if m > 8:
+            s.append(f"A relatively high short-term interest rate (around {rl:.2f}%{by}) "
+                     "rewards holders and is its biggest support — global capital tends to "
+                     "flow toward higher-yielding currencies.")
+        elif m < -8:
+            s.append(f"A low short-term interest rate (around {rl:.2f}%{by}) offers holders "
+                     "little yield, leaving it at a carry disadvantage to higher-yielding majors.")
+        else:
+            s.append(f"Its rate backdrop (short rate around {rl:.2f}%{by}) sits "
+                     "roughly mid-pack among the majors.")
+
+    cot = ind.get("cot_pctile")
+    if cot is not None:
+        p = cot["value"] + 50
+        if p >= 70:
+            s.append(f"Large speculative funds are heavily positioned for it — around the "
+                     f"{p:.0f}th percentile of the past three years — which signals conviction "
+                     "but also crowding that can unwind quickly.")
+        elif p <= 30:
+            s.append(f"Large speculative funds are leaning against it (around the {p:.0f}th "
+                     "percentile of the past three years), a bearish positioning signal.")
+
+    r = pills.get("risk", 0.0)
+    if r > 10:
+        s.append("The current market risk mood is working in its favour.")
+    elif r < -10:
+        s.append("The prevailing risk mood is a headwind — it tends to underperform when "
+                 "investors are positioned this way.")
+
+    g = pills.get("growth")
+    if g is not None and g < -8:
+        s.append("Softening domestic data — notably the labour market — is weighing on the "
+                 "growth picture.")
+    elif g is not None and g > 8:
+        s.append("A resilient domestic economy adds further support.")
+
+    cm = pills.get("commodity")
+    if cm is not None and cm > 8:
+        s.append("Firm commodity prices provide a terms-of-trade tailwind.")
+    elif cm is not None and cm < -8:
+        s.append("Soft commodity prices are a drag on its terms of trade.")
+
+    lbl = tr.get("label")
+    chg = abs(tr.get("change", 0.0))
+    if lbl == "strengthening":
+        s.append(f"Over recent weeks the score has been strengthening (up about {chg:.0f} "
+                 "points versus its trailing average), suggesting the macro tide is turning "
+                 "in its favour.")
+    elif lbl == "weakening":
+        s.append(f"Over recent weeks the score has been weakening (down about {chg:.0f} "
+                 "points versus its trailing average).")
+    else:
+        s.append("The score has been broadly stable over recent weeks.")
+    return " ".join(s)
+
+
 def _build_strength_context(request: Request) -> dict | None:
     latest = cs_load_latest()
     if not latest or not latest.get("currencies"):
@@ -1131,6 +1242,9 @@ def _build_strength_context(request: Request) -> dict | None:
     ordered = sorted(cur_map.values(), key=lambda d: d.get("rank", 99))
     for c in ordered:
         c["blurb"] = _strength_blurb(c)
+        c["explanation"] = _strength_explanation(c)
+        c["display_indicators"] = _display_indicators(c)
+        c["pillar_rows"] = _pillar_rows(c)
 
     history = cs_all_history()
     hist_compact = {code: [[e["date"], e["composite"]] for e in history.get(code, [])]

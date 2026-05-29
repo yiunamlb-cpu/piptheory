@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f0f1f3" id="metaTheme">
   <script>(function(){var t=localStorage.getItem('pt_theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('metaTheme').content='#0f1117';}})();</script>
-  <title>Currency Strength Meter — PIPTHEORY</title>
-  <meta name="description" content="A systematic, mechanical strength score for the 8 major currencies — built from interest rates, growth, positioning, risk sentiment and commodities. Updated daily.">
+  <title>Macro Currency Strength Meter — PIPTHEORY</title>
+  <meta name="description" content="A systematic macro strength score for the 8 major currencies — built from interest-rate differentials, growth, institutional positioning, risk sentiment and commodities. Updated daily.">
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v={{ static_version }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,57 +35,37 @@
 
 <main class="cs-main">
 
-  <!-- ZONE 1 — EXPLAINER -->
+  <!-- HEADER / METHODOLOGY -->
   <section class="cs-explain">
-    <h1 class="cs-h1">Currency Strength Meter</h1>
+    <h1 class="cs-h1">Macro Currency Strength Meter</h1>
     <p class="cs-lead">
-      A single, systematic score for each of the eight major currencies &mdash; how
-      strong or weak it is <em>right now, relative to the others</em>. Every score is
-      built mechanically from real macro data. No opinions, no guesswork: the same
-      inputs always produce the same number.
+      The Macro Currency Strength Meter distils the fundamental forces behind each major
+      currency into a single, systematic score. It mechanically synthesises five macro
+      pillars &mdash; <em>interest-rate differentials, economic growth, institutional
+      positioning, risk sentiment and commodity terms-of-trade</em> &mdash; each measured
+      against its own history and ranked across the eight majors. <strong>Updated every
+      day</strong>, it reflects the slow macro tide rather than intraday noise, giving an
+      objective read on which currencies are fundamentally strong or weak.
     </p>
     <div class="cs-pillars-intro">
-      <div class="cs-pintro"><span class="cs-pintro-h">Interest&nbsp;Rates</span><span class="cs-pintro-d">Which currency pays &amp; rewards holders</span></div>
+      <div class="cs-pintro"><span class="cs-pintro-h">Interest&nbsp;Rates</span><span class="cs-pintro-d">Carry &amp; yield that rewards holders</span></div>
       <div class="cs-pintro"><span class="cs-pintro-h">Growth</span><span class="cs-pintro-d">Health of the underlying economy</span></div>
-      <div class="cs-pintro"><span class="cs-pintro-h">Positioning</span><span class="cs-pintro-d">How big funds are betting</span></div>
+      <div class="cs-pintro"><span class="cs-pintro-h">Positioning</span><span class="cs-pintro-d">How institutional funds are betting</span></div>
       <div class="cs-pintro"><span class="cs-pintro-h">Risk&nbsp;Mood</span><span class="cs-pintro-d">Safe-haven vs risk-on flows</span></div>
       <div class="cs-pintro"><span class="cs-pintro-h">Commodities</span><span class="cs-pintro-d">Terms-of-trade tailwinds</span></div>
     </div>
     <p class="cs-howto">
       Scores run from <strong class="pos">+100 (very strong)</strong> to
-      <strong class="neg">&minus;100 (very weak)</strong>. It reflects the slow macro
-      tide over weeks &mdash; not day-to-day noise. Read it as <em>context</em>, not a buy/sell signal.
+      <strong class="neg">&minus;100 (very weak)</strong>, always <em>relative to the other
+      majors</em>. Read it as macro <em>context</em> &mdash; not a short-term buy/sell signal.
     </p>
   </section>
 
   <div class="tv-ad-slot tv-ad-leaderboard">Ad Slot — Leaderboard (728×90)</div>
 
-  <!-- ZONE 2 — THE METER -->
-  <section class="cs-meter">
-    <div class="cs-block-head"><h2>Strength Ranking</h2><span class="cs-sub">Tap a currency for the full breakdown</span></div>
-    <div class="cs-bars">
-      {% for c in currencies %}
-      <button class="cs-row" data-code="{{ c.code }}" aria-label="{{ c.name }} {{ c.composite }}">
-        <span class="cs-rank">{{ c.rank }}</span>
-        <span class="cs-code">{{ c.code }}</span>
-        <span class="cs-name">{{ c.name }}</span>
-        <span class="cs-bar"><span class="cs-bar-track">
-          <span class="cs-bar-zero"></span>
-          <span class="cs-bar-fill {{ 'pos' if c.composite >= 0 else 'neg' }}"
-                style="width:{{ (c.composite if c.composite >= 0 else -c.composite) / 2 }}%;{{ 'left:50%' if c.composite >= 0 else 'right:50%' }}"></span>
-        </span></span>
-        <span class="cs-score {{ 'pos' if c.composite >= 0 else 'neg' }}">{{ '%+.0f'|format(c.composite) }}</span>
-        <span class="cs-pill cs-{{ c.trend.label }}">
-          {% if c.trend.label == 'strengthening' %}&#9650;{% elif c.trend.label == 'weakening' %}&#9660;{% else %}&#8211;{% endif %}
-        </span>
-      </button>
-      {% endfor %}
-    </div>
-  </section>
-
-  <!-- ZONE 2b — HISTORY CHART -->
+  <!-- 1. 12-MONTH TREND -->
   <section class="cs-block">
-    <div class="cs-block-head"><h2>12-Month Trend</h2><span class="cs-sub">Click a currency in the legend to isolate it</span></div>
+    <div class="cs-block-head"><h2>12-Month Trend</h2><span class="cs-sub">Tap a currency in the legend to show or hide it</span></div>
     <div class="cs-chart-wrap">
       <div class="cs-chart-yscale"><span>+100</span><span>+50</span><span>0</span><span>&minus;50</span><span>&minus;100</span></div>
       <div class="cs-chart-main"><svg class="cs-chart" id="csChart"></svg><div class="cs-chart-tip" id="csTip"></div></div>
@@ -93,18 +73,64 @@
     <div class="cs-legend" id="csLegend"></div>
   </section>
 
-  <!-- ZONE 2c — HEATMAP -->
-  <section class="cs-block">
-    <div class="cs-block-head"><h2>Pair Strength Matrix</h2><span class="cs-sub">Row vs column — green = row currency stronger</span></div>
-    <div class="cs-heatmap-wrap"><div class="cs-heatmap" id="csHeatmap"></div></div>
+  <!-- 2. STRENGTH RANKING (accordion w/ inline detail) -->
+  <section class="cs-meter">
+    <div class="cs-block-head"><h2>Strength Ranking</h2><span class="cs-sub">Click any currency to expand its full breakdown</span></div>
+    <div class="cs-bars">
+      {% for c in currencies %}
+      <div class="cs-item{% if loop.first %} open{% endif %}" data-code="{{ c.code }}">
+        <button class="cs-row" aria-expanded="{{ 'true' if loop.first else 'false' }}">
+          <span class="cs-rank">{{ c.rank }}</span>
+          <span class="cs-code">{{ c.code }}</span>
+          <span class="cs-name">{{ c.name }}</span>
+          <span class="cs-bar"><span class="cs-bar-track">
+            <span class="cs-bar-zero"></span>
+            <span class="cs-bar-fill {{ 'pos' if c.composite >= 0 else 'neg' }}"
+                  style="width:{{ (c.composite if c.composite >= 0 else -c.composite) / 2 }}%;{{ 'left:50%' if c.composite >= 0 else 'right:50%' }}"></span>
+          </span></span>
+          <span class="cs-score {{ 'pos' if c.composite >= 0 else 'neg' }}">{{ '%+.0f'|format(c.composite) }}</span>
+          <span class="cs-pill cs-{{ c.trend.label }}">
+            {% if c.trend.label == 'strengthening' %}&#9650;{% elif c.trend.label == 'weakening' %}&#9660;{% else %}&#8211;{% endif %}
+          </span>
+          <span class="cs-chev">&#9656;</span>
+        </button>
+        <div class="cs-row-body">
+          <div class="cs-row-inner">
+            <div class="cs-detail-grid">
+              <div class="cs-detail-pillars">
+                <div class="cs-detail-h">What's driving it</div>
+                {% for p in c.pillar_rows %}
+                <div class="cs-pl-row">
+                  <span class="cs-pl-name">{{ p.label }}</span>
+                  <span class="cs-pl-bar"><span class="cs-pl-zero"></span>
+                    <span class="cs-pl-fill {{ 'pos' if p.score >= 0 else 'neg' }}"
+                          style="width:{{ [50, (p.score if p.score >= 0 else -p.score) / 2]|min }}%;{{ 'left:50%' if p.score >= 0 else 'right:50%' }}"></span>
+                  </span>
+                  <span class="cs-pl-val {{ 'pos' if p.score >= 0 else 'neg' }}">{{ '%+.0f'|format(p.score) }}</span>
+                </div>
+                {% endfor %}
+              </div>
+              <div class="cs-detail-ind">
+                <div class="cs-detail-h">Underlying data</div>
+                {% for ind in c.display_indicators %}
+                <div class="cs-ind-row"><span class="cs-ind-l">{{ ind.label }}</span><span class="cs-ind-v">{{ ind.val }}</span>{% if ind.asof and ind.asof != 'derived' %}<span class="cs-ind-a">as of {{ ind.asof }}</span>{% endif %}</div>
+                {% endfor %}
+              </div>
+            </div>
+            <p class="cs-explain-text">{{ c.explanation }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
   </section>
 
   <div class="tv-ad-slot tv-ad-infeed">Ad Slot — In-Feed Native</div>
 
-  <!-- ZONE 3 — CURRENCY DETAIL -->
+  <!-- 3. PAIR MATRIX -->
   <section class="cs-block">
-    <div class="cs-block-head"><h2 id="csDetailTitle">Currency Detail</h2><span class="cs-sub" id="csDetailSub"></span></div>
-    <div class="cs-detail" id="csDetail"></div>
+    <div class="cs-block-head"><h2>Pair Strength Matrix</h2><span class="cs-sub">Row vs column — green = row currency stronger</span></div>
+    <div class="cs-heatmap-wrap"><div class="cs-heatmap" id="csHeatmap"></div></div>
   </section>
 
   <footer class="cs-footer">
@@ -117,112 +143,53 @@
 <script>
 window.STRENGTH = {{ latest_json|safe }};
 window.SHIST = {{ history_json|safe }};
-window.SWEIGHTS = {{ weights|tojson }};
 
 (function(){
   var CODES = Object.keys(window.STRENGTH.currencies);
   var COLORS = {USD:'#1BAFD0',EUR:'#3B82F6',GBP:'#8B5CF6',JPY:'#FD636B',
                 CHF:'#FFB900',CAD:'#3BE8B0',AUD:'#EC4899',NZD:'#14B8A6'};
-  var PILLAR_LABEL = {monetary:'Interest Rates',growth:'Growth',positioning:'Positioning',risk:'Risk Mood',commodity:'Commodities'};
-  var hidden = {};   // code -> true if toggled off in chart
+  var hidden = {};
 
-  // ---------- THEME ----------
+  // THEME
   var tb=document.getElementById('themeToggle');
   function uti(){var d=document.documentElement.getAttribute('data-theme')==='dark';tb.innerHTML=d?'&#9788;':'&#9790;';document.getElementById('metaTheme').content=d?'#0f1117':'#f0f1f3';}
   uti();
   tb.addEventListener('click',function(){var d=document.documentElement.getAttribute('data-theme')==='dark';if(d){document.documentElement.removeAttribute('data-theme');localStorage.removeItem('pt_theme');}else{document.documentElement.setAttribute('data-theme','dark');localStorage.setItem('pt_theme','dark');}uti();drawChart();});
 
-  // ---------- DETAIL PANEL ----------
-  function fmtIndicator(code, key, ind){
-    if(!ind) return null;
-    var v = ind.value, asof = ind.as_of;
-    var map = {
-      rate_level:['Short-term rate', v.toFixed(2)+'%'],
-      bond_level:['10-year yield', v.toFixed(2)+'%'],
-      unrate_level:['Unemployment', (-v).toFixed(1)+'%'],
-      cot_pctile:['Fund positioning', (v+50).toFixed(0)+'th pctile'],
-      commodity:['Commodity momentum', (v>=0?'+':'')+v.toFixed(2)+'σ']
-    };
-    if(!map[key]) return null;
-    if(asof && asof.indexOf('T')>0) asof=asof.slice(0,10);
-    return {label:map[key][0], val:map[key][1], asof:asof};
-  }
-
-  function csSelect(code){
-    var c = window.STRENGTH.currencies[code];
-    if(!c) return;
-    document.querySelectorAll('.cs-row').forEach(function(r){r.classList.toggle('active', r.dataset.code===code);});
-    document.getElementById('csDetailTitle').textContent = c.name + ' ('+code+')';
-    var tr=c.trend||{};
-    document.getElementById('csDetailSub').textContent =
-      'Score '+(c.composite>=0?'+':'')+c.composite+' · '+c.label+
-      (tr.label && tr.label!=='new' ? ' · '+tr.label : '');
-
-    var html = '<div class="cs-detail-grid">';
-    // Pillar breakdown
-    html += '<div class="cs-detail-pillars"><div class="cs-detail-h">What\'s driving it</div>';
-    ['monetary','growth','positioning','risk','commodity'].forEach(function(p){
-      if(c.pillars[p]===undefined) return;
-      var v=c.pillars[p], w=Math.min(50,Math.abs(v)/2);
-      html += '<div class="cs-pl-row"><span class="cs-pl-name">'+PILLAR_LABEL[p]+'</span>'+
-        '<span class="cs-pl-bar"><span class="cs-pl-zero"></span>'+
-        '<span class="cs-pl-fill '+(v>=0?'pos':'neg')+'" style="width:'+w+'%;'+(v>=0?'left:50%':'right:50%')+'"></span></span>'+
-        '<span class="cs-pl-val '+(v>=0?'pos':'neg')+'">'+(v>=0?'+':'')+v.toFixed(0)+'</span></div>';
+  // ACCORDION
+  document.querySelectorAll('.cs-item > .cs-row').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var item=btn.parentElement;
+      var open=item.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open?'true':'false');
     });
-    html += '</div>';
-    // Indicators
-    html += '<div class="cs-detail-ind"><div class="cs-detail-h">Underlying data</div>';
-    ['rate_level','bond_level','unrate_level','cot_pctile','commodity'].forEach(function(k){
-      var f = fmtIndicator(code,k,c.indicators[k]);
-      if(!f) return;
-      html += '<div class="cs-ind-row"><span class="cs-ind-l">'+f.label+'</span><span class="cs-ind-v">'+f.val+'</span>'+
-        (f.asof&&f.asof!=='derived'?'<span class="cs-ind-a">as of '+f.asof+'</span>':'')+'</div>';
-    });
-    html += '</div></div>';
-    // Blurb
-    if(c.blurb) html += '<p class="cs-blurb">'+c.blurb+'</p>';
-    document.getElementById('csDetail').innerHTML = html;
-  }
-  window.csSelect = csSelect;
-  document.querySelectorAll('.cs-row').forEach(function(r){
-    r.addEventListener('click',function(){csSelect(r.dataset.code);});
   });
 
-  // ---------- MULTI-LINE CHART ----------
+  // MULTI-LINE CHART
   function drawChart(){
-    var svg=document.getElementById('csChart');
-    var main=svg.parentElement;
-    var W=main.offsetWidth, H=280, padR=8, padB=4;
-    if(W<10) return;
-    svg.setAttribute('width',W); svg.setAttribute('height',H);
-    svg.setAttribute('viewBox','0 0 '+W+' '+H);
+    var svg=document.getElementById('csChart'); var main=svg.parentElement;
+    var W=main.offsetWidth, H=280, padR=8, padB=18; if(W<10) return;
+    svg.setAttribute('width',W); svg.setAttribute('height',H); svg.setAttribute('viewBox','0 0 '+W+' '+H);
     var cs=getComputedStyle(document.documentElement);
     var grid=cs.getPropertyValue('--border-2').trim()||'#ccc';
     var faint=cs.getPropertyValue('--text-faint').trim()||'#999';
-    function y(v){return padB + (100-v)/200*(H-padB*2);}  // +100 top .. -100 bottom
-    // dates from the longest series
+    function y(v){return 4 + (100-v)/200*(H-padB-4);}
     var dates=[]; CODES.forEach(function(c){ if(window.SHIST[c]&&window.SHIST[c].length>dates.length) dates=window.SHIST[c].map(function(p){return p[0];}); });
     var n=dates.length; if(n<2){svg.innerHTML='';return;}
     function x(i){return (i/(n-1))*(W-padR);}
     var s='';
-    // gridlines
     [100,50,0,-50,-100].forEach(function(g){s+='<line x1="0" y1="'+y(g)+'" x2="'+(W-padR)+'" y2="'+y(g)+'" stroke="'+grid+'" stroke-width="1" '+(g===0?'':'stroke-dasharray="2,3"')+' opacity="'+(g===0?0.8:0.4)+'"/>';});
-    // lines
     CODES.forEach(function(c){
-      if(hidden[c]) return;
-      var arr=window.SHIST[c]; if(!arr||arr.length<2) return;
+      if(hidden[c]) return; var arr=window.SHIST[c]; if(!arr||arr.length<2) return;
       var d=''; arr.forEach(function(p,i){ d+=(i?'L':'M')+x(i).toFixed(1)+','+y(p[1]).toFixed(1)+' '; });
       s+='<path d="'+d+'" fill="none" stroke="'+COLORS[c]+'" stroke-width="2" stroke-linejoin="round" opacity="0.9"/>';
     });
-    // date ticks (start, mid, end)
-    [0,Math.floor(n/2),n-1].forEach(function(i){var lbl=dates[i]?dates[i].slice(2):'';s+='<text x="'+x(i)+'" y="'+(H-2)+'" fill="'+faint+'" font-size="9" font-family="monospace" text-anchor="'+(i===0?'start':i===n-1?'end':'middle')+'">'+lbl+'</text>';});
-    svg.innerHTML=s;
-    svg._dates=dates; svg._x=x; svg._n=n;
+    [0,Math.floor(n/2),n-1].forEach(function(i){var lbl=dates[i]?dates[i].slice(2):'';s+='<text x="'+x(i)+'" y="'+(H-4)+'" fill="'+faint+'" font-size="9" font-family="monospace" text-anchor="'+(i===0?'start':i===n-1?'end':'middle')+'">'+lbl+'</text>';});
+    svg.innerHTML=s; svg._dates=dates; svg._x=x; svg._n=n;
   }
-
   function buildLegend(){
     var L=document.getElementById('csLegend'); var h='';
-    CODES.forEach(function(c){
+    CODES.sort(function(a,b){return window.STRENGTH.currencies[a].rank-window.STRENGTH.currencies[b].rank;}).forEach(function(c){
       h+='<button class="cs-leg" data-code="'+c+'"><span class="cs-leg-dot" style="background:'+COLORS[c]+'"></span>'+c+'</button>';
     });
     L.innerHTML=h;
@@ -230,51 +197,40 @@ window.SWEIGHTS = {{ weights|tojson }};
       b.addEventListener('click',function(){var c=b.dataset.code;hidden[c]=!hidden[c];b.classList.toggle('off',hidden[c]);drawChart();});
     });
   }
-
-  // chart hover
   (function(){
     var svg=document.getElementById('csChart'), tip=document.getElementById('csTip');
     svg.addEventListener('mousemove',function(e){
-      if(!svg._dates) return;
-      var rect=svg.getBoundingClientRect();
-      var rel=(e.clientX-rect.left)/rect.width;
-      var i=Math.round(rel*(svg._n-1)); if(i<0)i=0; if(i>=svg._n)i=svg._n-1;
-      var rows=CODES.filter(function(c){return !hidden[c]&&window.SHIST[c]&&window.SHIST[c][i];})
-        .map(function(c){return {c:c,v:window.SHIST[c][i][1]};}).sort(function(a,b){return b.v-a.v;});
+      if(!svg._dates) return; var rect=svg.getBoundingClientRect();
+      var i=Math.round((e.clientX-rect.left)/rect.width*(svg._n-1)); if(i<0)i=0; if(i>=svg._n)i=svg._n-1;
+      var rows=CODES.filter(function(c){return !hidden[c]&&window.SHIST[c]&&window.SHIST[c][i];}).map(function(c){return {c:c,v:window.SHIST[c][i][1]};}).sort(function(a,b){return b.v-a.v;});
       var html='<div class="cs-tip-d">'+(svg._dates[i]||'')+'</div>';
       rows.forEach(function(r){html+='<div class="cs-tip-r"><span class="cs-leg-dot" style="background:'+COLORS[r.c]+'"></span>'+r.c+' <b>'+(r.v>=0?'+':'')+r.v+'</b></div>';});
       tip.innerHTML=html; tip.style.display='block';
-      var tx=svg._x(i); tip.style.left=Math.min(rect.width-150, Math.max(0,tx+8))+'px';
+      tip.style.left=Math.min(rect.width-150,Math.max(0,svg._x(i)+8))+'px';
     });
     svg.addEventListener('mouseleave',function(){tip.style.display='none';});
   })();
 
-  // ---------- HEATMAP ----------
+  // HEATMAP
   function drawHeatmap(){
-    var box=document.getElementById('csHeatmap');
-    var cur=window.STRENGTH.currencies;
+    var box=document.getElementById('csHeatmap'); var cur=window.STRENGTH.currencies;
     var order=CODES.slice().sort(function(a,b){return cur[a].rank-cur[b].rank;});
     var h='<table class="cs-hm"><tr><th></th>';
-    order.forEach(function(c){h+='<th>'+c+'</th>';});
-    h+='</tr>';
+    order.forEach(function(c){h+='<th>'+c+'</th>';}); h+='</tr>';
     order.forEach(function(r){
       h+='<tr><th>'+r+'</th>';
       order.forEach(function(c){
         if(r===c){h+='<td class="cs-hm-diag"></td>';return;}
-        var diff=cur[r].composite-cur[c].composite;
-        var mag=Math.min(1,Math.abs(diff)/120);
+        var diff=cur[r].composite-cur[c].composite, mag=Math.min(1,Math.abs(diff)/120);
         var col=diff>=0?'59,232,176':'253,99,107';
         h+='<td title="'+r+'/'+c+' '+(diff>=0?'+':'')+diff.toFixed(0)+'" style="background:rgba('+col+','+(0.12+mag*0.7).toFixed(2)+')">'+(diff>=0?'+':'')+diff.toFixed(0)+'</td>';
       });
       h+='</tr>';
     });
-    h+='</table>';
-    box.innerHTML=h;
+    box.innerHTML=h+'</table>';
   }
 
-  // ---------- INIT ----------
   buildLegend(); drawChart(); drawHeatmap();
-  csSelect(CODES.sort(function(a,b){return window.STRENGTH.currencies[a].rank-window.STRENGTH.currencies[b].rank;})[0]);
   var rt; window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(drawChart,150);});
 })();
 </script>
