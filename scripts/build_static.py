@@ -53,17 +53,18 @@ def build() -> None:
     codes = [c.lower() for c in _PAIR_PRIORITY]
     pairs = _all_pair_slugs()
 
-    # --- Clean-URL HTML pages -> <path>/index.html ---
+    # --- HTML pages as flat *.html so Cloudflare serves the no-slash URL
+    #     directly (matches our canonical tags + sitemap, no 308 hop). ---
     _page(client, "/", "index.html")
-    _page(client, "/about", "about/index.html")
-    _page(client, "/research", "research/index.html")
-    _page(client, "/privacy", "privacy/index.html")
+    _page(client, "/about", "about.html")
+    _page(client, "/research", "research.html")
+    _page(client, "/privacy", "privacy.html")
     for p in posts:
-        _page(client, f"/research/{p['slug']}", f"research/{p['slug']}/index.html")
+        _page(client, f"/research/{p['slug']}", f"research/{p['slug']}.html")
     for c in codes:
-        _page(client, f"/currency/{c}", f"currency/{c}/index.html")
+        _page(client, f"/currency/{c}", f"currency/{c}.html")
     for slug in pairs:
-        _page(client, f"/pair/{slug}", f"pair/{slug}/index.html")
+        _page(client, f"/pair/{slug}", f"pair/{slug}.html")
 
     # --- Machine endpoints ---
     _page(client, "/sitemap.xml", "sitemap.xml")
