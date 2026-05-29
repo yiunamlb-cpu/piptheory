@@ -108,7 +108,7 @@
   <section class="cs-block" id="psSection">
     <div class="cs-block-head cs-block-head-2">
       <div class="cs-head-titles">
-        <h2>Currency Performance</h2>
+        <h2>Currency Performance Tug of War</h2>
         <span class="cs-sub">Each currency's relative price strength across all 28 major pairs, since the start of the window.</span>
       </div>
       <div class="cs-ctrls">
@@ -403,6 +403,8 @@ window.PSTR = {{ price_strength_json|safe }};
   function buildLegend(){
     var L=document.getElementById('psLegend'); var d=curData(); var ix=d.ix||{};
     var codes=ORDER.filter(function(c){return ix[c];});
+    var S=(window.STRENGTH&&window.STRENGTH.currencies)||{};  // match trend legend: order by strength rank
+    codes.sort(function(a,b){return ((S[a]&&S[a].rank)||99)-((S[b]&&S[b].rank)||99);});
     L.innerHTML=codes.map(function(c){return '<button class="cs-leg'+(hidden[c]?' off':'')+'" data-code="'+c+'"><span class="cs-leg-dot" style="background:'+COLORS[c]+'"></span>'+c+'</button>';}).join('');
     L.querySelectorAll('.cs-leg').forEach(function(b){b.addEventListener('click',function(){var c=b.dataset.code;hidden[c]=!hidden[c];b.classList.toggle('off',hidden[c]);draw();});});
   }
