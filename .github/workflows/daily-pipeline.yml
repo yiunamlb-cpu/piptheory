@@ -64,4 +64,5 @@ jobs:
 
           DATE_LABEL="${{ github.event.inputs.date || 'today' }}"
           git commit -m "state: daily pipeline run for $DATE_LABEL"
+          git pull --rebase origin main
           git push origin main
