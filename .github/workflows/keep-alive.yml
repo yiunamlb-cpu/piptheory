@@ -1,20 +1,14 @@
-# Ping the Render free-tier service every 14 minutes to prevent cold starts.
-# GitHub Actions cron runs in UTC; */14 fires ~every 14 min (5 min granularity,
-# so GitHub may batch to roughly every 15 min — close enough).
 name: Keep Alive
 
 on:
   schedule:
-    - cron: "*/10 * * * *"
-  workflow_dispatch:        # manual trigger button
+    - cron: "*/4 * * * *"
+  workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping site
+      - name: Ping piptheory.com
         run: |
-          # Primary: custom domain
-          curl -sf --max-time 30 "https://piptheory.com/" -o /dev/null && echo "✓ piptheory.com alive" || echo "⚠ piptheory.com unreachable"
-          # Fallback: Render subdomain (uncomment and replace with your actual Render URL)
-          # curl -sf --max-time 30 "https://piptheory.onrender.com/" -o /dev/null && echo "✓ render alive" || echo "⚠ render unreachable"
+          curl -s -o /dev/null -w "Pinged piptheory.com — HTTP %{http_code}\n" --max-time 60 https://piptheory.com/
