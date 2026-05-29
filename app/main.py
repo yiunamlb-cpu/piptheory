@@ -1158,79 +1158,101 @@ def _pillar_rows(c: dict) -> list[dict]:
     return [{"label": lbl, "score": pills[k]} for k, lbl in _PILLAR_ORDER if k in pills]
 
 
+# Plain-English character of each currency, for layman phrasing of the
+# risk-sentiment and commodity sentences.
+_CCY_CHARACTER = {
+    "USD": {"risk": "haven"},
+    "JPY": {"risk": "haven"},
+    "CHF": {"risk": "haven"},
+    "EUR": {"risk": "neutral"},
+    "GBP": {"risk": "neutral"},
+    "AUD": {"risk": "risk", "exports": "metals like iron ore"},
+    "NZD": {"risk": "risk", "exports": "farm goods like dairy"},
+    "CAD": {"risk": "risk", "exports": "oil"},
+}
+
+
 def _strength_explanation(c: dict) -> str:
-    """A longer, jargon-free, data-grounded explanation (deterministic)."""
-    name, label, rank = c["name"], c["label"], c["rank"]
-    comp = c["composite"]
+    """A plain-English, jargon-free explanation a non-expert can follow.
+    Deterministic — built straight from the pillar scores + raw data."""
+    name, rank, comp = c["name"], c["rank"], c["composite"]
     pills, ind, tr = c.get("pillars", {}), c.get("indicators", {}), c.get("trend", {})
+    ch = _CCY_CHARACTER.get(c["code"], {})
     s = []
+
+    # 1. Where it stands — plain
     if rank == 1:
-        pos = "the strongest of the eight majors"
+        where = "the strongest of the eight major currencies right now"
     elif rank == 8:
-        pos = "the weakest of the eight majors"
+        where = "the weakest of the eight major currencies right now"
+    elif rank <= 3:
+        where = f"one of the stronger major currencies right now (ranked #{rank} of 8)"
+    elif rank >= 6:
+        where = f"one of the weaker major currencies right now (ranked #{rank} of 8)"
     else:
-        pos = f"#{rank} of the eight majors"
-    s.append(f"The {name} is currently {pos}, with a macro strength score of "
-             f"{comp:+.0f} ({label.lower()}).")
+        where = f"middle-of-the-pack among the majors (ranked #{rank} of 8)"
+    s.append(f"The {name} is {where}, with a strength score of {comp:+.0f}.")
 
+    # 2. Interest rates — the usual main driver, in everyday terms
     m = pills.get("monetary", 0.0)
-    rate, bond = ind.get("rate_level"), ind.get("bond_level")
-    if rate is not None:
-        rl = rate["value"]
-        by = f" alongside a 10-year yield near {bond['value']:.2f}%" if bond else ""
-        if m > 8:
-            s.append(f"A relatively high short-term interest rate (around {rl:.2f}%{by}) "
-                     "rewards holders and is its biggest support — global capital tends to "
-                     "flow toward higher-yielding currencies.")
-        elif m < -8:
-            s.append(f"A low short-term interest rate (around {rl:.2f}%{by}) offers holders "
-                     "little yield, leaving it at a carry disadvantage to higher-yielding majors.")
-        else:
-            s.append(f"Its rate backdrop (short rate around {rl:.2f}%{by}) sits "
-                     "roughly mid-pack among the majors.")
+    rate = ind.get("rate_level")
+    if rate is not None and m > 8:
+        s.append(f"Its biggest support is interest rates: at around {rate['value']:.1f}%, it "
+                 "pays more than most other major economies — and money tends to move toward "
+                 "currencies that pay more.")
+    elif rate is not None and m < -8:
+        s.append(f"Its biggest drag is interest rates: at around {rate['value']:.1f}%, it pays "
+                 "less than most other major economies, so it attracts less money than "
+                 "higher-paying rivals.")
 
+    # 3. Positioning — what big investors are doing, no jargon
     cot = ind.get("cot_pctile")
-    if cot is not None:
-        p = cot["value"] + 50
-        if p >= 70:
-            s.append(f"Large speculative funds are heavily positioned for it — around the "
-                     f"{p:.0f}th percentile of the past three years — which signals conviction "
-                     "but also crowding that can unwind quickly.")
-        elif p <= 30:
-            s.append(f"Large speculative funds are leaning against it (around the {p:.0f}th "
-                     "percentile of the past three years), a bearish positioning signal.")
+    if cot is not None and cot["value"] + 50 >= 70:
+        s.append("Big global investors are betting heavily that it will rise — near their most "
+                 "bullish in three years. That's a strong vote of confidence, though such "
+                 "crowded bets can reverse quickly if the mood shifts.")
+    elif cot is not None and cot["value"] + 50 <= 30:
+        s.append("Big global investors are mostly betting against it, which adds to the pressure.")
 
+    # 4. Risk mood — explained for the currency's character
     r = pills.get("risk", 0.0)
-    if r > 10:
-        s.append("The current market risk mood is working in its favour.")
-    elif r < -10:
-        s.append("The prevailing risk mood is a headwind — it tends to underperform when "
-                 "investors are positioned this way.")
+    if abs(r) > 10:
+        if ch.get("risk") == "risk":
+            s.append("It tends to do well when markets feel confident, and the mood is upbeat "
+                     "right now — a tailwind." if r > 0 else
+                     "It tends to struggle when markets turn cautious, and that's the mood right "
+                     "now — a headwind.")
+        elif ch.get("risk") == "haven":
+            s.append("Investors buy it for safety when they're nervous, and current jitters are "
+                     "lifting it." if r > 0 else
+                     "It's a safe-haven currency that shines when investors are nervous — but "
+                     "markets are fairly calm right now, which gives it less of a boost.")
 
-    g = pills.get("growth")
-    if g is not None and g < -8:
-        s.append("Softening domestic data — notably the labour market — is weighing on the "
-                 "growth picture.")
-    elif g is not None and g > 8:
-        s.append("A resilient domestic economy adds further support.")
-
+    # 5. Commodities — for the commodity exporters
     cm = pills.get("commodity")
-    if cm is not None and cm > 8:
-        s.append("Firm commodity prices provide a terms-of-trade tailwind.")
-    elif cm is not None and cm < -8:
-        s.append("Soft commodity prices are a drag on its terms of trade.")
+    if cm is not None and ch.get("exports"):
+        if cm > 8:
+            s.append(f"It also earns a lot from exporting {ch['exports']}, and firm prices for "
+                     "those are giving it an extra lift.")
+        elif cm < -8:
+            s.append(f"It earns a lot from exporting {ch['exports']}, so weak prices for those "
+                     "are weighing on it.")
 
+    # 6. Economy — only when it clearly stands out
+    g = pills.get("growth")
+    if g is not None and g < -12:
+        s.append("A softening economy, with unemployment creeping up, is another weight on it.")
+    elif g is not None and g > 12:
+        s.append("A healthy economy adds further support.")
+
+    # 7. Direction — plain
     lbl = tr.get("label")
-    chg = abs(tr.get("change", 0.0))
     if lbl == "strengthening":
-        s.append(f"Over recent weeks the score has been strengthening (up about {chg:.0f} "
-                 "points versus its trailing average), suggesting the macro tide is turning "
-                 "in its favour.")
+        s.append("Over the past few weeks it has been steadily getting stronger.")
     elif lbl == "weakening":
-        s.append(f"Over recent weeks the score has been weakening (down about {chg:.0f} "
-                 "points versus its trailing average).")
+        s.append("Over the past few weeks it has been gradually weakening.")
     else:
-        s.append("The score has been broadly stable over recent weeks.")
+        s.append("It has held fairly steady over the past few weeks.")
     return " ".join(s)
 
 
@@ -1436,38 +1458,21 @@ async def sitemap():
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
-    """Homepage = the Macro Currency Strength Meter (the hero). Falls back to
-    the research desk if strength data hasn't been generated yet."""
+    """Homepage = the Macro Currency Strength Meter (the hero)."""
     ctx = _build_strength_context(request)
     if ctx:
         return templates.TemplateResponse(request, "dashboard_strength.html", ctx)
-    runs = list_runs()
-    if not runs:
-        return templates.TemplateResponse(
-            request, "empty.html", {"message": "No runs yet."}
-        )
-    return RedirectResponse(url=f"/run/{runs[0]}")
+    return HTMLResponse(
+        "<h1>Macro Currency Strength Meter</h1><p>Data is being generated — "
+        "check back shortly.</p>", status_code=503)
 
 
-@app.get("/run/{date}", response_class=HTMLResponse)
-async def run_page(request: Request, date: str):
-    runs = list_runs()
-    if date not in runs:
-        raise HTTPException(404, f"No run for date {date}")
-    run = load_run(date)
-    if not run:
-        raise HTTPException(500, f"Failed to load run {date}")
-
-    surface = _detect_surface(request)
-    ctx = _build_home_context(run, runs, date, surface)
-    template = "dashboard_tv.html"
-
-    response = templates.TemplateResponse(request, template, ctx)
-    # Sticky-set the override cookie so a manual ?view= choice persists.
-    override = request.query_params.get("view")
-    if override in ("mobile", "desktop"):
-        response.set_cookie("nam_view", override, max_age=60 * 60 * 24 * 30, samesite="lax")
-    return response
+# The LLM "Research Desk" (per-instrument bull/bear/judge) is RETIRED to cut
+# spend and is hidden from the public. Old /run/* URLs redirect to the meter.
+@app.get("/run/{date}")
+@app.get("/run")
+async def run_page(date: str | None = None):
+    return RedirectResponse(url="/", status_code=301)
 
 
 # ---------- API: recent events log (READ-ONLY in public release) ----------

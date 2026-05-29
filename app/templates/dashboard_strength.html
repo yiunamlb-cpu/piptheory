@@ -23,9 +23,7 @@
     <span class="tv-logo-text" style="display:none">PIPTHEORY</span>
   </a>
   <div class="tv-topbar-right">
-    <a class="cs-nav" href="/run/{{ run_date_nav }}">Research&nbsp;Desk</a>
     {% if last_synced_iso %}
-    <span class="tv-topbar-div"></span>
     <span class="tv-sync-dot"></span>
     <span>Updated <time id="syncTime" datetime="{{ as_of }}">{{ run_date }}</time></span>
     {% endif %}

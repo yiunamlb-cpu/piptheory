@@ -1,22 +1,20 @@
-name: Daily Pipeline
+name: Daily Strength Update
+
+# Retired the LLM "bias engine" (research desk) to cut spend. This now only
+# recomputes the mechanical, free currency-strength meter and commits it.
 
 on:
   schedule:
     - cron: "0 6 * * *"
   workflow_dispatch:
-    inputs:
-      date:
-        description: "Run date override (YYYY-MM-DD, leave blank for today)"
-        required: false
-        default: ""
 
 permissions:
   contents: write
 
 jobs:
-  run-pipeline:
+  strength:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@v4
@@ -26,64 +24,31 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Run bias engine
-        env:
-          PYTHONPATH: ${{ github.workspace }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
-          OANDA_API_KEY: ${{ secrets.OANDA_API_KEY }}
-          OANDA_ACCOUNT_ID: ${{ secrets.OANDA_ACCOUNT_ID }}
-          OANDA_ENV: practice
-          MODEL_CHEAP: deepseek/deepseek-v4-pro
-          MODEL_FRONTIER: deepseek/deepseek-v4-pro
-          DAILY_BUDGET_USD: "5"
-        run: |
-          if [ -n "${{ github.event.inputs.date }}" ]; then
-            echo "Backfilling date: ${{ github.event.inputs.date }}"
-            python scripts/run_bias_engine.py --date "${{ github.event.inputs.date }}"
-          else
-            echo "Running for today"
-            python scripts/run_bias_engine.py
-          fi
+        run: pip install -r requirements.txt
 
       - name: Compute currency strength meter
-        continue-on-error: true   # a data hiccup here must not block the research commit
         env:
           PYTHONPATH: ${{ github.workspace }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
-        run: |
-          python -m src.data.currency_strength --persist
+        run: python -m src.data.currency_strength --persist
 
       - name: Commit and push results
         run: |
           git config user.name "piptheory-bot"
           git config user.email "bot@piptheory.com"
-
-          git add --force state/score_history.json state/thesis_tracker.json \
-            state/currency_strength.json state/currency_strength_latest.json 2>/dev/null || true
-          git add bias_cards/ 2>/dev/null || true
-
+          git add --force state/currency_strength.json state/currency_strength_latest.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
-
-          DATE_LABEL="${{ github.event.inputs.date || 'today' }}"
-          git commit -m "state: daily pipeline run for $DATE_LABEL"
+          git commit -m "state: daily strength update"
           git pull --rebase origin main
           git push origin main
 
       - name: Warm up Render instance after deploy
         run: |
-          echo "Waiting for Render deploy to start..."
           sleep 60
-          echo "Warming up instance (will retry for up to 5 min)..."
           for i in 1 2 3 4 5; do
-            echo "Attempt $i..."
             curl -s -o /dev/null -w "HTTP %{http_code}\n" --max-time 120 https://piptheory.com/ || echo "Request failed"
             sleep 60
           done
-          echo "Warm-up complete"
