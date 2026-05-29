@@ -470,15 +470,17 @@ class BiasEngine:
 
     # --- Orchestration ---
 
-    def run(self, council_instruments: list[str] | None = None) -> PipelineResult:
+    def run(self, council_instruments: list[str] | None = None, override_date: str | None = None) -> PipelineResult:
         """Run the full pipeline.
 
         Args:
             council_instruments: Override which instruments go through Layer 4.
                 If None, runs Layer 4 for instruments with strategist conviction
                 >= COUNCIL_CONVICTION_THRESHOLD.
+            override_date: Override the run date (YYYY-MM-DD) for backfilling
+                past days. Default: today.
         """
-        run_date = datetime.now().date().isoformat()
+        run_date = override_date if override_date else datetime.now().date().isoformat()
         out_dir = BIAS_CARDS_DIR / run_date
         out_dir.mkdir(parents=True, exist_ok=True)
 

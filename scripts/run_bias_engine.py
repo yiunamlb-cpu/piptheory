@@ -6,6 +6,7 @@ Usage:
     python scripts/run_bias_engine.py              # full pipeline, conviction-filtered Layer 4
     python scripts/run_bias_engine.py --inst EURUSD AUDUSD GC   # only those at Layer 4
     python scripts/run_bias_engine.py --no-council              # Layer 1-3 + index only
+    python scripts/run_bias_engine.py --date 2026-05-28        # backfill a past date
 """
 from __future__ import annotations
 
@@ -35,6 +36,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Skip Layer 4 + Layer 5. Useful for fast iteration on Layer 1-3.",
     )
+    p.add_argument(
+        "--date",
+        default=None,
+        help="Override run date (YYYY-MM-DD) for backfilling past days. Default: today.",
+    )
     return p.parse_args()
 
 
@@ -44,6 +50,7 @@ def main() -> int:
     console.print(Panel.fit(
         f"[cyan]Model:[/cyan] {settings.model_cheap}\n"
         f"[cyan]Daily budget:[/cyan] ${settings.daily_budget_usd:.2f}\n"
+        f"[cyan]Date:[/cyan] {args.date or 'today'}\n"
         f"[cyan]Council mode:[/cyan] " +
         ("disabled (Layer 1-3 only)" if args.no_council else
          f"explicit ({args.inst})" if args.inst else "conviction-filtered"),
@@ -54,7 +61,7 @@ def main() -> int:
     engine = BiasEngine(client=client)
 
     council = [] if args.no_council else (args.inst if args.inst else None)
-    result = engine.run(council_instruments=council)
+    result = engine.run(council_instruments=council, override_date=args.date)
 
     out_dir = engine.output_dir(result.run_date)
     console.rule("[green]Run complete[/green]")

@@ -1,0 +1,78 @@
+# Runs the bias engine daily at 06:00 UTC, generates bias_cards/{date}/,
+# commits results, and pushes to main — triggering Render auto-deploy with fresh data.
+#
+# Also supports manual backfill via workflow_dispatch.inputs.date
+# (e.g., "2026-05-28" to fill a missed day).
+#
+# Required secrets (set in repo Settings > Secrets and variables > Actions):
+#   OPENROUTER_API_KEY  — OpenRouter API key for LLM calls
+#   FRED_API_KEY        — FRED API key for macro data
+#
+# Optional:
+#   OANDA_API_KEY, OANDA_ACCOUNT_ID — for live FX data (falls back to yfinance)
+#
+name: Daily Pipeline
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # 06:00 UTC daily
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Run date override (YYYY-MM-DD, leave blank for today)"
+        required: false
+        default: ""
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45   # liberal timeout for LLM calls
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run bias engine
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          OANDA_API_KEY: ${{ secrets.OANDA_API_KEY }}
+          OANDA_ACCOUNT_ID: ${{ secrets.OANDA_ACCOUNT_ID }}
+          OANDA_ENV: practice
+          MODEL_CHEAP: deepseek/deepseek-v4-pro
+          MODEL_FRONTIER: deepseek/deepseek-v4-pro
+          DAILY_BUDGET_USD: "5"
+        run: |
+          if [ -n "${{ github.event.inputs.date }}" ]; then
+            echo "Backfilling date: ${{ github.event.inputs.date }}"
+            python scripts/run_bias_engine.py --date "${{ github.event.inputs.date }}"
+          else
+            echo "Running for today"
+            python scripts/run_bias_engine.py
+          fi
+
+      - name: Commit and push results
+        run: |
+          git config user.name "piptheory-bot"
+          git config user.email "bot@piptheory.com"
+          
+          # Stage state files and bias cards
+          git add --force state/score_history.json state/thesis_tracker.json 2>/dev/null || true
+          git add bias_cards/ 2>/dev/null || true
+          
+          # Check if anything changed
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          
+          DATE_LABEL="${{ github.event.inputs.date || 'today' }}"
+          git commit -m "state: daily pipeline run for $DATE_LABEL"
+          git push origin main
