@@ -23,8 +23,9 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # --- LLM gateway ---
-    openrouter_api_key: str = Field(..., alias="OPENROUTER_API_KEY")
+    # --- LLM gateway (retired for the public site; optional so config loads
+    #     in CI / static builds / Render without the key present) ---
+    openrouter_api_key: str = Field("", alias="OPENROUTER_API_KEY")
     model_cheap: str = Field("deepseek/deepseek-v4-pro", alias="MODEL_CHEAP")
     model_frontier: str = Field("deepseek/deepseek-v4-pro", alias="MODEL_FRONTIER")
 
