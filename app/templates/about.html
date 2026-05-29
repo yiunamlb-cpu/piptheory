@@ -1,221 +1,116 @@
-{% extends "base.html" %}
-{% block title %}About PIPTHEORY · daily macro research{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f0f1f3" id="metaTheme">
+  <script>(function(){var t=localStorage.getItem('pt_theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('metaTheme').content='#0f1117';}})();</script>
+  <title>About &amp; Methodology — PIPTHEORY</title>
+  <meta name="description" content="How the PIPTHEORY Macro Currency Strength Meter works — a free, systematic, mechanical score for the 8 major currencies built from five fundamental pillars.">
+  <link rel="canonical" href="https://piptheory.com/about">
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v={{ static_version }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/dashboard.css?v={{ static_version }}">
+  <link rel="stylesheet" href="/static/strength.css?v={{ static_version }}">
+</head>
+<body class="cs-page">
+<header class="tv-topbar">
+  <a href="/" class="tv-logo">
+    <img class="tv-logo-light" src="/static/logo-text.png?v={{ static_version }}" alt="PIPTHEORY" height="19">
+    <img class="tv-logo-dark" src="/static/logo-text-light.png?v={{ static_version }}" alt="PIPTHEORY" height="19">
+  </a>
+  <div class="tv-topbar-right">
+    <a class="cs-nav" href="/">Strength&nbsp;Meter</a>
+    <span class="tv-topbar-div"></span>
+    <a class="cs-nav" href="/research">Research</a>
+    <button class="tv-theme-toggle" id="themeToggle" title="Toggle theme">&#9790;</button>
+  </div>
+</header>
 
-{% block content %}
-<main class="page">
+<main class="cs-main">
+  <a class="cs-post-back" href="/">&larr; Home</a>
+  <article class="cs-prose">
+    <h1>About &amp; Methodology</h1>
+    <p>PIPTHEORY is a <strong>free</strong>, systematic <strong>Macro Currency Strength Meter</strong>.
+    It scores each of the eight major currencies — USD, EUR, GBP, JPY, CHF, CAD, AUD and NZD —
+    on a scale from <strong>+100 (very strong)</strong> to <strong>&minus;100 (very weak)</strong>,
+    updated every day. Strength is always <em>relative</em>: a currency is only strong or weak
+    compared to the others.</p>
 
-  {# ─── Top bar ──────────────────────────────────────────────────── #}
-  <header class="topbar">
-    <a class="brand-link" href="/" aria-label="PIPTHEORY home">
-      <img class="brand-logo" src="/static/logo-text.png?v={{ static_version }}" alt="PIPTHEORY" />
-      <span class="brand-tagline">daily macro research</span>
-    </a>
-    <div class="topbar-actions">
-      <a href="/" class="btn btn-sm">← Today's research</a>
-    </div>
-  </header>
+    <h2>It's mechanical, not opinion</h2>
+    <p>The score is calculated by a fixed, transparent formula from real economic and market
+    data. There is no AI writing the numbers, no analyst's view, and nothing subjective. That
+    means it's <strong>fully reproducible</strong> — the same inputs always produce the same
+    score, so it never contradicts itself from one day to the next.</p>
 
-  <article class="about-page">
+    <h2>The five pillars</h2>
+    <p>Each currency's score blends five fundamental forces, each measured against its own
+    history and ranked across the eight majors:</p>
+    <ul>
+      <li><strong>Interest Rates</strong> — the short-term rate and 10-year bond yield. Currencies that pay more tend to attract global capital.</li>
+      <li><strong>Growth</strong> — the labour market and the health of the underlying economy.</li>
+      <li><strong>Positioning</strong> — how large institutional funds are positioned, from CFTC futures data.</li>
+      <li><strong>Risk Mood</strong> — safe-haven currencies (USD, JPY, CHF) versus risk-on currencies (AUD, NZD, CAD), scaled by the current market mood.</li>
+      <li><strong>Commodities</strong> — terms-of-trade tailwinds for commodity exporters.</li>
+    </ul>
+    <p>These are combined into a single composite, ranked, and tracked over time. A currency
+    pair's reading is simply the difference between the two currencies' scores
+    (EUR/USD = EUR score &minus; USD score).</p>
 
-    <header class="about-hero">
-      <h1>A multi-agent macro research desk.</h1>
-      <p class="about-lede">
-        Every morning before US market open, a panel of specialist
-        research agents reads the world's macro data, debates each
-        instrument from multiple angles, and publishes a single daily
-        brief. PIPTHEORY is that publication.
-      </p>
-    </header>
+    <h2>Context signals</h2>
+    <p>Two extra signals are shown for context but deliberately <em>not</em> folded into the
+    score: a <strong>valuation</strong> read (whether a currency looks stretched versus its own
+    recent range) and a <strong>price-vs-fundamental</strong> check (whether spot has already
+    moved in line with the fundamentals, i.e. how much is "priced in"). We tested adding these
+    to the score and they didn't improve it, so they stay as context only.</p>
 
-    <section class="about-section">
-      <div class="about-eyebrow">What this is</div>
-      <h2>Macro research at the speed of the market — without a team of analysts.</h2>
-      <p>
-        Traditionally, this kind of cross-asset daily research is the
-        product of a discretionary macro desk: half a dozen analysts,
-        a strategist, a portfolio manager, and a contrarian or two.
-        PIPTHEORY replicates that workflow as a panel of specialist AI
-        agents — each focused on one piece of the puzzle, each producing
-        structured analysis that the next agent reads and synthesises.
-      </p>
-      <p>
-        The result is the same kind of daily output a small institutional
-        desk would publish: a regime read, an instrument-by-instrument
-        directional view with confidence levels, the macro themes driving
-        each call, and a single brief that ties it all together.
-      </p>
-    </section>
+    <h2>How to read it — honestly</h2>
+    <p>Treat the meter as <strong>macro context, not a trading signal</strong>. A high score
+    means the fundamental wind is at a currency's back; it does <em>not</em> predict tomorrow's
+    price. Markets are forward-looking and often price the fundamental picture in advance, and
+    no mechanical model sees political shocks or surprises. The score reflects the slow macro
+    tide over weeks, not day-to-day noise.</p>
 
-    <section class="about-section" id="methodology">
-      <div class="about-eyebrow">How it works</div>
-      <h2>Five layers. Seven specialists.</h2>
-      <p>
-        Each daily run cascades through structured stages. Earlier stages
-        read the world; later stages pressure-test the read.
-      </p>
+    <h2>Updates</h2>
+    <p>The meter recomputes automatically every day. The "Updated" date is shown at the top of
+    the homepage. It's daily macro context, not a real-time alert service.</p>
 
-      <ol class="about-steps">
-        <li>
-          <div class="step-num">01</div>
-          <div class="step-title">Specialists read the data</div>
-          <p>
-            Seven research panels run in parallel: a US Fed analyst, an
-            ECB analyst, a Bank of England analyst, a Bank of Japan
-            analyst, an inflation tracker, a market positioning analyst,
-            and a geopolitical risk analyst. Each reads its own primary
-            sources — official central-bank statements, government
-            economic data, derivatives positioning, the news cycle — and
-            produces a structured read.
-          </p>
-        </li>
-        <li>
-          <div class="step-num">02</div>
-          <div class="step-title">A senior strategist synthesises</div>
-          <p>
-            A cross-asset strategist reads all seven specialist outputs
-            and the active macro themes, then produces a draft directional
-            view for every instrument the desk covers — direction (long /
-            short / no view), conviction (1-10), the driving themes
-            behind the call, and the invalidation conditions.
-          </p>
-        </li>
-        <li>
-          <div class="step-num">03</div>
-          <div class="step-title">A contrarian attacks every view</div>
-          <p>
-            A dedicated red-team analyst, calibrated to be wrong 70% of
-            the time on purpose, attacks the consensus on every
-            instrument. Seven attack vectors: crowded positioning,
-            narrative fragility, historical analog, cross-asset dissent,
-            central-bank reaction, tail risk, news-shock reversal.
-            The point isn't to be right — it's to make sure no draft view
-            survives without being properly stress-tested.
-          </p>
-        </li>
-        <li>
-          <div class="step-num">04</div>
-          <div class="step-title">A three-judge council debates</div>
-          <p>
-            For each instrument where the strategist's conviction is 5+,
-            a Bull analyst makes the strongest long case, a Bear analyst
-            makes the strongest short case, and a Judge weighs both with
-            explicit probability decomposition before assigning the final
-            direction + conviction. This runs per-instrument and in
-            parallel — by the end of the morning every covered symbol
-            has been argued from both sides and adjudicated.
-          </p>
-        </li>
-        <li>
-          <div class="step-num">05</div>
-          <div class="step-title">The daily brief is written</div>
-          <p>
-            A PM-style writer takes every adjudicated view and produces
-            the day's brief in plain English — the regime read, the
-            highest-conviction calls, the cross-asset narrative tying
-            them together. That's what you read at the top of the
-            homepage.
-          </p>
-        </li>
-      </ol>
-    </section>
+    <h2>What this is NOT</h2>
+    <ul>
+      <li><strong>Not financial advice.</strong> Nothing here is a recommendation to buy, sell or hold anything.</li>
+      <li><strong>Not a signal service.</strong> No entry levels, stops or targets.</li>
+      <li><strong>Not personalised.</strong> Everyone sees the same numbers; it doesn't know your situation.</li>
+      <li><strong>Not a crystal ball.</strong> The model can be wrong, and markets move on things it can't measure.</li>
+    </ul>
+    <p>Markets carry the risk of loss. Past performance does not indicate future results.
+    Consult a licensed financial adviser in your jurisdiction before acting on anything you
+    read here.</p>
 
-    <section class="about-section">
-      <div class="about-eyebrow">How often it updates</div>
-      <h2>Daily, before US market open.</h2>
-      <p>
-        A fresh publication appears every weekday at approximately
-        <strong>07:00 UTC</strong> (02:00 ET / 08:00 CET). On weekends
-        the previous Friday's publication stays at the top until
-        Monday's sync. The exact "last sync" time is shown at the top
-        of every page.
-      </p>
-      <p>
-        When a major event happens mid-day — a central-bank decision, a
-        surprise data print, a geopolitical shock — it's reflected in
-        the next morning's publication rather than mid-day. PIPTHEORY
-        is daily research, not a real-time alert service.
-      </p>
-    </section>
-
-    <section class="about-section">
-      <div class="about-eyebrow">What's covered</div>
-      <h2>Nine instruments. Five regime themes.</h2>
-      <p>
-        The instrument universe is deliberately small and deliberately
-        liquid: the US Dollar Index (DXY), four major FX pairs (EURUSD,
-        USDJPY, GBPUSD, AUDUSD), two US equity indices (S&P 500 futures
-        ES, Nasdaq 100 futures NQ), and two commodity benchmarks (Gold
-        GC, WTI Crude CL). These nine instruments together cover the
-        FX, equity, and commodity expressions of every major macro
-        theme.
-      </p>
-      <p>
-        The theme set evolves with the regime — typically 4 to 6 active
-        themes at any time, each with its own conviction rating. The
-        live theme list is on the homepage under "Macro picture."
-      </p>
-    </section>
-
-    <section class="about-section" id="disclaimer">
-      <div class="about-eyebrow">Important</div>
-      <h2>What this is NOT.</h2>
-      <ul class="about-list-warn">
-        <li><strong>Not financial advice.</strong> Nothing on PIPTHEORY is a recommendation to buy, sell, or hold any financial instrument.</li>
-        <li><strong>Not a signal service.</strong> There are no entry levels, no stops, no targets, no execution guidance of any kind. PIPTHEORY publishes directional views and reasoning, not trades.</li>
-        <li><strong>Not a substitute for your own research.</strong> The agents read public data and form views. They can be wrong. Markets move on things the panel doesn't see. Use this to inform your thinking, not to delegate it.</li>
-        <li><strong>Not personalised.</strong> The same publication is delivered to every reader. It does not know your risk tolerance, account size, time horizon, or jurisdiction.</li>
-      </ul>
-      <p>
-        Markets carry the risk of loss. Past performance is not
-        indicative of future results. Consult a licensed financial
-        adviser in your jurisdiction before acting on any view discussed
-        on this site.
-      </p>
-    </section>
-
-    <section class="about-section" id="privacy">
-      <div class="about-eyebrow">Privacy</div>
-      <h2>What we collect.</h2>
-      <p>
-        PIPTHEORY uses basic site analytics (page views, sessions, device
-        type, country) to understand readership and improve the product.
-        We do not collect personal information — there are no accounts,
-        no login, no email lists.
-      </p>
-      <p>
-        We serve display advertising via Google AdSense (and may add
-        other ad partners in future). Ad networks may set cookies and
-        collect anonymous information about your visit for ad targeting
-        and frequency capping. You can opt out of personalised ads at
-        <a href="https://adssettings.google.com/" target="_blank" rel="noopener">adssettings.google.com</a>.
-      </p>
-    </section>
-
-    <section class="about-section" id="advertising">
-      <div class="about-eyebrow">Advertising</div>
-      <h2>Reach a macro-curious audience.</h2>
-      <p>
-        PIPTHEORY readers are traders, allocators, finance professionals,
-        and individuals serious about understanding global markets.
-        Display advertising slots are available across the site — top
-        leaderboard, in-content rectangle, and sidebar placements.
-      </p>
-      <p>
-        For direct sponsorship or display partnerships, get in touch via
-        the contact details in the site footer (coming soon). Programmatic
-        advertising is currently served through Google AdSense.
-      </p>
-    </section>
-
+    <h2>Privacy &amp; advertising</h2>
+    <p>PIPTHEORY is free and supported by advertising (Google AdSense). Ad partners may use
+    cookies for ad delivery and frequency capping. Full details — including how to opt out of
+    personalised ads — are in the <a href="/privacy">Privacy Policy</a>. Questions:
+    <strong>contact@piptheory.com</strong>.</p>
   </article>
 
-  {% include "_footer.html" %}
+  <footer class="cs-footer">
+    <div class="cs-footer-links">
+      <a href="/">Strength Meter</a>
+      <a href="/research">Research</a>
+      <a href="/about">About</a>
+      <a href="/privacy">Privacy</a>
+    </div>
+    <p class="cs-disclaimer">Educational macro context only — not investment advice.</p>
+  </footer>
 </main>
 
-{% include "_cookie_consent.html" %}
-
-{% endblock %}
-
-{% block scripts %}
-<script src="/static/app.js?v={{ static_version }}"></script>
-{% endblock %}
+<script>
+(function(){
+  var tb=document.getElementById('themeToggle');
+  function uti(){var d=document.documentElement.getAttribute('data-theme')==='dark';tb.innerHTML=d?'&#9788;':'&#9790;';document.getElementById('metaTheme').content=d?'#0f1117':'#f0f1f3';}
+  uti();
+  tb.addEventListener('click',function(){var d=document.documentElement.getAttribute('data-theme')==='dark';if(d){document.documentElement.removeAttribute('data-theme');localStorage.removeItem('pt_theme');}else{document.documentElement.setAttribute('data-theme','dark');localStorage.setItem('pt_theme','dark');}uti();});
+})();
+</script>
+</body>
+</html>

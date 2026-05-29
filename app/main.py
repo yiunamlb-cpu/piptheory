@@ -1150,6 +1150,13 @@ def _display_indicators(c: dict) -> list[dict]:
     if "commodity" in ind:
         v = ind["commodity"]["value"]
         rows.append({"label": "Commodity momentum", "val": f"{'+' if v >= 0 else ''}{v:.2f}σ", "asof": _asof_date(ind["commodity"])})
+    if c.get("price_3m") is not None:
+        v = c["price_3m"]
+        rows.append({"label": "3-month move vs USD", "val": f"{'+' if v >= 0 else ''}{v:.1f}%", "asof": None})
+    if "valuation" in ind:
+        vz = ind["valuation"]["value"]
+        tag = "stretched / expensive" if vz <= -1 else ("historically cheap" if vz >= 1 else "near fair value")
+        rows.append({"label": "Valuation (vs 1-yr norm)", "val": tag, "asof": None})
     return rows
 
 
@@ -1253,6 +1260,18 @@ def _strength_explanation(c: dict) -> str:
         s.append("Over the past few weeks it has been gradually weakening.")
     else:
         s.append("It has held fairly steady over the past few weeks.")
+
+    # 8. Context signals (not part of the score): valuation + price divergence
+    val = (ind.get("valuation") or {}).get("value")
+    if val is not None and val <= -1.0:
+        s.append("One caution: after that run it now looks stretched — expensive versus its "
+                 "own recent range — which raises the risk of a pullback.")
+    elif val is not None and val >= 1.0:
+        s.append("It's also historically cheap versus its own recent range, which can cushion "
+                 "the downside.")
+    if c.get("divergence") == "lagging" and c.get("price_3m") is not None:
+        s.append(f"Worth noting: the price hasn't fully followed yet ({c['price_3m']:+.0f}% vs "
+                 "the dollar over three months), so the fundamentals may not be entirely priced in.")
     return " ".join(s)
 
 

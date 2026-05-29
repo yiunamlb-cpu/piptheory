@@ -580,11 +580,11 @@
       "composite": 50.4,
       "date": "2026-05-29",
       "pillars": {
-        "commodity": 16.2,
+        "commodity": 11.1,
         "growth": 44.3,
         "monetary": 69.6,
         "positioning": 68.0,
-        "risk": 31.1
+        "risk": 35.9
       },
       "rank": 1
     }
@@ -1167,14 +1167,14 @@
       "rank": 2
     },
     {
-      "composite": 5.9,
+      "composite": 5.7,
       "date": "2026-05-29",
       "pillars": {
-        "commodity": 22.7,
+        "commodity": 18.4,
         "growth": -36.4,
         "monetary": -2.5,
         "positioning": 38.6,
-        "risk": 18.7
+        "risk": 21.6
       },
       "rank": 3
     }
@@ -1703,12 +1703,12 @@
       "rank": 8
     },
     {
-      "composite": -49.9,
+      "composite": -51.0,
       "date": "2026-05-29",
       "pillars": {
         "monetary": -66.2,
         "positioning": -39.7,
-        "risk": -31.1
+        "risk": -35.9
       },
       "rank": 8
     }
@@ -2723,13 +2723,13 @@
       "rank": 6
     },
     {
-      "composite": -10.8,
+      "composite": -10.6,
       "date": "2026-05-29",
       "pillars": {
         "growth": -43.0,
         "monetary": 5.9,
         "positioning": -16.4,
-        "risk": 6.2
+        "risk": 7.2
       },
       "rank": 6
     }
@@ -3208,12 +3208,12 @@
       "rank": 7
     },
     {
-      "composite": -17.2,
+      "composite": -18.3,
       "date": "2026-05-29",
       "pillars": {
         "monetary": -16.3,
         "positioning": -8.1,
-        "risk": -31.1
+        "risk": -35.9
       },
       "rank": 7
     }
@@ -3796,14 +3796,14 @@
       "rank": 4
     },
     {
-      "composite": 1.9,
+      "composite": 1.1,
       "date": "2026-05-29",
       "pillars": {
-        "commodity": 32.2,
+        "commodity": 22.2,
         "growth": 1.2,
         "monetary": 11.1,
         "positioning": -55.8,
-        "risk": 31.1
+        "risk": 35.9
       },
       "rank": 4
     }
@@ -4334,13 +4334,13 @@
       "rank": 3
     },
     {
-      "composite": 12.8,
+      "composite": 12.3,
       "date": "2026-05-29",
       "pillars": {
         "growth": 33.9,
         "monetary": 15.3,
         "positioning": 11.5,
-        "risk": -18.7
+        "risk": -21.6
       },
       "rank": 2
     }

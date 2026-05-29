@@ -57,6 +57,12 @@ COMPOSITE_SCALE = 45.0  # maps weighted-avg z (~±2) onto the ±100 display rang
 
 # Default pillar weights (DISCLOSED + tunable). Renormalised per currency
 # across whichever pillars have fresh data.
+# Validated 5-factor model. We TESTED adding rate-expectations (rate/yield
+# momentum) and valuation (mean-reversion): both failed to improve the backtest
+# (valuation clearly hurt — strong currencies tend to persist, not revert; the
+# rate-momentum split was neutral-to-slightly-worse), so neither is scored.
+# Valuation + price-vs-fundamental divergence are still COMPUTED and shown as
+# context signals — just not folded into the composite.
 PILLAR_WEIGHTS: dict[str, float] = {
     "monetary": 0.30,
     "growth": 0.20,
@@ -148,6 +154,39 @@ def _change_over(s: pd.Series | None, days: int = 90) -> float | None:
     return float(s.iloc[-1] - past.iloc[-1])
 
 
+def _change_over_pct(s: pd.Series | None, days: int = 90) -> float | None:
+    """Percent change over the trailing `days` (for price action)."""
+    if s is None or s.empty:
+        return None
+    cutoff = s.index[-1] - pd.Timedelta(days=days)
+    past = s[s.index <= cutoff]
+    if past.empty or past.iloc[-1] == 0:
+        return None
+    return float((s.iloc[-1] / past.iloc[-1] - 1.0) * 100.0)
+
+
+# currency -> (price instrument, invert) for its value-vs-USD index
+_USD_PAIR = {
+    "EUR": ("EURUSD", False), "GBP": ("GBPUSD", False), "AUD": ("AUDUSD", False),
+    "NZD": ("NZDUSD", False), "JPY": ("USDJPY", True), "CAD": ("USDCAD", True),
+    "CHF": ("USDCHF", True), "USD": ("DXY", False),
+}
+
+
+def _usd_index(prices: PriceClient, ccy: str, period: str, as_of: date | None) -> pd.Series | None:
+    """The currency's value-vs-USD price series (USD uses the dollar index)."""
+    inst, inv = _USD_PAIR.get(ccy, (None, False))
+    if not inst:
+        return None
+    try:
+        s = _slice(prices.get_ohlc(inst, period=period)["Close"].dropna(), as_of)
+    except Exception:
+        return None
+    if s is None or s.empty:
+        return None
+    return (1.0 / s) if inv else s
+
+
 def _momentum_z(closes: pd.Series, window: int = 63) -> float | None:
     """Z-score of the latest `window`-day % change vs its trailing-year distribution."""
     closes = closes.dropna()
@@ -213,6 +252,9 @@ def _gather(fred: FredClient, cot: CotClient, prices: PriceClient,
         lt = _latest(bd)
         if lt and _age_days(lt[1], as_of) <= MAX_AGE["bond"]:
             raw[code]["bond_level"] = {"value": lt[0], "as_of": lt[1].isoformat(), "stale": False}
+            bt = _change_over(bd, 90)  # rate-outlook: 3m move in the 10y yield
+            if bt is not None:
+                raw[code]["bond_traj"] = {"value": bt, "as_of": lt[1].isoformat(), "stale": False}
 
         # --- Growth: unemployment level (inverted) + trajectory (inverted) ---
         if cfg.unrate:
@@ -255,6 +297,16 @@ def _gather(fred: FredClient, cot: CotClient, prices: PriceClient,
             if ok:
                 raw[code]["commodity"] = {"value": mom, "as_of": asof, "stale": False}
 
+        # --- Valuation (mean-reversion) + price action vs USD (divergence) ---
+        idx = _usd_index(prices, code, price_period, as_of)
+        if idx is not None and len(idx) >= 40:
+            asof2 = idx.index[-1].date().isoformat()
+            # expensive vs own 1-yr norm => negative valuation (expect reversion)
+            raw[code]["valuation"] = {"value": -_level_z(idx), "as_of": asof2, "stale": False}
+            pm = _change_over_pct(idx, 90)
+            if pm is not None:
+                raw[code]["price_3m"] = {"value": pm, "as_of": asof2, "stale": False}
+
     return raw
 
 
@@ -294,7 +346,7 @@ def compute_strength(*, persist: bool = True, as_of: date | None = None,
                                     "as_of": "derived", "stale": False}
 
     # Cross-sectionally standardise each factor across currencies that have it.
-    factor_keys = ["rate_level", "rate_traj", "bond_level", "unrate_level",
+    factor_keys = ["rate_level", "rate_traj", "bond_level", "bond_traj", "unrate_level",
                    "unrate_traj", "cot_pctile", "cot_trend"]
     z: dict[str, dict[str, float]] = {c: {} for c in CURRENCIES}
     for fk in factor_keys:
@@ -302,13 +354,15 @@ def compute_strength(*, persist: bool = True, as_of: date | None = None,
         for c, zc in _xsection_z(present).items():
             z[c][fk] = zc
 
-    # Risk + Commodity pillars are absolute (already in z-units), NOT
-    # cross-sectional — risk = tilt × intensity; commodity = the
-    # exposure-weighted momentum z computed vs each commodity's own history.
+    # Risk / Commodity / Valuation pillars are absolute (already in z-units),
+    # NOT cross-sectional — risk = tilt × intensity; commodity = basket
+    # momentum z; valuation = (negated) price-vs-own-1yr-norm z.
     for c, cfg in CURRENCIES.items():
         z[c]["risk"] = _clip(cfg.safe_haven * risk_intensity)
         if "commodity" in raw[c]:
             z[c]["commodity"] = _clip(raw[c]["commodity"]["value"])
+        if "valuation" in raw[c]:
+            z[c]["valuation"] = _clip(raw[c]["valuation"]["value"])
 
     # Assemble pillars per currency.
     pillar_map = {
@@ -341,6 +395,7 @@ def compute_strength(*, persist: bool = True, as_of: date | None = None,
             "pillars": {p: round(s * COMPOSITE_SCALE, 1) for p, s in pillar_scores.items()},
             "available_pillars": sorted(pillar_scores.keys()),
             "indicators": {k: raw[code][k] for k in raw[code]},
+            "price_3m": round(raw[code]["price_3m"]["value"], 1) if "price_3m" in raw[code] else None,
         }
 
     # Rank (1 = strongest) and label.
@@ -348,6 +403,8 @@ def compute_strength(*, persist: bool = True, as_of: date | None = None,
     for rank, code in enumerate(ordered, start=1):
         results[code]["rank"] = rank
         results[code]["label"] = _label(results[code]["composite"])
+        results[code]["divergence"] = _divergence(
+            results[code]["composite"], results[code]["price_3m"])
 
     # Trend from stored history.
     hist = _load()
@@ -377,6 +434,21 @@ def _label(composite: float) -> str:
     if composite > -50:
         return "Slightly Weak"
     return "Weak"
+
+
+def _divergence(composite: float, price_3m: float | None) -> str | None:
+    """Is the fundamental read already reflected in the price?
+    'lagging' = fundamentals point one way but spot hasn't followed (not yet
+    priced in); 'confirmed' = price agrees with the fundamentals."""
+    if price_3m is None or abs(composite) < 20:
+        return None
+    if composite > 0 and price_3m < -1.5:
+        return "lagging"
+    if composite < 0 and price_3m > 1.5:
+        return "lagging"
+    if (composite > 0 and price_3m > 1.5) or (composite < 0 and price_3m < -1.5):
+        return "confirmed"
+    return None
 
 
 def _trend(history: list[dict], current: float) -> dict:
