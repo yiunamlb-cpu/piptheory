@@ -43,6 +43,19 @@ WATCHLIST_COT_CODES: dict[str, dict[str, str]] = {
         "cftc_market": "AUSTRALIAN DOLLAR - CHICAGO MERCANTILE EXCHANGE",
         "report_type": "TFF",
     },
+    # --- Added for the currency-strength meter (8 majors) ---
+    "USDCAD": {
+        "cftc_market": "CANADIAN DOLLAR - CHICAGO MERCANTILE EXCHANGE",
+        "report_type": "TFF",
+    },
+    "USDCHF": {
+        "cftc_market": "SWISS FRANC - CHICAGO MERCANTILE EXCHANGE",
+        "report_type": "TFF",
+    },
+    "NZDUSD": {
+        "cftc_market": "NZ DOLLAR - CHICAGO MERCANTILE EXCHANGE",
+        "report_type": "TFF",
+    },
     "GC": {
         "cftc_market": "GOLD - COMMODITY EXCHANGE INC.",
         "report_type": "Disaggregated",

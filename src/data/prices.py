@@ -41,6 +41,16 @@ INSTRUMENT_TO_TICKER: dict[str, str] = {
     "USDJPY": "JPY=X",       # yfinance uses JPY=X for USD/JPY
     "GBPUSD": "GBPUSD=X",
     "AUDUSD": "AUDUSD=X",
+    # --- Added for the currency-strength meter (8 majors) ---
+    "NZDUSD": "NZDUSD=X",
+    "USDCAD": "USDCAD=X",
+    "USDCHF": "USDCHF=X",
+    # Risk-sentiment inputs (safe-haven factor): VIX + S&P 500 cash index
+    "VIX": "^VIX",
+    "SPX": "^GSPC",
+    # Commodity inputs (terms-of-trade factor). Oil(CL)/Gold(GC) already above.
+    "COPPER": "HG=F",        # industrial metals proxy — AUD terms-of-trade
+    "COMMOD_BROAD": "DBC",   # broad commodity ETF — general terms-of-trade
 }
 
 

@@ -95,6 +95,35 @@ MACRO_SERIES: dict[str, dict[str, str]] = {
         "jp_call_rate_proxy": "IR3TIB01JPM156N",  # 3m Japan rate proxy
         "jgb_10y": "IRLTLT01JPM156N",             # Japan 10y JGB
     },
+    # --- Added for the currency-strength meter (8 majors). IDs follow the
+    # OECD MEI pattern used above (IR3TIB01=3m rate, IRLTLT01=10y bond,
+    # CPGRLE01=CPI YoY, LRHUTTTT=unemployment). Australia & NZ publish some
+    # series quarterly (Q) rather than monthly (M) — verified at build time;
+    # snapshot() tags any that fail to resolve as [unavailable].
+    "australia": {
+        "au_cpi_yoy": "CPALTT01AUQ659N",          # CPI total YoY (quarterly)
+        "au_unrate": "LRHUTTTTAUM156S",
+        "au_rate_3m_proxy": "IR3TIB01AUM156N",    # 3m bank bill proxy for RBA cash
+        "au_bond_10y": "IRLTLT01AUM156N",
+    },
+    "canada": {
+        "ca_cpi_yoy": "CPALTT01CAM659N",          # CPI total YoY (verified current-most)
+        "ca_unrate": "LRHUTTTTCAM156S",
+        "ca_rate_3m_proxy": "IR3TIB01CAM156N",    # 3m rate proxy for BoC
+        "ca_bond_10y": "IRLTLT01CAM156N",
+    },
+    "switzerland": {
+        "ch_cpi_yoy": "CPALTT01CHM659N",          # CPI total YoY
+        "ch_unrate": "LRHUTTTTCHQ156S",           # harmonised unemployment (quarterly)
+        "ch_rate_3m_proxy": "IR3TIB01CHM156N",    # 3m rate proxy for SNB
+        "ch_bond_10y": "IRLTLT01CHM156N",
+    },
+    "newzealand": {
+        "nz_cpi_index": "NZLCPIALLQINMEI",        # CPI index (quarterly) — engine computes YoY
+        "nz_unrate": "LRHUTTTTNZQ156S",           # quarterly
+        "nz_rate_3m_proxy": "IR3TIB01NZM156N",    # 3m rate proxy for RBNZ
+        "nz_bond_10y": "IRLTLT01NZM156N",
+    },
 }
 
 
