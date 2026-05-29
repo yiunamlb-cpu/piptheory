@@ -81,6 +81,9 @@ body.cs-page .tv-topbar{padding:0 max(24px, calc((100% - 1440px) / 2 + 24px))}
 .cs-range button:hover{border-color:var(--border-3);color:var(--text)}
 .cs-range button.active{background:var(--accent-grad);border-color:transparent;color:#fff;box-shadow:var(--glow-accent)}
 .cs-range button.cs-dis,.cs-range button:disabled{opacity:.32;cursor:not-allowed;pointer-events:none}
+/* Resolution toggle (4H/1D) — ink fill so it reads as a distinct "mode"
+   switch, not the same cyan as the period range buttons. */
+#psRes button.active{background:var(--text);border-color:var(--text);color:var(--bg-1);box-shadow:none}
 .cs-block-head-2{align-items:flex-start}
 .cs-head-titles{display:flex;flex-direction:column;gap:3px;min-width:0}
 .cs-head-titles .cs-sub{line-height:1.45}
