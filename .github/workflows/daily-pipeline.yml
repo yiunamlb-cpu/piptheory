@@ -41,6 +41,7 @@ jobs:
 
       - name: Run bias engine
         env:
+          PYTHONPATH: ${{ github.workspace }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           OANDA_API_KEY: ${{ secrets.OANDA_API_KEY }}
