@@ -43,6 +43,19 @@ body.cs-page .tv-topbar{padding:0 max(24px, calc((100% - 1440px) / 2 + 24px))}
 .cs-block-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px;border-bottom:1px solid var(--border-2);padding-bottom:8px}
 .cs-block-head h2{font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-.02em}
 .cs-sub{font-size:11px;color:var(--text-faint)}
+/* Info tooltips on section titles ("?" badge → hover/tap explanation) */
+.cs-info{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;margin-left:6px;
+  border:1px solid var(--border-3);border-radius:50%;background:var(--bg-1);color:var(--text-dim);
+  font-family:var(--mono);font-size:10px;font-weight:600;line-height:1;cursor:help;vertical-align:middle;
+  position:relative;transition:border-color .15s,color .15s;flex-shrink:0;padding:0}
+.cs-info:hover,.cs-info.open{border-color:var(--accent);color:var(--accent)}
+.cs-h1 .cs-info{width:18px;height:18px;font-size:11px;margin-left:9px;transform:translateY(-3px)}
+.cs-info::after{content:attr(data-tip);position:absolute;top:calc(100% + 8px);left:0;
+  width:min(290px,72vw);background:var(--bg-1);border:1px solid var(--border-3);
+  padding:9px 11px;font-family:var(--display);font-size:11.5px;font-weight:400;line-height:1.5;
+  color:var(--text);text-align:left;letter-spacing:0;white-space:normal;z-index:60;
+  box-shadow:0 6px 20px rgba(0,0,0,.16);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .15s}
+.cs-info:hover::after,.cs-info:focus-visible::after,.cs-info.open::after{opacity:1;visibility:visible}
 
 /* ZONE 2 — ranked bars */
 .cs-bars{display:flex;flex-direction:column;gap:6px}

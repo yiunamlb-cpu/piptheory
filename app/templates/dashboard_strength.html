@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#f0f1f3" id="metaTheme">
   <script>(function(){var t=localStorage.getItem('pt_theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('metaTheme').content='#0f1117';}})();</script>
   <title>Macro Currency Strength Meter — PIPTHEORY</title>
-  <meta name="description" content="A systematic macro strength score for the 8 major currencies — built from interest-rate differentials, growth, institutional positioning, risk sentiment and commodities. Updated daily.">
+  <meta name="description" content="A systematic macro strength score for the 8 major currencies — built from interest-rate differentials, growth, institutional positioning, risk sentiment and commodities. Refreshed every 4 hours.">
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v={{ static_version }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,7 +36,7 @@
 
   <!-- HEADER / METHODOLOGY -->
   <section class="cs-explain">
-    <h1 class="cs-h1">Macro Currency Strength Meter</h1>
+    <h1 class="cs-h1">Macro Currency Strength Meter <button class="cs-info" type="button" aria-label="What is this?" data-tip="A single score from -100 to +100 for each major currency, built from interest rates, growth, institutional positioning, risk sentiment and commodities. Higher means fundamentally stronger than the others — macro context, not a trade signal.">?</button></h1>
     {% if currencies %}
     <div class="cs-readout">
       <div class="cs-ro">
@@ -53,7 +53,7 @@
         <span class="cs-ro-tag">System</span>
         <div class="cs-ro-sysrow">8 major currencies</div>
         <div class="cs-ro-sysrow">5-factor mechanical model</div>
-        <div class="cs-ro-sysrow">Updated daily &middot; {{ run_date }}</div>
+        <div class="cs-ro-sysrow">Refreshed every 4 hours</div>
       </div>
     </div>
     {% endif %}
@@ -63,8 +63,8 @@
       macroeconomic and market data &mdash; <em>interest rates, growth, capital flows, risk
       regime and global trade</em> &mdash; into a single, reproducible score, using a
       proprietary framework grounded in decades of research on what moves exchange rates.
-      <strong>Updated free every day</strong>, it reflects the slow macro tide rather than
-      intraday noise &mdash; an objective, jargon-free read on which currencies are
+      <strong>Refreshed free every four hours</strong>, it still reflects the slow macro tide
+      rather than intraday noise &mdash; an objective, jargon-free read on which currencies are
       fundamentally strong or weak.
     </p>
     <div class="cs-pillars-intro">
@@ -87,7 +87,7 @@
   <section class="cs-block">
     <div class="cs-block-head cs-block-head-2">
       <div class="cs-head-titles">
-        <h2>Historic Macro Strength Trend</h2>
+        <h2>Historic Macro Strength Trend <button class="cs-info" type="button" aria-label="What is this?" data-tip="How each currency's strength score has moved over time. Rising lines mean strengthening fundamentals, falling lines mean weakening. Use the range buttons to zoom; click a legend chip to hide or show a currency.">?</button></h2>
         <span class="cs-sub">Each currency's macro strength score over time, on the &minus;100 to +100 scale.</span>
       </div>
       <div class="cs-range" id="csRange">
@@ -108,7 +108,7 @@
   <section class="cs-block" id="psSection">
     <div class="cs-block-head cs-block-head-2">
       <div class="cs-head-titles">
-        <h2>Currency Performance Tug of War</h2>
+        <h2>Currency Performance Tug of War <button class="cs-info" type="button" aria-label="What is this?" data-tip="How each currency's price has actually moved against the others, all starting from 0 at the left edge. Lines pulling upward have outperformed the pack; lines pulling down have lagged. Switch 4H or 1D for detail and choose a time period.">?</button></h2>
         <span class="cs-sub">Each currency's relative price strength across all 28 major pairs, since the start of the window.</span>
       </div>
       <div class="cs-ctrls">
@@ -134,7 +134,7 @@
 
   <!-- 2. STRENGTH RANKING (accordion w/ inline detail) -->
   <section class="cs-meter">
-    <div class="cs-block-head"><h2>Strength Ranking</h2><span class="cs-sub">Click any currency to expand its full breakdown</span></div>
+    <div class="cs-block-head"><h2>Strength Ranking <button class="cs-info" type="button" aria-label="What is this?" data-tip="The eight majors ranked by today's score. Click any row to expand what's driving it — the five pillars and the underlying data behind the number.">?</button></h2><span class="cs-sub">Click any currency to expand its full breakdown</span></div>
     <div class="cs-bars">
       {% for c in currencies %}
       <div class="cs-item{% if loop.first %} open{% endif %}" data-code="{{ c.code }}">
@@ -189,7 +189,7 @@
 
   <!-- 3. PAIR MATRIX -->
   <section class="cs-block">
-    <div class="cs-block-head"><h2>Pair Strength Matrix</h2><span class="cs-sub">Row vs column — green = row currency stronger</span></div>
+    <div class="cs-block-head"><h2>Pair Strength Matrix <button class="cs-info" type="button" aria-label="What is this?" data-tip="The score gap for every currency pair. Green means the row currency is stronger than the column one; red means weaker. Bigger numbers mean a wider gap.">?</button></h2><span class="cs-sub">Row vs column — green = row currency stronger</span></div>
     <div class="cs-heatmap-wrap"><div class="cs-heatmap" id="csHeatmap"></div></div>
   </section>
 
@@ -443,6 +443,26 @@ window.PSTR = {{ price_strength_json|safe }};
   var tb2=document.getElementById('themeToggle'); if(tb2) tb2.addEventListener('click',function(){setTimeout(draw,0);});
   syncPeriodAvail(); buildLegend(); draw();
   var prt; window.addEventListener('resize',function(){clearTimeout(prt);prt=setTimeout(draw,150);});
+})();
+
+// ---- INFO TOOLTIPS (tap to toggle on touch) + LOCAL "Updated" TIME ----
+(function(){
+  var infos=document.querySelectorAll('.cs-info');
+  infos.forEach(function(b){
+    b.addEventListener('click',function(e){
+      e.stopPropagation();
+      var open=b.classList.contains('open');
+      document.querySelectorAll('.cs-info.open').forEach(function(x){x.classList.remove('open');});
+      if(!open) b.classList.add('open');
+    });
+  });
+  document.addEventListener('click',function(){document.querySelectorAll('.cs-info.open').forEach(function(x){x.classList.remove('open');});});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')document.querySelectorAll('.cs-info.open').forEach(function(x){x.classList.remove('open');});});
+  // Show the update time in the viewer's local timezone (reflects the 4-hourly refresh)
+  var t=document.getElementById('syncTime');
+  if(t){var d=new Date(t.getAttribute('datetime'));if(!isNaN(d)){
+    t.textContent=d.toLocaleString(undefined,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+  }}
 })();
 </script>
 {% include "_cs_cookie.html" %}
