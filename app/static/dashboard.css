@@ -89,6 +89,9 @@ select{font-family:inherit}
 .tv-topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:16px;height:48px;padding:0 24px;background:var(--bg-1);border-bottom:1px solid var(--border-2)}
 .tv-logo{display:flex;align-items:center;flex-shrink:0;text-decoration:none}
 .tv-logo img{height:19px;display:block}
+.tv-logo .tv-logo-dark{display:none}
+[data-theme="dark"] .tv-logo .tv-logo-light{display:none}
+[data-theme="dark"] .tv-logo .tv-logo-dark{display:block}
 .tv-logo-text{font-family:var(--mono);font-weight:700;font-size:15px;letter-spacing:.08em;color:var(--text)}
 .tv-topbar-div{width:1px;height:16px;background:var(--border-3);flex-shrink:0}
 .tv-date-pick{background:var(--bg-2);color:var(--text);border:1px solid var(--border-2);border-radius:4px;padding:4px 10px;font-family:var(--mono);font-size:13px;cursor:pointer;outline:none}

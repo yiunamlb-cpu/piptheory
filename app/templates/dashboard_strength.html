@@ -18,9 +18,8 @@
 
 <header class="tv-topbar">
   <a href="/" class="tv-logo">
-    <img src="/static/logo-text.png?v={{ static_version }}" alt="PIPTHEORY" height="19"
-         onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
-    <span class="tv-logo-text" style="display:none">PIPTHEORY</span>
+    <img class="tv-logo-light" src="/static/logo-text.png?v={{ static_version }}" alt="PIPTHEORY" height="19">
+    <img class="tv-logo-dark" src="/static/logo-text-light.png?v={{ static_version }}" alt="PIPTHEORY" height="19">
   </a>
   <div class="tv-topbar-right">
     {% if last_synced_iso %}
@@ -88,8 +87,8 @@
       <div class="cs-range" id="csRange">
         <button data-days="30">1M</button>
         <button data-days="90">3M</button>
-        <button data-days="180" class="active">6M</button>
-        <button data-days="370">1Y</button>
+        <button data-days="180">6M</button>
+        <button data-days="370" class="active">1Y</button>
       </div>
     </div>
     <div class="cs-chart-wrap">
@@ -193,7 +192,7 @@ window.SHIST = {{ history_json|safe }};
   });
 
   // MULTI-LINE CHART (range-aware + crosshair)
-  var rangeDays = 180;
+  var rangeDays = 370;
   function drawChart(){
     var svg=document.getElementById('csChart'); var main=svg.parentElement;
     var W=main.offsetWidth, H=280, padR=8, padB=18; if(W<10) return;
