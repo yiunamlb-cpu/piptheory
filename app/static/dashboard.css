@@ -11,19 +11,19 @@
   --text: #1a1d26;
   --text-dim: #5f6673;
   --text-faint: #8d95a2;
-  --bull: #3BE8B0;
-  --bull-bright: #2dd6a0;
-  --bull-bg: rgba(59,232,176,0.07);
-  --bear: #FD636B;
-  --bear-bright: #e55660;
-  --bear-bg: rgba(253,99,107,0.07);
+  --bull: #12A150;
+  --bull-bright: #0E8A44;
+  --bull-bg: rgba(18,161,80,0.07);
+  --bear: #E23636;
+  --bear-bright: #C42F2F;
+  --bear-bg: rgba(226,54,54,0.07);
   --accent: #1BAFD0;
   --amber: #FFB900;
   --amber-bg: rgba(255,185,0,0.06);
   --shadow: rgba(0,0,0,0.06);
   --font: 'Inter', system-ui, -apple-system, sans-serif;
   --mono: 'IBM Plex Mono', 'JetBrains Mono', 'SF Mono', Consolas, monospace;
-  --display: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+  --display: 'Inter', system-ui, -apple-system, sans-serif;
   /* Industrial / precision design tokens — flat surfaces, sharp edges,
      hairline rules, no glow/gradient/soft-shadow. */
   --radius: 2px;
@@ -52,12 +52,12 @@
   --text: #d1d4dc;
   --text-dim: #787b86;
   --text-faint: #5d606b;
-  --bull: #5aefc4;
-  --bull-bright: #80f4d4;
-  --bull-bg: rgba(90,239,196,0.10);
-  --bear: #ff8a90;
-  --bear-bright: #ffb0b4;
-  --bear-bg: rgba(255,138,144,0.10);
+  --bull: #2FCB72;
+  --bull-bright: #54D98C;
+  --bull-bg: rgba(47,203,114,0.10);
+  --bear: #FB5A60;
+  --bear-bright: #FF8086;
+  --bear-bg: rgba(251,90,96,0.10);
   --accent: #3dc6e6;
   --amber: #ffcd3d;
   --amber-bg: rgba(255,205,61,0.08);
