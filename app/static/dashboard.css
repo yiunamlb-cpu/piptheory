@@ -22,20 +22,23 @@
   --amber-bg: rgba(255,185,0,0.06);
   --shadow: rgba(0,0,0,0.06);
   --font: 'Inter', system-ui, -apple-system, sans-serif;
-  --mono: 'JetBrains Mono', 'Cascadia Code', 'SF Mono', Consolas, monospace;
-  --display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
-  /* Modern-Quant design tokens */
-  --shadow-card: 0 1px 2px rgba(16,22,38,.04), 0 6px 20px rgba(16,22,38,.07);
-  --shadow-hover: 0 2px 6px rgba(16,22,38,.07), 0 14px 34px rgba(16,22,38,.13);
-  --card-grad: linear-gradient(180deg, #ffffff 0%, #f7f9fb 100%);
-  --accent-grad: linear-gradient(135deg, #1BAFD0 0%, #36d3e6 100%);
-  --bull-grad: linear-gradient(90deg, #2dd6a0 0%, #4cf0bc 100%);
-  --bear-grad: linear-gradient(90deg, #e85560 0%, #ff7e86 100%);
-  --glow-bull: 0 0 10px rgba(59,232,176,.40);
-  --glow-bear: 0 0 10px rgba(253,99,107,.36);
-  --glow-accent: 0 0 0 1px rgba(27,175,208,.22), 0 6px 22px rgba(27,175,208,.16);
-  --page-glow: radial-gradient(110% 55% at 50% -8%, rgba(27,175,208,.07), transparent 62%);
-  --hairline: rgba(16,22,38,.08);
+  --mono: 'IBM Plex Mono', 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+  --display: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+  /* Industrial / precision design tokens — flat surfaces, sharp edges,
+     hairline rules, no glow/gradient/soft-shadow. */
+  --radius: 2px;
+  --shadow-card: none;
+  --shadow-hover: none;
+  --card-grad: var(--bg-1);
+  --accent-grad: var(--accent);
+  --bull-grad: var(--bull);
+  --bear-grad: var(--bear);
+  --glow-bull: none;
+  --glow-bear: none;
+  --glow-accent: none;
+  --page-glow: none;
+  --grid-dot: rgba(16,22,38,.045);
+  --hairline: rgba(16,22,38,.12);
 }
 [data-theme="dark"] {
   --bg-0: #0f1117;
@@ -59,17 +62,18 @@
   --amber: #ffcd3d;
   --amber-bg: rgba(255,205,61,0.08);
   --shadow: rgba(0,0,0,0.3);
-  --shadow-card: 0 1px 2px rgba(0,0,0,.32), 0 8px 28px rgba(0,0,0,.45);
-  --shadow-hover: 0 2px 6px rgba(0,0,0,.4), 0 18px 44px rgba(0,0,0,.6);
-  --card-grad: linear-gradient(180deg, #1b202b 0%, #141823 100%);
-  --accent-grad: linear-gradient(135deg, #3dc6e6 0%, #62d6f0 100%);
-  --bull-grad: linear-gradient(90deg, #5aefc4 0%, #8af7d8 100%);
-  --bear-grad: linear-gradient(90deg, #ff8a90 0%, #ffaeb3 100%);
-  --glow-bull: 0 0 13px rgba(90,239,196,.45);
-  --glow-bear: 0 0 13px rgba(255,138,144,.42);
-  --glow-accent: 0 0 0 1px rgba(61,198,230,.30), 0 6px 24px rgba(61,198,230,.22);
-  --page-glow: radial-gradient(110% 55% at 50% -8%, rgba(61,198,230,.10), transparent 62%);
-  --hairline: rgba(255,255,255,.07);
+  --shadow-card: none;
+  --shadow-hover: none;
+  --card-grad: var(--bg-1);
+  --accent-grad: var(--accent);
+  --bull-grad: var(--bull);
+  --bear-grad: var(--bear);
+  --glow-bull: none;
+  --glow-bear: none;
+  --glow-accent: none;
+  --page-glow: none;
+  --grid-dot: rgba(255,255,255,.05);
+  --hairline: rgba(255,255,255,.09);
 }
 
 /* ── RESET ─────────────────────────────────────────────── */
@@ -82,7 +86,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 select{font-family:inherit}
 
 /* ── TOPBAR ────────────────────────────────────────────── */
-.tv-topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:16px;height:48px;padding:0 24px;background:var(--bg-1);border-bottom:1px solid var(--border-2);box-shadow:0 1px 3px var(--shadow)}
+.tv-topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:16px;height:48px;padding:0 24px;background:var(--bg-1);border-bottom:1px solid var(--border-2)}
 .tv-logo{display:flex;align-items:center;flex-shrink:0;text-decoration:none}
 .tv-logo img{height:19px;display:block}
 .tv-logo-text{font-family:var(--mono);font-weight:700;font-size:15px;letter-spacing:.08em;color:var(--text)}
