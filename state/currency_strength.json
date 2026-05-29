@@ -577,14 +577,14 @@
       "rank": 1
     },
     {
-      "composite": 50.7,
+      "composite": 48.4,
       "date": "2026-05-29",
       "pillars": {
-        "commodity": 9.7,
+        "commodity": 10.9,
         "growth": 44.3,
-        "monetary": 69.6,
-        "positioning": 68.0,
-        "risk": 39.2
+        "monetary": 69.7,
+        "positioning": 56.1,
+        "risk": 38.5
       },
       "rank": 1
     }
@@ -1167,16 +1167,16 @@
       "rank": 2
     },
     {
-      "composite": 6.0,
+      "composite": 5.4,
       "date": "2026-05-29",
       "pillars": {
-        "commodity": 18.7,
+        "commodity": 20.6,
         "growth": -36.4,
         "monetary": -2.5,
-        "positioning": 38.6,
-        "risk": 23.5
+        "positioning": 34.5,
+        "risk": 23.1
       },
-      "rank": 3
+      "rank": 4
     }
   ],
   "CHF": [
@@ -1703,12 +1703,12 @@
       "rank": 8
     },
     {
-      "composite": -51.8,
+      "composite": -41.3,
       "date": "2026-05-29",
       "pillars": {
         "monetary": -66.2,
-        "positioning": -39.7,
-        "risk": -39.2
+        "positioning": -6.1,
+        "risk": -38.5
       },
       "rank": 8
     }
@@ -2187,14 +2187,14 @@
       "rank": 5
     },
     {
-      "composite": -5.5,
+      "composite": -12.1,
       "date": "2026-05-29",
       "pillars": {
         "monetary": -17.0,
-        "positioning": 7.7,
+        "positioning": -13.9,
         "risk": -0.0
       },
-      "rank": 5
+      "rank": 6
     }
   ],
   "GBP": [
@@ -2723,15 +2723,15 @@
       "rank": 6
     },
     {
-      "composite": -10.5,
+      "composite": -5.4,
       "date": "2026-05-29",
       "pillars": {
         "growth": -43.0,
         "monetary": 5.9,
-        "positioning": -16.4,
-        "risk": 7.8
+        "positioning": 5.4,
+        "risk": 7.7
       },
-      "rank": 6
+      "rank": 5
     }
   ],
   "JPY": [
@@ -3208,12 +3208,12 @@
       "rank": 7
     },
     {
-      "composite": -19.0,
+      "composite": -38.9,
       "date": "2026-05-29",
       "pillars": {
         "monetary": -16.3,
-        "positioning": -8.1,
-        "risk": -39.2
+        "positioning": -73.1,
+        "risk": -38.5
       },
       "rank": 7
     }
@@ -3796,16 +3796,16 @@
       "rank": 4
     },
     {
-      "composite": 1.6,
+      "composite": 9.8,
       "date": "2026-05-29",
       "pillars": {
-        "commodity": 22.0,
+        "commodity": 23.4,
         "growth": 1.2,
-        "monetary": 11.1,
-        "positioning": -55.8,
-        "risk": 39.2
+        "monetary": 11.2,
+        "positioning": -15.3,
+        "risk": 38.5
       },
-      "rank": 4
+      "rank": 3
     }
   ],
   "USD": [
@@ -4334,13 +4334,13 @@
       "rank": 3
     },
     {
-      "composite": 11.9,
+      "composite": 15.1,
       "date": "2026-05-29",
       "pillars": {
         "growth": 33.9,
-        "monetary": 15.3,
-        "positioning": 11.5,
-        "risk": -23.5
+        "monetary": 15.1,
+        "positioning": 24.9,
+        "risk": -23.1
       },
       "rank": 2
     }
