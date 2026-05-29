@@ -1,6 +1,12 @@
 {
   "DXY": [
     {
+      "date": "2026-05-28",
+      "bias": "short",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
       "date": "2026-05-27",
       "bias": "short",
       "conviction": 4,
@@ -80,6 +86,12 @@
     }
   ],
   "EURUSD": [
+    {
+      "date": "2026-05-28",
+      "bias": "long",
+      "conviction": 6,
+      "source": "judge"
+    },
     {
       "date": "2026-05-27",
       "bias": "long",
@@ -161,6 +173,12 @@
   ],
   "USDJPY": [
     {
+      "date": "2026-05-28",
+      "bias": "long",
+      "conviction": 5,
+      "source": "judge"
+    },
+    {
       "date": "2026-05-27",
       "bias": "short",
       "conviction": 4,
@@ -240,6 +258,12 @@
     }
   ],
   "GBPUSD": [
+    {
+      "date": "2026-05-28",
+      "bias": "long",
+      "conviction": 4,
+      "source": "strategist"
+    },
     {
       "date": "2026-05-27",
       "bias": "long",
@@ -321,6 +345,12 @@
   ],
   "AUDUSD": [
     {
+      "date": "2026-05-28",
+      "bias": "short",
+      "conviction": 2,
+      "source": "judge"
+    },
+    {
       "date": "2026-05-27",
       "bias": "short",
       "conviction": 4,
@@ -400,6 +430,12 @@
     }
   ],
   "ES": [
+    {
+      "date": "2026-05-28",
+      "bias": "long",
+      "conviction": 4,
+      "source": "judge"
+    },
     {
       "date": "2026-05-27",
       "bias": "long",
@@ -481,6 +517,12 @@
   ],
   "NQ": [
     {
+      "date": "2026-05-28",
+      "bias": "long",
+      "conviction": 4,
+      "source": "judge"
+    },
+    {
       "date": "2026-05-27",
       "bias": "long",
       "conviction": 4,
@@ -561,6 +603,12 @@
   ],
   "GC": [
     {
+      "date": "2026-05-28",
+      "bias": "long",
+      "conviction": 6,
+      "source": "judge"
+    },
+    {
       "date": "2026-05-27",
       "bias": "long",
       "conviction": 6,
@@ -640,6 +688,12 @@
     }
   ],
   "CL": [
+    {
+      "date": "2026-05-28",
+      "bias": "short",
+      "conviction": 4,
+      "source": "judge"
+    },
     {
       "date": "2026-05-27",
       "bias": "long",

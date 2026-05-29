@@ -2,6 +2,13 @@
   "DXY": {
     "history": [
       {
+        "date": "2026-05-28",
+        "drivers": [
+          "Theme\u202f2 (ECB hawkish pivot \u2192 EUR strength)",
+          "Fed dovish\u2011hold shift (undermines Theme\u202f3\u2019s hawkish skew)"
+        ]
+      },
+      {
         "date": "2026-05-27",
         "drivers": [
           "ECB Hawkish Pivot (Theme 2) \u2014 rate differential compression",
@@ -97,6 +104,13 @@
   "EURUSD": {
     "history": [
       {
+        "date": "2026-05-28",
+        "drivers": [
+          "Theme\u202f2 (ECB hawkish pivot)",
+          "Fed dovish\u2011hold shift (differential compression)"
+        ]
+      },
+      {
         "date": "2026-05-27",
         "drivers": [
           "ECB Hawkish Pivot (Theme 2) \u2014 June hike priced, rate differential compression",
@@ -191,6 +205,13 @@
   },
   "USDJPY": {
     "history": [
+      {
+        "date": "2026-05-28",
+        "drivers": [
+          "Fed dovish\u2011hold shift (USD weaker)",
+          "BoJ hawkish dissent (6\u20113 vote, potential for July hike) \u2014 narrowing US\u2011JP rate spread"
+        ]
+      },
       {
         "date": "2026-05-27",
         "drivers": [
@@ -288,6 +309,13 @@
   "GBPUSD": {
     "history": [
       {
+        "date": "2026-05-28",
+        "drivers": [
+          "BoE hawkish\u2011hold (carry support)",
+          "Soft USD backdrop"
+        ]
+      },
+      {
         "date": "2026-05-27",
         "drivers": [
           "(none explicitly; BoE similar to ECB but weaker conviction)",
@@ -378,6 +406,13 @@
   },
   "AUDUSD": {
     "history": [
+      {
+        "date": "2026-05-28",
+        "drivers": [
+          "Theme\u202f4 (China deflationary drag)",
+          "Extreme long positioning (crowded trade contra\u2011signal) \u2014 bearish AUDUSD"
+        ]
+      },
       {
         "date": "2026-05-27",
         "drivers": [
@@ -474,6 +509,13 @@
   "ES": {
     "history": [
       {
+        "date": "2026-05-28",
+        "drivers": [
+          "Theme\u202f5 (AI capex anchor)",
+          "Soft USD / dovish Fed (lowers discount rate)"
+        ]
+      },
+      {
         "date": "2026-05-27",
         "drivers": [
           "AI Capex as Equity Anchor (Theme 5) \u2014 supports dips",
@@ -568,6 +610,13 @@
   "NQ": {
     "history": [
       {
+        "date": "2026-05-28",
+        "drivers": [
+          "Theme\u202f5 (AI capex anchor \u2014 most direct expression)",
+          "Fed dovish shift (lower rates)"
+        ]
+      },
+      {
         "date": "2026-05-27",
         "drivers": [
           "AI Capex as Equity Anchor (Theme 5) \u2014 most direct expression",
@@ -658,6 +707,13 @@
   },
   "GC": {
     "history": [
+      {
+        "date": "2026-05-28",
+        "drivers": [
+          "Theme\u202f1 (energy\u2011driven reflation / stagflation bid)",
+          "Theme\u202f4 (China structural gold buying), Geopolitical safe\u2011haven"
+        ]
+      },
       {
         "date": "2026-05-27",
         "drivers": [
@@ -756,6 +812,13 @@
   },
   "CL": {
     "history": [
+      {
+        "date": "2026-05-28",
+        "drivers": [
+          "Theme\u202f1 (energy\u2011driven reflation / supply disruption)",
+          "Iran supply risk (geopolitical)"
+        ]
+      },
       {
         "date": "2026-05-27",
         "drivers": [
