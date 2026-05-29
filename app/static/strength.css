@@ -1,0 +1,108 @@
+/* ── Currency Strength Meter ─────────────────────────────── */
+.cs-main{max-width:1080px;margin:0 auto;padding:24px 20px 60px}
+.cs-nav{font-size:12px;color:var(--text-dim);font-weight:500}
+.cs-nav:hover{color:var(--accent);text-decoration:none}
+
+.pos{color:var(--bull-bright,var(--bull))}
+.neg{color:var(--bear-bright,var(--bear))}
+
+/* ZONE 1 — explainer */
+.cs-explain{margin-bottom:24px}
+.cs-h1{font-size:26px;font-weight:700;letter-spacing:-.02em;margin-bottom:10px}
+.cs-lead{font-size:15px;line-height:1.6;color:var(--text-dim);max-width:760px;margin-bottom:18px}
+.cs-lead em{color:var(--text);font-style:normal;font-weight:600}
+.cs-pillars-intro{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px}
+.cs-pintro{background:var(--bg-1);border:1px solid var(--border-2);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.cs-pintro-h{font-size:13px;font-weight:700;color:var(--text)}
+.cs-pintro-d{font-size:11px;color:var(--text-faint);line-height:1.4}
+.cs-howto{font-size:13px;color:var(--text-dim);line-height:1.6;max-width:760px}
+.cs-howto strong{font-weight:700}
+.cs-howto em{font-style:normal;font-weight:600;color:var(--text)}
+
+/* block heads */
+.cs-block,.cs-meter{margin:26px 0}
+.cs-block-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:8px}
+.cs-block-head h2{font-size:16px;font-weight:700}
+.cs-sub{font-size:11px;color:var(--text-faint)}
+
+/* ZONE 2 — ranked bars */
+.cs-bars{display:flex;flex-direction:column;gap:6px}
+.cs-row{display:grid;grid-template-columns:24px 50px minmax(70px,1fr) minmax(130px,2.4fr) 56px 26px;
+  align-items:center;gap:10px;width:100%;text-align:left;padding:9px 12px;border:1px solid var(--border-2);
+  border-radius:8px;background:var(--bg-1);cursor:pointer;transition:border-color .15s,background .15s}
+.cs-row:hover{border-color:var(--border-3);background:var(--bg-2)}
+.cs-row.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.cs-rank{font-family:var(--mono);font-size:12px;color:var(--text-faint);text-align:center}
+.cs-code{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.04em;background:var(--bg-3);border-radius:5px;padding:4px 0;text-align:center}
+.cs-name{font-size:13px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cs-bar-track{position:relative;height:12px;background:var(--bg-3);border-radius:6px;display:block;width:100%;overflow:hidden}
+.cs-bar-zero{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--border-3);transform:translateX(-.5px);z-index:2}
+.cs-bar-fill{position:absolute;top:0;bottom:0;border-radius:6px}
+.cs-bar-fill.pos{background:var(--bull)}
+.cs-bar-fill.neg{background:var(--bear)}
+.cs-score{font-family:var(--mono);font-size:14px;font-weight:700;text-align:right}
+.cs-pill{font-size:11px;text-align:center}
+.cs-pill.cs-strengthening{color:var(--bull-bright,var(--bull))}
+.cs-pill.cs-weakening{color:var(--bear-bright,var(--bear))}
+.cs-pill.cs-stable,.cs-pill.cs-new{color:var(--text-faint)}
+
+/* ZONE 2b — chart */
+.cs-chart-wrap{display:flex;gap:0;align-items:stretch}
+.cs-chart-yscale{display:flex;flex-direction:column;justify-content:space-between;padding:0 8px 16px 0;
+  font-size:9px;font-family:var(--mono);color:var(--text-faint);min-width:30px;text-align:right}
+.cs-chart-main{position:relative;flex:1;min-width:0}
+.cs-chart{display:block;width:100%}
+.cs-chart-tip{position:absolute;top:6px;pointer-events:none;display:none;background:var(--bg-1);
+  border:1px solid var(--border-3);border-radius:6px;padding:7px 9px;font-size:11px;box-shadow:0 4px 16px var(--shadow);z-index:10;min-width:120px}
+.cs-tip-d{font-family:var(--mono);font-size:9px;color:var(--text-faint);margin-bottom:4px}
+.cs-tip-r{display:flex;align-items:center;gap:5px;line-height:1.5;white-space:nowrap}
+.cs-tip-r b{margin-left:auto;font-family:var(--mono)}
+.cs-legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.cs-leg{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;font-family:var(--mono);
+  padding:4px 9px;border:1px solid var(--border-2);border-radius:14px;background:var(--bg-1);color:var(--text);transition:opacity .15s}
+.cs-leg.off{opacity:.35}
+.cs-leg-dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
+
+/* ZONE 2c — heatmap */
+.cs-heatmap-wrap{overflow-x:auto}
+.cs-hm{border-collapse:collapse;font-family:var(--mono);font-size:11px;width:100%;min-width:520px}
+.cs-hm th{color:var(--text-dim);font-weight:700;padding:5px 6px;text-align:center}
+.cs-hm td{text-align:center;padding:7px 4px;border-radius:4px;color:var(--text);font-weight:600}
+.cs-hm-diag{background:var(--bg-3)!important}
+
+/* ZONE 3 — detail */
+.cs-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:14px}
+.cs-detail-h{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-faint);margin-bottom:10px;font-weight:600}
+.cs-pl-row{display:grid;grid-template-columns:90px 1fr 36px;align-items:center;gap:8px;margin-bottom:8px}
+.cs-pl-name{font-size:12px;color:var(--text-dim)}
+.cs-pl-bar{position:relative;height:8px;background:var(--bg-3);border-radius:4px;overflow:hidden}
+.cs-pl-zero{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--border-3);z-index:2}
+.cs-pl-fill{position:absolute;top:0;bottom:0;border-radius:4px}
+.cs-pl-fill.pos{background:var(--bull)}
+.cs-pl-fill.neg{background:var(--bear)}
+.cs-pl-val{font-family:var(--mono);font-size:12px;font-weight:700;text-align:right}
+.cs-ind-row{display:flex;align-items:baseline;gap:8px;font-size:12px;padding:5px 0;border-bottom:1px solid var(--border)}
+.cs-ind-l{color:var(--text-dim)}
+.cs-ind-v{margin-left:auto;font-family:var(--mono);font-weight:600;color:var(--text)}
+.cs-ind-a{font-size:9px;color:var(--text-faint);font-family:var(--mono)}
+.cs-blurb{font-size:14px;line-height:1.6;color:var(--text);background:var(--bg-2);border-left:3px solid var(--accent);
+  border-radius:0 6px 6px 0;padding:12px 16px}
+
+/* footer */
+.cs-footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);text-align:center}
+.cs-footer p{font-size:12px;color:var(--text-dim);margin-bottom:6px}
+.cs-disclaimer{font-size:11px;color:var(--text-faint);max-width:680px;margin:0 auto;line-height:1.5}
+
+/* responsive */
+@media(max-width:760px){
+  .cs-main{padding:16px 12px 48px}
+  .cs-h1{font-size:22px}
+  .cs-pillars-intro{grid-template-columns:1fr 1fr}
+  .cs-row{grid-template-columns:20px 44px minmax(96px,2.6fr) 50px 22px;gap:8px;padding:8px 10px}
+  .cs-name{display:none}
+  .cs-detail-grid{grid-template-columns:1fr;gap:18px}
+}
+@media(max-width:420px){
+  .cs-pillars-intro{grid-template-columns:1fr}
+  .cs-pl-row{grid-template-columns:78px 1fr 32px}
+}

@@ -48,7 +48,8 @@ from src.data.prices import PriceClient
 
 log = structlog.get_logger(__name__)
 
-_PATH = STATE_DIR / "currency_strength.json"
+_PATH = STATE_DIR / "currency_strength.json"            # slim history (charts)
+_LATEST_PATH = STATE_DIR / "currency_strength_latest.json"  # rich current snapshot
 _LOCK = threading.RLock()
 _MAX_HISTORY = 400  # ~13 months of daily snapshots
 
@@ -362,6 +363,7 @@ def compute_strength(*, persist: bool = True, as_of: date | None = None,
     }
     if persist:
         _append_snapshot(out)
+        _save_latest(out)
     return out
 
 
@@ -433,6 +435,34 @@ def load_history(code: str, n: int | None = None) -> list[dict]:
     """Return stored daily snapshots for a currency (oldest first)."""
     entries = _load().get(code, [])
     return entries[-n:] if n else entries
+
+
+def _save_latest(out: dict) -> None:
+    """Persist the full current snapshot (pillars + indicators) for the web UI."""
+    _LATEST_PATH.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=str(_LATEST_PATH.parent), suffix=".tmp")
+    try:
+        with open(fd, "w", encoding="utf-8") as f:
+            json.dump(out, f, indent=2, sort_keys=True)
+        Path(tmp).replace(_LATEST_PATH)
+    except Exception:
+        Path(tmp).unlink(missing_ok=True)
+        raise
+
+
+def load_latest() -> dict | None:
+    """Read the rich current snapshot written by the last persisted run."""
+    if not _LATEST_PATH.exists():
+        return None
+    try:
+        return json.loads(_LATEST_PATH.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
+def all_history() -> dict[str, list[dict]]:
+    """Full slim history for every currency (for charts)."""
+    return _load()
 
 
 if __name__ == "__main__":

@@ -13,7 +13,8 @@ Set-Location $root
 $stateFiles = @(
     "state/score_history.json",
     "state/thesis_tracker.json",
-    "state/currency_strength.json"
+    "state/currency_strength.json",
+    "state/currency_strength_latest.json"
 )
 
 $changed = $false

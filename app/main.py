@@ -51,6 +51,10 @@ from src.data import (  # noqa: E402
     upcoming_events,
 )
 from src.data.prices import INSTRUMENT_TO_TICKER  # noqa: E402
+from src.data.currency_strength import (  # noqa: E402
+    all_history as cs_all_history,
+    load_latest as cs_load_latest,
+)
 from src.orchestration.pipeline import ACTIVE_UNIVERSE  # noqa: E402  single source of truth
 
 # Public release: no position tracking, no chat, no manual events writes, no
@@ -1083,6 +1087,106 @@ async def about_page(request: Request):
         "last_synced_iso": last_synced_iso,
         "render_time": datetime.now().strftime("%H:%M:%S"),
     })
+
+
+# ---------- Currency Strength Meter ----------
+
+# Plain-language phrasing per pillar (support, headwind). Deterministic —
+# no LLM. Keeps the explanation layman-friendly and consistent.
+_PILLAR_PHRASE = {
+    "monetary": ("relatively high interest rates", "low interest rates"),
+    "growth": ("a resilient economy", "a softening economy"),
+    "positioning": ("supportive investor positioning", "investors leaning against it"),
+    "risk": ("the current market mood", "a risk mood working against it"),
+    "commodity": ("firm commodity prices", "weak commodity prices"),
+}
+
+
+def _strength_blurb(c: dict) -> str:
+    """Build a 1-2 sentence, jargon-free explanation from the pillar scores."""
+    pills = c.get("pillars", {})
+    name, label, rank = c["name"], c["label"], c["rank"]
+    pos = sorted(((v, k) for k, v in pills.items() if v > 8), reverse=True)
+    neg = sorted((v, k) for k, v in pills.items() if v < -8)
+    parts = [f"The {name} is {label.lower()} — ranked #{rank} of the eight majors."]
+    clause = []
+    if pos:
+        clause.append("supported by " + _PILLAR_PHRASE[pos[0][1]][0])
+    if neg:
+        clause.append("held back by " + _PILLAR_PHRASE[neg[0][1]][1])
+    if clause:
+        s = " and ".join(clause)
+        parts.append(s[0].upper() + s[1:] + ".")
+    tr = c.get("trend", {})
+    if tr.get("label") in ("strengthening", "weakening"):
+        parts.append(f"It has been {tr['label']} over recent weeks.")
+    return " ".join(parts)
+
+
+def _build_strength_context(request: Request) -> dict | None:
+    latest = cs_load_latest()
+    if not latest or not latest.get("currencies"):
+        return None
+    cur_map = latest["currencies"]
+    ordered = sorted(cur_map.values(), key=lambda d: d.get("rank", 99))
+    for c in ordered:
+        c["blurb"] = _strength_blurb(c)
+
+    history = cs_all_history()
+    hist_compact = {code: [[e["date"], e["composite"]] for e in history.get(code, [])]
+                    for code in cur_map}
+
+    runs = list_runs()
+    return {
+        "surface": _detect_surface(request),
+        "as_of": latest.get("as_of"),
+        "run_date": latest.get("run_date"),
+        "weights": latest.get("weights", {}),
+        "risk_intensity": latest.get("risk_intensity", 0.0),
+        "currencies": ordered,
+        "history_json": json.dumps(hist_compact, separators=(",", ":")),
+        "latest_json": json.dumps({"currencies": cur_map}, separators=(",", ":")),
+        "last_synced_iso": latest.get("as_of"),
+        "run_date_nav": runs[0] if runs else "",
+    }
+
+
+@app.get("/strength", response_class=HTMLResponse)
+async def strength_page(request: Request):
+    ctx = _build_strength_context(request)
+    if not ctx:
+        return HTMLResponse(
+            "<h1>Currency strength data is being generated.</h1>"
+            "<p>Check back shortly.</p>", status_code=503)
+    return templates.TemplateResponse(request, "dashboard_strength.html", ctx)
+
+
+@app.get("/api/strength")
+async def api_strength():
+    """Full meter snapshot + history (read-only JSON)."""
+    latest = cs_load_latest()
+    if not latest:
+        raise HTTPException(503, "Strength data not available yet")
+    history = cs_all_history()
+    return JSONResponse({
+        "latest": latest,
+        "history": {k: [[e["date"], e["composite"]] for e in v]
+                    for k, v in history.items()},
+    })
+
+
+@app.get("/api/strength/{code}")
+async def api_strength_one(code: str):
+    """Single-currency detail: pillars, indicators, history."""
+    latest = cs_load_latest()
+    if not latest:
+        raise HTTPException(503, "Strength data not available yet")
+    code = code.upper()
+    cur = latest.get("currencies", {}).get(code)
+    if not cur:
+        raise HTTPException(404, f"Unknown currency {code}")
+    history = cs_all_history().get(code, [])
+    return JSONResponse({"currency": cur, "history": history})
 
 
 @app.get("/", response_class=HTMLResponse)

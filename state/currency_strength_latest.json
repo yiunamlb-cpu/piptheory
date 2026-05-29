@@ -1,0 +1,474 @@
+{
+  "as_of": "2026-05-29T08:07:31+00:00",
+  "currencies": {
+    "AUD": {
+      "available_pillars": [
+        "commodity",
+        "growth",
+        "monetary",
+        "positioning",
+        "risk"
+      ],
+      "code": "AUD",
+      "composite": 50.4,
+      "indicators": {
+        "bond_level": {
+          "as_of": "2026-04-01",
+          "stale": false,
+          "value": 4.96
+        },
+        "commodity": {
+          "as_of": "2026-05-28",
+          "stale": false,
+          "value": 0.36035896379819793
+        },
+        "cot_pctile": {
+          "as_of": "2026-05-19T00:00:00",
+          "stale": false,
+          "value": 47.7
+        },
+        "cot_trend": {
+          "as_of": "2026-05-19T00:00:00",
+          "stale": false,
+          "value": 13323.0
+        },
+        "rate_level": {
+          "as_of": "2026-04-01",
+          "stale": false,
+          "value": 4.34
+        },
+        "rate_traj": {
+          "as_of": "2026-04-01",
+          "stale": false,
+          "value": 0.5699999999999998
+        },
+        "unrate_level": {
+          "as_of": "2026-03-01",
+          "stale": false,
+          "value": -4.255249
+        },
+        "unrate_traj": {
+          "as_of": "2026-03-01",
+          "stale": false,
+          "value": 0.200202
+        }
+      },
+      "label": "Strong",
+      "name": "Australian Dollar",
+      "pillars": {
+        "commodity": 16.2,
+        "growth": 44.3,
+        "monetary": 69.6,
+        "positioning": 68.0,
+        "risk": 31.1
+      },
+      "rank": 1,
+      "trend": {
+        "change": 8.4,
+        "label": "strengthening"
+      }
+    },
+    "CAD": {
+      "available_pillars": [
+        "commodity",
+        "growth",
+        "monetary",
+        "positioning",
+        "risk"
+      ],
+      "code": "CAD",
+      "composite": 5.9,
+      "indicators": {
+        "bond_level": {
+          "as_of": "2026-05-01",
+          "stale": false,
+          "value": 3.53
+        },
+        "commodity": {
+          "as_of": "2026-05-29",
+          "stale": false,
+          "value": 0.5036551273452984
+        },
+        "cot_pctile": {
+          "as_of": "2026-05-19T00:00:00",
+          "stale": false,
+          "value": 3.700000000000003
+        },
+        "cot_trend": {
+          "as_of": "2026-05-19T00:00:00",
+          "stale": false,
+          "value": 15174.0
+        },
+        "rate_level": {
+          "as_of": "2026-04-01",
+          "stale": false,
+          "value": 2.272
+        },
+        "rate_traj": {
+          "as_of": "2026-04-01",
+          "stale": false,
+          "value": 0.08199999999999985
+        },
+        "unrate_level": {
+          "as_of": "2026-04-01",
+          "stale": false,
+          "value": -6.9
+        },
+        "unrate_traj": {
+          "as_of": "2026-04-01",
+          "stale": false,
+          "value": -0.0
+        }
+      },
+      "label": "Neutral",
+      "name": "Canadian Dollar",
+      "pillars": {
+        "commodity": 22.7,
+        "growth": -36.4,
+        "monetary": -2.5,
+        "positioning": 38.6,
+        "risk": 18.7
+      },
+      "rank": 3,
+      "trend": {
+        "change": -3.9,
+        "label": "stable"
+      }
+    },
+    "CHF": {
+      "available_pillars": [
+        "monetary",
+        "positioning",
+        "risk"
+      ],
+      "code": "CHF",
+      "composite": -49.9,
+      "indicators": {
+        "bond_level": {
+          "as_of": "2026-04-01",
+          "stale": false,
+          "value": 0.45
+        },
+        "cot_pctile": {
+          "as_of": "2026-05-19T00:00:00",
+          "stale": false,
+          "value": -18.9
+        },
+        "cot_trend": {
+          "as_of": "2026-05-19T00:00:00",
+          "stale": false,
+          "value": 329.0
+        },
+        "rate_level": {
+          "as_of": "2026-04-01",
+          "stale": false,
+          "value": -0.04
+        },
+        "rate_traj": {
+          "as_of": "2026-04-01",
+          "stale": false,
+          "value": -0.0011135000000000034
+        }
+      },
+      "label": "Slightly Weak",
+      "name": "Swiss Franc",
+      "pillars": {
+        "monetary": -66.2,
+        "positioning": -39.7,
+        "risk": -31.1
+      },
+      "rank": 8,
+      "trend": {
+        "change": -16.7,
+        "label": "weakening"
+      }
+    },
+    "EUR": {
+      "available_pillars": [
+        "monetary",
+        "positioning",
+        "risk"
+      ],
+      "code": "EUR",
+      "composite": -5.5,
+      "indicators": {
+        "bond_level": {
+          "as_of": "2026-04-01",
+          "stale": false,
+          "value": 2.9963157895
+        },
+        "cot_pctile": {
+          "as_of": "2026-05-19T00:00:00",
+          "stale": false,
+          "value": 16.700000000000003
+        },
+        "cot_trend": {
+          "as_of": "2026-05-19T00:00:00",
+          "stale": false,
+          "value": 4723.0
+        },
+        "rate_level": {
+          "as_of": "2026-01-01",
+          "stale": false,
+          "value": 2.0277272727
+        },
+        "rate_traj": {
+          "as_of": "2026-01-01",
+          "stale": false,
+          "value": -0.006707509900000019
+        }
+      },
+      "label": "Neutral",
+      "name": "Euro",
+      "pillars": {
+        "monetary": -17.0,
+        "positioning": 7.7,
+        "risk": -0.0
+      },
+      "rank": 5,
+      "trend": {
+        "change": 2.9,
+        "label": "stable"
+      }
+    },
+    "GBP": {
+      "available_pillars": [
+        "growth",
+        "monetary",
+        "positioning",
+        "risk"
+      ],
+      "code": "GBP",
+      "composite": -10.8,
+      "indicators": {
+        "bond_level": {
+          "as_of": "2026-04-01",
+          "stale": false,
+          "value": 4.8207
+        },
+        "cot_pctile": {
+          "as_of": "2026-05-19T00:00:00",
+          "stale": false,
+          "value": -1.3999999999999986
+        },
+        "cot_trend": {
+          "as_of": "2026-05-19T00:00:00",
+          "stale": false,
+          "value": 2487.0
+        },
+        "rate_level": {
+          "as_of": "2026-01-01",
+          "stale": false,
+          "value": 3.71
+        },
+        "rate_traj": {
+          "as_of": "2026-01-01",
+          "stale": false,
+          "value": -0.2200000000000002
+        },
+        "unrate_level": {
+          "as_of": "2025-12-01",
+          "stale": false,
+          "value": -5.2
+        },
+        "unrate_traj": {
+          "as_of": "2025-12-01",
+          "stale": false,
+          "value": -0.5
+        }
+      },
+      "label": "Neutral",
+      "name": "British Pound",
+      "pillars": {
+        "growth": -43.0,
+        "monetary": 5.9,
+        "positioning": -16.4,
+        "risk": 6.2
+      },
+      "rank": 6,
+      "trend": {
+        "change": -2.8,
+        "label": "stable"
+      }
+    },
+    "JPY": {
+      "available_pillars": [
+        "monetary",
+        "positioning",
+        "risk"
+      ],
+      "code": "JPY",
+      "composite": -17.2,
+      "indicators": {
+        "bond_level": {
+          "as_of": "2026-04-01",
+          "stale": false,
+          "value": 2.515
+        },
+        "cot_pctile": {
+          "as_of": "2026-05-19T00:00:00",
+          "stale": false,
+          "value": -31.4
+        },
+        "cot_trend": {
+          "as_of": "2026-05-19T00:00:00",
+          "stale": false,
+          "value": 10857.0
+        },
+        "rate_level": {
+          "as_of": "2026-03-01",
+          "stale": false,
+          "value": 1.26882
+        },
+        "rate_traj": {
+          "as_of": "2026-03-01",
+          "stale": false,
+          "value": 0.1960900000000001
+        }
+      },
+      "label": "Slightly Weak",
+      "name": "Japanese Yen",
+      "pillars": {
+        "monetary": -16.3,
+        "positioning": -8.1,
+        "risk": -31.1
+      },
+      "rank": 7,
+      "trend": {
+        "change": -13.7,
+        "label": "weakening"
+      }
+    },
+    "NZD": {
+      "available_pillars": [
+        "commodity",
+        "growth",
+        "monetary",
+        "positioning",
+        "risk"
+      ],
+      "code": "NZD",
+      "composite": 1.9,
+      "indicators": {
+        "bond_level": {
+          "as_of": "2026-04-01",
+          "stale": false,
+          "value": 4.68
+        },
+        "commodity": {
+          "as_of": "2026-05-28",
+          "stale": false,
+          "value": 0.7148112642507105
+        },
+        "cot_pctile": {
+          "as_of": "2026-05-19T00:00:00",
+          "stale": false,
+          "value": -43.8
+        },
+        "cot_trend": {
+          "as_of": "2026-05-19T00:00:00",
+          "stale": false,
+          "value": 1497.0
+        },
+        "rate_level": {
+          "as_of": "2026-04-01",
+          "stale": false,
+          "value": 2.56
+        },
+        "rate_traj": {
+          "as_of": "2026-04-01",
+          "stale": false,
+          "value": 0.06000000000000005
+        },
+        "unrate_level": {
+          "as_of": "2026-01-01",
+          "stale": false,
+          "value": -5.3
+        },
+        "unrate_traj": {
+          "as_of": "2026-01-01",
+          "stale": false,
+          "value": -0.0
+        }
+      },
+      "label": "Neutral",
+      "name": "New Zealand Dollar",
+      "pillars": {
+        "commodity": 32.2,
+        "growth": 1.2,
+        "monetary": 11.1,
+        "positioning": -55.8,
+        "risk": 31.1
+      },
+      "rank": 4,
+      "trend": {
+        "change": -11.8,
+        "label": "weakening"
+      }
+    },
+    "USD": {
+      "available_pillars": [
+        "growth",
+        "monetary",
+        "positioning",
+        "risk"
+      ],
+      "code": "USD",
+      "composite": 12.8,
+      "indicators": {
+        "bond_level": {
+          "as_of": "2026-05-27",
+          "stale": false,
+          "value": 4.48
+        },
+        "cot_pctile": {
+          "as_of": "derived",
+          "stale": false,
+          "value": 3.914285714285712
+        },
+        "rate_level": {
+          "as_of": "2026-05-27",
+          "stale": false,
+          "value": 3.62
+        },
+        "rate_traj": {
+          "as_of": "2026-05-27",
+          "stale": false,
+          "value": -0.020000000000000018
+        },
+        "unrate_level": {
+          "as_of": "2026-04-01",
+          "stale": false,
+          "value": -4.3
+        },
+        "unrate_traj": {
+          "as_of": "2026-04-01",
+          "stale": false,
+          "value": 0.10000000000000053
+        }
+      },
+      "label": "Neutral",
+      "name": "US Dollar",
+      "pillars": {
+        "growth": 33.9,
+        "monetary": 15.3,
+        "positioning": 11.5,
+        "risk": -18.7
+      },
+      "rank": 2,
+      "trend": {
+        "change": -3.5,
+        "label": "stable"
+      }
+    }
+  },
+  "risk_intensity": -0.692,
+  "run_date": "2026-05-29",
+  "weights": {
+    "commodity": 0.15,
+    "growth": 0.2,
+    "monetary": 0.3,
+    "positioning": 0.2,
+    "risk": 0.15
+  }
+}
