@@ -66,3 +66,15 @@ jobs:
           git commit -m "state: daily pipeline run for $DATE_LABEL"
           git pull --rebase origin main
           git push origin main
+
+      - name: Warm up Render instance after deploy
+        run: |
+          echo "Waiting for Render deploy to start..."
+          sleep 60
+          echo "Warming up instance (will retry for up to 5 min)..."
+          for i in 1 2 3 4 5; do
+            echo "Attempt $i..."
+            curl -s -o /dev/null -w "HTTP %{http_code}\n" --max-time 120 https://piptheory.com/ || echo "Request failed"
+            sleep 60
+          done
+          echo "Warm-up complete"
