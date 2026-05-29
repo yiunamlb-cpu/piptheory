@@ -51,6 +51,9 @@ data/raw/
 *.feather
 *.h5
 
+# --- Static-site build output (Cloudflare Pages publishes this; not committed) ---
+dist/
+
 # --- Runtime state (cost tracking, agent memory snapshots, etc.) ---
 state/
 # Allow public-safe state files the dashboard needs (pushed by scripts/push_state.ps1)

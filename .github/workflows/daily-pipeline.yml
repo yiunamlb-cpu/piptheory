@@ -16,6 +16,11 @@ jobs:
   strength:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      # The Cloudflare deploy steps below stay DORMANT until this secret exists.
+      # Add CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID as repo secrets to turn
+      # them on; until then the site keeps deploying to Render exactly as before.
+      CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -52,6 +57,21 @@ jobs:
           git commit -m "state: daily strength update"
           git pull --rebase origin main
           git push origin main
+
+      # --- Cloudflare Pages (static) — auto-activates once CF_TOKEN is set ---
+      - name: Build static site
+        if: env.CF_TOKEN != ''
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: python -m scripts.build_static
+
+      - name: Deploy to Cloudflare Pages
+        if: env.CF_TOKEN != ''
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=piptheory --branch=main
 
       - name: Ping deployed site
         run: |
