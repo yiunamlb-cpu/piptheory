@@ -83,7 +83,7 @@ body.cs-page .tv-topbar{padding:0 max(24px, calc((100% - 1440px) / 2 + 24px))}
 .cs-range button.cs-dis,.cs-range button:disabled{opacity:.32;cursor:not-allowed;pointer-events:none}
 .cs-block-head-2{align-items:flex-start}
 .cs-head-titles{display:flex;flex-direction:column;gap:3px;min-width:0}
-.cs-head-titles .cs-sub{max-width:46ch;line-height:1.45}
+.cs-head-titles .cs-sub{line-height:1.45}
 .cs-ctrls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0}
 .cs-ctrl-div{width:1px;align-self:stretch;background:var(--border-2);margin:2px 0}
 .cs-chart-wrap{display:flex;gap:0;align-items:stretch;background:var(--card-grad);border:1px solid var(--border-2);border-radius:0;padding:16px 16px 8px;box-shadow:var(--shadow-card)}
