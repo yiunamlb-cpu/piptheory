@@ -26,7 +26,7 @@
   --display: 'Inter', system-ui, -apple-system, sans-serif;
   /* Industrial / precision design tokens — flat surfaces, sharp edges,
      hairline rules, no glow/gradient/soft-shadow. */
-  --radius: 2px;
+  --radius: 0;
   --shadow-card: none;
   --shadow-hover: none;
   --card-grad: var(--bg-1);
