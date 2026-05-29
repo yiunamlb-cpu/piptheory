@@ -2,6 +2,13 @@
   "DXY": {
     "history": [
       {
+        "date": "2026-05-29",
+        "drivers": [
+          "Theme 3 (Fed\u2011stuck, skewed\u2011to\u2011hike \u2192 neutral for USD)",
+          "Theme 2 (ECB hawkish pivot \u2192 USD\u2011negative via EUR strength)"
+        ]
+      },
+      {
         "date": "2026-05-28",
         "drivers": [
           "Theme\u202f2 (ECB hawkish pivot \u2192 EUR strength)",
@@ -104,6 +111,13 @@
   "EURUSD": {
     "history": [
       {
+        "date": "2026-05-29",
+        "drivers": [
+          "Theme 2 (ECB Hawkish Pivot) \u2014 rate differential compressing in EUR\u2019s favour",
+          "Theme 1 (Energy\u2011Driven Reflation) \u2014 reinforces ECB hike path"
+        ]
+      },
+      {
         "date": "2026-05-28",
         "drivers": [
           "Theme\u202f2 (ECB hawkish pivot)",
@@ -205,6 +219,13 @@
   },
   "USDJPY": {
     "history": [
+      {
+        "date": "2026-05-29",
+        "drivers": [
+          "N/A \u2014 the prior map\u2019s \u201cFed > BoJ\u201d driver is challenged by BoJ\u2019s explicit hike\u2011bias. This bias is candidate for a new or updated theme: **BoJ Normalisation Acceleration",
+          "(potential) Theme 3 (Fed\u2011stuck) \u2014 if Fed remains on hold while BoJ hikes, rate differential narrows, supporting JPY"
+        ]
+      },
       {
         "date": "2026-05-28",
         "drivers": [
@@ -309,6 +330,13 @@
   "GBPUSD": {
     "history": [
       {
+        "date": "2026-05-29",
+        "drivers": [
+          "N/A \u2014 THEMES had a generic \u201cBoE in similar boat to ECB\u201d anchoring slight bullishness; not a formal theme. If BoE solidifies a hawkish stance, this would become a derived theme",
+          "Theme 3 (Fed\u2011stuck) \u2014 passive dollar softness supportive for cable"
+        ]
+      },
+      {
         "date": "2026-05-28",
         "drivers": [
           "BoE hawkish\u2011hold (carry support)",
@@ -406,6 +434,13 @@
   },
   "AUDUSD": {
     "history": [
+      {
+        "date": "2026-05-29",
+        "drivers": [
+          "Theme 4 (China Deflationary Quagmire) \u2014 bearish for AUD via demand channel",
+          "(competing) Theme 1 (Energy\u2011Driven Reflation) \u2014 would normally be AUD\u2011positive via commodity prices, but positioning suggests the market is already long and stretched"
+        ]
+      },
       {
         "date": "2026-05-28",
         "drivers": [
@@ -509,6 +544,13 @@
   "ES": {
     "history": [
       {
+        "date": "2026-05-29",
+        "drivers": [
+          "Theme 5 (AI Capex as Equity Anchor) \u2014 supports buying dips",
+          "Theme 1 (Energy\u2011Driven Reflation) \u2014 caps upside through margin pressure and higher yields"
+        ]
+      },
+      {
         "date": "2026-05-28",
         "drivers": [
           "Theme\u202f5 (AI capex anchor)",
@@ -610,6 +652,13 @@
   "NQ": {
     "history": [
       {
+        "date": "2026-05-29",
+        "drivers": [
+          "Theme 5 (AI Capex) \u2014 strongest direct expression among equity indices",
+          "Theme 1 reflation caps upside"
+        ]
+      },
+      {
         "date": "2026-05-28",
         "drivers": [
           "Theme\u202f5 (AI capex anchor \u2014 most direct expression)",
@@ -707,6 +756,13 @@
   },
   "GC": {
     "history": [
+      {
+        "date": "2026-05-29",
+        "drivers": [
+          "Theme 1 (Energy\u2011Driven Reflation) \u2014 inflation hedge demand",
+          "Theme 4 (China Deflation) \u2014 PBoC buying and store\u2011of\u2011value bid"
+        ]
+      },
       {
         "date": "2026-05-28",
         "drivers": [
@@ -812,6 +868,12 @@
   },
   "CL": {
     "history": [
+      {
+        "date": "2026-05-29",
+        "drivers": [
+          "Theme 1 (Energy\u2011Driven Reflation) \u2014 direct expression"
+        ]
+      },
       {
         "date": "2026-05-28",
         "drivers": [
