@@ -88,8 +88,10 @@ def _compute_static_version() -> str:
 _STATIC_VERSION = _compute_static_version()
 templates.env.globals["static_version"] = _STATIC_VERSION
 
-# Google Analytics — set GA_MEASUREMENT_ID env var (e.g. "G-XXXXXXXXXX")
-_GA_ID = os.environ.get("GA_MEASUREMENT_ID", "")
+# Google Analytics 4 — the GA Measurement ID is public (it appears in page
+# source). Hardcoded so it renders correctly on Render, the Cloudflare static
+# build, and locally, independent of any stale GA_MEASUREMENT_ID env value.
+_GA_ID = "G-0TYLNLEDEK"
 templates.env.globals["ga_id"] = _GA_ID
 
 
