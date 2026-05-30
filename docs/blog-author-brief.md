@@ -23,15 +23,18 @@ updated: 2099-12-31
 keyword: primary target keyword
 summary: 1-2 sentence meta description (~150 chars) containing the keyword + a hook.
 faq:
-  - q: A natural question someone searches?
-    a: A direct, self-contained 1-3 sentence answer.
-  - q: Second question?
-    a: Answer.
-  - q: Third question?
-    a: Answer.
+  - q: "A natural question someone searches?"
+    a: "A direct, self-contained 1-3 sentence answer."
+  - q: "Second question?"
+    a: "Answer."
+  - q: "Third question?"
+    a: "Answer."
 ---
 ```
 
+- **CRITICAL — quote your YAML strings.** ALWAYS wrap every `faq` `q:`/`a:` value, and the
+  `summary`, in **double quotes**. An unquoted value containing a colon-space (e.g. `the CME: EUR`,
+  `note: this`, a ratio like `2: 1`) silently breaks the whole front matter. When in doubt, quote it.
 - Use `date: 2099-12-31` for ALL posts (keeps them hidden until scheduled — do not invent dates).
 - The FAQ goes in **front matter only** (the template renders it + emits FAQ structured data). 3–5 Q&As.
 
