@@ -195,3 +195,113 @@ Each explainer ends with: "See how PIPTHEORY scores [X] today →" (internal lin
 - BIS EER; CFTC COT; IMF SDR; FRED (links above)
 - ChartSnipe 2026 guide — https://chartsnipe.com/blog/currency-strength-meter-guide
 - currencystrengthindicator.net "best meters" roundup
+
+---
+
+# Blog Production Guidelines (every post must follow)
+
+**Specs**
+- **Length:** ≥ 1,500 words.
+- **SEO (use the keyword map above):** one primary target keyword per post in the title, H1,
+  URL slug, first ~100 words, and ≥2 H2s; supporting/long-tail terms in subheads; a meta
+  description with the keyword + a hook. Each post is mapped to its target keyword in the
+  pipeline below.
+- **Internal links:** every post links to the live meter and the relevant `/currency/*` or
+  `/pair/*` pages, plus 2–3 sibling explainers (topic-cluster interlinking).
+- **Structure:** scannable — short paragraphs, descriptive H2/H3s, bullet lists, a
+  TL;DR / "key takeaways" box, and a closing "See it live on the meter →" CTA.
+
+**Hyperlinking rules**
+- **DO** link to authoritative, NON-competing sources for credibility + E-E-A-T: academic
+  papers, central banks (Fed/ECB/BoJ/BoE/etc.), primary data (BIS, CFTC, IMF, FRED), reputable
+  news/encyclopedic refs (Reuters, Wikipedia), named experts/traders' public work, **prop firms
+  and brokers** (for context like "how funding works").
+- **DO NOT** link to direct currency-strength-meter competitors (MarketMilk/BabyPips, LogikFx,
+  Myfxbook, OANDA strength tool, FXSSI, Mataf, LiveCharts, FX Blue, exact-match domains).
+  Reference the concept without linking the rival tool.
+- Descriptive, keyword-rich anchor text (never "click here"). External links open in a new tab
+  with `rel="noopener"`; add `nofollow` on promotional/affiliate links (prop firms/brokers).
+
+**Visual / formatting requirements — NO images; all visuals are HTML/SVG/CSS**
+- Every post includes several **HTML-made graphics**: inline SVG + CSS, **animated where it
+  aids clarity** (so they can move if needed). No `<img>`/stock photos.
+- Use a mix: cause→effect & cycle diagrams, comparison tables, mini bar/line charts (SVG),
+  annotated timelines (for case studies), callout/quote boxes, "key takeaways" panels, step lists.
+- **Never a wall of text:** break every ~2–3 paragraphs with a visual, table, list, or callout.
+  Easy to follow, articulate, well-formatted.
+- Graphics inherit the site design tokens (industrial/sharp, theme-aware light/dark) and are
+  responsive (mobile-first; no fixed widths that overflow).
+- **Technical pre-req:** the blog renderer must pass raw HTML/SVG (and scoped CSS) through
+  markdown — verify/enable before production.
+
+---
+
+# Content Pipeline — 50 Posts (draft proposed 2026-05-30, pending approval)
+
+Format: `Title — target keyword`.
+
+**A. Macro & currency basics**
+1. What Is a Currency Strength Meter? (And How to Actually Use One) — *how to use a currency strength meter*
+2. Fundamentals vs Price-Based Currency Strength: Which Should You Trust? — *fundamental vs price-based currency strength*
+3. How Is Currency Strength Calculated? A Plain-English Guide — *how is currency strength calculated*
+4. What Makes a Currency Strong? The Five Forces That Move FX — *what makes a currency strong*
+5. Interest Rate Differentials: The #1 Driver of Currency Strength — *interest rate differential forex*
+6. Inflation, Real Yields & FX: Why Real Rates Rule — *real yields and currencies*
+7. Real Effective Exchange Rate (REER): Is a Currency Cheap or Expensive? — *real effective exchange rate*
+8. Reserve Currencies Explained: Why the World Hoards Dollars — *reserve currency*
+9. How Central Banks Move Currencies (Rates, QE, Guidance) — *how central banks affect currency*
+10. Which Economic Data Actually Moves FX? (NFP, CPI, PMIs, GDP) — *economic data that moves forex*
+
+**B. Correlations & intermarket**
+11. The Dollar & Gold: Why They Move Opposite (And When They Don't) — *dollar gold correlation*
+12. Oil & the Canadian Dollar: How Crude Drives the Loonie — *oil cad correlation*
+13. Risk-On vs Risk-Off: How Sentiment Rotates Currencies — *risk on risk off currencies*
+14. Bond Yields & FX: How the 2-Year Yield Leads Currencies — *bond yields and currencies*
+15. Stocks & the Dollar: The Equity–FX Feedback Loop — *stock market dollar correlation*
+16. The Aussie as a China Proxy: Iron Ore, the Yuan & AUD — *aud china correlation*
+17. The Three Safe Havens: Gold, the Yen & the Franc — *safe haven currencies*
+18. Commodity Currencies (AUD, CAD, NZD): Terms of Trade Explained — *commodity currencies*
+
+**C. Phenomena & strategies**
+19. The Carry Trade Explained: How It Works and Why It Crashes — *what is the carry trade*
+20. Currency Momentum: Why Trends Persist in FX — *currency momentum strategy*
+21. Value vs Momentum in Currencies: What the Research Shows — *value and momentum forex*
+22. The Currency Crash "Smile": Why High-Yielders Fall Fast — *carry trade crash*
+23. Mean Reversion vs Trend: When Each Wins in FX — *mean reversion vs trend forex*
+24. Forex Seasonality: Month-End, Quarter-End & Year-End Flows — *forex seasonality*
+25. Divergence Trading: When Price and Fundamentals Disagree — *price vs fundamentals divergence*
+
+**D. Positioning & data**
+26. How to Read the COT Report for Currency Positioning — *cot report forex*
+27. Sentiment Extremes: When "Everyone Is Long" Signals a Top — *forex sentiment extremes*
+28. What Smart Money Tracks: Positioning, Flows & Order Books — *smart money forex*
+
+**E. Famous macro case studies**
+29. Black Wednesday 1992: How Soros Broke the Bank of England — *soros bank of england*
+30. The 2015 Swiss Franc Shock: When the SNB Removed the Floor — *swiss franc shock 2015*
+31. The Plaza Accord: The Day Governments Crashed the Dollar — *plaza accord explained*
+32. The 2024 Yen Carry Unwind: Anatomy of a Global Shock — *yen carry trade unwind*
+33. The 1997 Asian Financial Crisis: When Pegs Shattered — *asian financial crisis explained*
+34. Brexit & the Pound: The Biggest Sterling Shock in History — *brexit pound impact*
+35. The 2022 "Dollar Wrecking Ball": When King Dollar Broke Markets — *why was the dollar so strong 2022*
+36. Currency Crises 101: Lessons from the Lira, Peso & Ruble — *currency crisis explained*
+
+**F. Legendary traders**
+37. George Soros & Reflexivity, Explained Simply — *soros reflexivity*
+38. Stanley Druckenmiller's Macro Playbook — *druckenmiller trading strategy*
+39. The Greatest Macro Traders of All Time — *famous macro traders*
+40. Bill Lipschutz: The "Sultan of Currencies" on Risk — *bill lipschutz*
+41. How Global Macro Hedge Funds Trade Currencies — *global macro trading*
+
+**G. Mindset & psychology**
+42. Trading Psychology for Macro Traders: Patience Over Prediction — *trading psychology*
+43. Why Conviction Beats Being Right — *trading conviction*
+44. Risk Management in FX: Position Sizing for Macro Bets — *forex risk management*
+45. How to Build a Macro Thesis (and Know When You're Wrong) — *how to build a macro thesis*
+46. The Discipline of Waiting for the Fat Pitch — *patience in trading*
+
+**H. Getting funded / the business of trading**
+47. How Forex Traders Get Funded: Prop Firms Explained (2026) — *how to get funded trading forex*
+48. Passing a Prop Firm Challenge: A Macro-Based Approach — *pass prop firm challenge*
+49. Funded Account vs Your Own Capital: The Real Math — *funded account vs own money*
+50. From Retail to Pro: How to Scale a Macro Edge — *becoming a professional trader*
