@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-05-29T22:09:15+00:00",
+  "as_of": "2026-05-30T04:19:27+00:00",
   "currencies": {
     "AUD": {
       "available_pillars": [
@@ -10,7 +10,7 @@
         "risk"
       ],
       "code": "AUD",
-      "composite": 48.4,
+      "composite": 48.2,
       "divergence": null,
       "indicators": {
         "bond_level": {
@@ -26,7 +26,7 @@
         "commodity": {
           "as_of": "2026-05-29",
           "stale": false,
-          "value": 0.24166924419735392
+          "value": 0.20362855439485902
         },
         "cot_pctile": {
           "as_of": "2026-05-26T00:00:00",
@@ -72,7 +72,7 @@
       "label": "Slightly Strong",
       "name": "Australian Dollar",
       "pillars": {
-        "commodity": 10.9,
+        "commodity": 9.2,
         "growth": 44.3,
         "monetary": 69.7,
         "positioning": 56.1,
@@ -81,7 +81,7 @@
       "price_3m": 1.2,
       "rank": 1,
       "trend": {
-        "change": 6.4,
+        "change": 6.3,
         "label": "strengthening"
       }
     },
@@ -94,7 +94,7 @@
         "risk"
       ],
       "code": "CAD",
-      "composite": 5.4,
+      "composite": 5.3,
       "divergence": null,
       "indicators": {
         "bond_level": {
@@ -110,7 +110,7 @@
         "commodity": {
           "as_of": "2026-05-29",
           "stale": false,
-          "value": 0.4571388852004082
+          "value": 0.4352152086689931
         },
         "cot_pctile": {
           "as_of": "2026-05-26T00:00:00",
@@ -156,7 +156,7 @@
       "label": "Neutral",
       "name": "Canadian Dollar",
       "pillars": {
-        "commodity": 20.6,
+        "commodity": 19.6,
         "growth": -36.4,
         "monetary": -2.5,
         "positioning": 34.5,
@@ -230,7 +230,7 @@
       "price_3m": -1.0,
       "rank": 8,
       "trend": {
-        "change": -8.0,
+        "change": -8.5,
         "label": "weakening"
       }
     },
@@ -295,7 +295,7 @@
       "price_3m": -1.2,
       "rank": 6,
       "trend": {
-        "change": -3.7,
+        "change": -3.3,
         "label": "stable"
       }
     },
@@ -372,7 +372,7 @@
       "price_3m": -0.3,
       "rank": 5,
       "trend": {
-        "change": 2.6,
+        "change": 2.3,
         "label": "stable"
       }
     },
@@ -437,7 +437,7 @@
       "price_3m": -2.1,
       "rank": 7,
       "trend": {
-        "change": -35.3,
+        "change": -34.3,
         "label": "weakening"
       }
     },
@@ -521,7 +521,7 @@
       "price_3m": 0.2,
       "rank": 3,
       "trend": {
-        "change": -3.9,
+        "change": -4.3,
         "label": "stable"
       }
     },
@@ -554,7 +554,7 @@
         "price_3m": {
           "as_of": "2026-05-29",
           "stale": false,
-          "value": 1.3646150231461096
+          "value": 1.3318338731983959
         },
         "rate_level": {
           "as_of": "2026-05-28",
@@ -579,7 +579,7 @@
         "valuation": {
           "as_of": "2026-05-29",
           "stale": false,
-          "value": -0.5055209056257045
+          "value": -0.4721269906456889
         }
       },
       "label": "Slightly Strong",
@@ -590,16 +590,16 @@
         "positioning": 24.9,
         "risk": -23.1
       },
-      "price_3m": 1.4,
+      "price_3m": 1.3,
       "rank": 2,
       "trend": {
-        "change": -1.1,
+        "change": -1.3,
         "label": "stable"
       }
     }
   },
   "risk_intensity": -0.856,
-  "run_date": "2026-05-29",
+  "run_date": "2026-05-30",
   "weights": {
     "commodity": 0.15,
     "growth": 0.2,
