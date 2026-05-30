@@ -1,8 +1,8 @@
 ---
 title: "Fundamentals vs Price-Based Currency Strength: Which Should You Trust?"
 slug: fundamentals-vs-price-based-currency-strength
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-05-30
+updated: 2026-05-30
 keyword: fundamental vs price-based currency strength
 summary: Price-based and fundamental currency strength meters answer completely different questions. Here's what each measures, when each is reliable, and why the smartest traders use both together.
 faq:

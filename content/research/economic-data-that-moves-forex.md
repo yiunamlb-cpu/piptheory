@@ -1,8 +1,8 @@
 ---
 title: "Which Economic Data Actually Moves FX? (NFP, CPI, PMIs, GDP)"
 slug: economic-data-that-moves-forex
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-06-19
+updated: 2026-06-19
 keyword: economic data that moves forex
 summary: "Not all economic data moves currencies equally. NFP, CPI, PMIs and central bank decisions drive the largest FX reactions — but only when they surprise. Here's the hierarchy of releases and why the surprise gap matters more than the number itself."
 faq:

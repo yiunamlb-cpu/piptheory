@@ -1,8 +1,8 @@
 ---
 title: "The Three Safe Havens: Gold, the Yen and the Franc"
 slug: safe-haven-currencies
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-06-11
+updated: 2026-06-11
 keyword: safe haven currencies
 summary: "Safe haven currencies — the Japanese yen, Swiss franc, and gold — appreciate when equity markets fall and fear spikes. Here's why each earns the label and how to use them in a macro framework."
 faq:

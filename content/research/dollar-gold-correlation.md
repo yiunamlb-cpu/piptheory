@@ -1,8 +1,8 @@
 ---
 title: "The Dollar and Gold: Why They Move Opposite (And When They Don't)"
 slug: dollar-gold-correlation
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-07-07
+updated: 2026-07-07
 keyword: dollar gold correlation
 summary: "The dollar gold correlation is typically inverse — when the USD rises, gold falls, and vice versa. Here's the real reason why, the key exceptions, and what it means for macro traders."
 faq:

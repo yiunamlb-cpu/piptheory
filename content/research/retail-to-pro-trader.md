@@ -1,8 +1,8 @@
 ---
 title: "From Retail to Pro: How to Scale a Macro Edge"
 slug: retail-to-pro-trader
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-08-08
+updated: 2026-08-08
 keyword: becoming a professional trader
 summary: "Becoming a professional trader means more than consistent returns — it requires a documented edge, institutional-grade risk discipline, and a clear capital structure. Here's the realistic path from retail to professional."
 faq:

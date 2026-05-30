@@ -1,8 +1,8 @@
 ---
 title: "Currency Momentum: Why Trends Persist in FX"
 slug: currency-momentum-explained
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-06-21
+updated: 2026-06-21
 keyword: currency momentum strategy
 summary: Currency momentum is the tendency for currencies that have been rising to keep rising — and for weak currencies to stay weak. Research shows the effect is real, persistent, and worth understanding even if you never trade it directly.
 faq:

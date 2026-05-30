@@ -1,8 +1,8 @@
 ---
 title: "The Carry Trade Explained: How It Works and Why It Crashes"
 slug: carry-trade-explained
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-06-09
+updated: 2026-06-09
 keyword: what is the carry trade
 summary: The carry trade borrows in a low-rate currency and invests in a high-rate one to pocket the interest differential — but it crashes violently when risk appetite vanishes. Here's exactly how it works and why it unwinds.
 faq:

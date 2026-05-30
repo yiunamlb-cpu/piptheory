@@ -1,8 +1,8 @@
 ---
 title: "The Plaza Accord: The Day Governments Crashed the Dollar"
 slug: plaza-accord-explained
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-08-24
+updated: 2026-08-24
 keyword: plaza accord explained
 summary: On 22 September 1985, the G5 nations agreed at New York's Plaza Hotel to deliberately weaken the US dollar — the only time major governments have openly coordinated to devalue the world's reserve currency.
 faq:

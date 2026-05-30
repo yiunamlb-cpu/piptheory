@@ -1,8 +1,8 @@
 ---
 title: "The Currency Crash Smile: Why High-Yielders Fall Fast"
 slug: currency-crash-smile
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-07-27
+updated: 2026-07-27
 keyword: carry trade crash
 summary: "Carry trade crash risk explains why high-yield currencies earn steady gains then collapse suddenly — the 'crash smile' is negative skewness baked into the strategy's payoff profile."
 faq:

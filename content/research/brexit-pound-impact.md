@@ -1,8 +1,8 @@
 ---
 title: "Brexit and the Pound: The Biggest Sterling Shock in History"
 slug: brexit-pound-impact
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-08-30
+updated: 2026-08-30
 keyword: brexit pound impact
 summary: "Brexit's impact on the pound was historic: GBP/USD fell about 8% overnight on 23-24 June 2016, the largest single-day move for any G10 currency since free-floating rates began. Here is what happened, why it happened so fast, and what it means for macro FX."
 faq:

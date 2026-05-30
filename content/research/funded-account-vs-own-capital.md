@@ -1,8 +1,8 @@
 ---
 title: "Funded Account vs Your Own Capital: The Real Math"
 slug: funded-account-vs-own-capital
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-07-31
+updated: 2026-07-31
 keyword: funded account vs own money
 summary: "Funded account vs own money — the numbers look obvious until you model the failure rate, challenge costs, and the compounding difference. Here's the real maths for traders with a proven edge."
 faq:

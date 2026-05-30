@@ -1,8 +1,8 @@
 ---
 title: "How to Build a Macro Thesis (and Know When You're Wrong)"
 slug: how-to-build-a-macro-thesis
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-08-02
+updated: 2026-08-02
 keyword: how to build a macro thesis
 summary: "A macro thesis is a falsifiable, evidence-based argument about why a currency should move — with a specific condition that tells you when you are wrong. Here's how to build one that actually holds up."
 faq:

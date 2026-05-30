@@ -1,8 +1,8 @@
 ---
 title: "What Smart Money Tracks: Positioning, Flows and Order Books"
 slug: smart-money-forex
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-07-21
+updated: 2026-07-21
 keyword: smart money forex
 summary: "Smart money forex participants — banks, macro hedge funds and central banks — leave measurable footprints in positioning data, capital flows and order books. Here's what they track and how to follow their lead using public data."
 faq:

@@ -1,8 +1,8 @@
 ---
 title: "The Aussie as a China Proxy: Iron Ore, the Yuan and AUD"
 slug: aud-china-proxy
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-07-17
+updated: 2026-07-17
 keyword: aud china correlation
 summary: "The AUD China correlation is one of FX's tightest intermarket links — iron ore prices, Chinese PMIs, and yuan moves all feed directly into the Australian dollar. Here's the full mechanism."
 faq:

@@ -1,8 +1,8 @@
 ---
 title: "Commodity Currencies (AUD, CAD, NZD): Terms of Trade Explained"
 slug: commodity-currencies-explained
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-06-13
+updated: 2026-06-13
 keyword: commodity currencies
 summary: "Commodity currencies — the Australian dollar, Canadian dollar, and New Zealand dollar — rise and fall with their countries' export prices. Here's how terms of trade drives AUD, CAD, and NZD."
 faq:

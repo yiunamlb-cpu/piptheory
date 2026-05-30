@@ -1,8 +1,8 @@
 ---
 title: "Reserve Currencies Explained: Why the World Hoards Dollars"
 slug: reserve-currencies-explained
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-06-27
+updated: 2026-06-27
 keyword: reserve currency
 summary: "A reserve currency is one held by central banks worldwide as foreign-exchange reserves. The US dollar dominates because of its liquidity, legal institutions and the size of US financial markets — but that dominance is slowly eroding. This guide explains why, using IMF COFER data and the SDR basket."
 faq:

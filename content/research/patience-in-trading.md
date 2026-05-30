@@ -1,8 +1,8 @@
 ---
 title: "The Discipline of Waiting for the Fat Pitch"
 slug: patience-in-trading
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-08-06
+updated: 2026-08-06
 keyword: patience in trading
 summary: "Patience in trading — waiting for the high-conviction, high-odds macro setup rather than trading every day — is the discipline that separates consistent macro performers from chronic overttraders."
 faq:

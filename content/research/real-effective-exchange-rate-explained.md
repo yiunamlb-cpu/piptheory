@@ -1,8 +1,8 @@
 ---
 title: "Real Effective Exchange Rate (REER): Is a Currency Cheap or Expensive?"
 slug: real-effective-exchange-rate-explained
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-06-15
+updated: 2026-06-15
 keyword: real effective exchange rate
 summary: "The real effective exchange rate (REER) is the standard measure of whether a currency is fundamentally cheap or expensive relative to history. This guide explains what REER is, how the BIS calculates it, and why it matters for macro traders."
 faq:

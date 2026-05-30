@@ -1,8 +1,8 @@
 ---
 title: "Bill Lipschutz: The 'Sultan of Currencies' on Risk"
 slug: bill-lipschutz
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-08-18
+updated: 2026-08-18
 keyword: bill lipschutz
 summary: "Bill Lipschutz turned a $12,000 inheritance into hundreds of millions trading currencies at Salomon Brothers, then co-founded Hathersage Capital. His obsession with risk management — not returns — is what made him the Sultan of Currencies."
 faq:

@@ -1,8 +1,8 @@
 ---
 title: "Risk Management in FX: Position Sizing for Macro Bets"
 slug: forex-risk-management
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-07-01
+updated: 2026-07-01
 keyword: forex risk management
 summary: "Forex risk management for macro traders means sizing positions to survive being early and to capitalise when conviction is highest — not just limiting loss on individual trades."
 faq:

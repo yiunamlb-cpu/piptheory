@@ -1,8 +1,8 @@
 ---
 title: "How to Read the COT Report for Currency Positioning"
 slug: how-to-read-cot-report-forex
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-06-07
+updated: 2026-06-07
 keyword: cot report forex
 summary: The CFTC Commitments of Traders report shows how large speculators and institutions are positioned in currency futures every week — making it one of the most useful free sentiment tools in forex. Here's how to read it correctly.
 faq:

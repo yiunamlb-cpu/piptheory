@@ -1,8 +1,8 @@
 ---
 title: "The 1997 Asian Financial Crisis: When Pegs Shattered"
 slug: asian-financial-crisis-1997
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-08-28
+updated: 2026-08-28
 keyword: asian financial crisis explained
 summary: "The 1997 Asian financial crisis began when Thailand floated the baht on 2 July 1997, triggering a contagion that crashed currencies across the region and forced $118 billion in IMF bailouts. Here is what caused it and what every macro trader can learn."
 faq:

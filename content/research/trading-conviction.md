@@ -1,8 +1,8 @@
 ---
 title: "Why Conviction Beats Being Right"
 slug: trading-conviction
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-08-04
+updated: 2026-08-04
 keyword: trading conviction
 summary: "Trading conviction — the ability to size and hold a well-reasoned macro bet — matters more to long-run performance than the raw frequency of correct calls. Here's why, and how to build it."
 faq:

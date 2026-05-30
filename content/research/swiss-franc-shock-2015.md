@@ -1,8 +1,8 @@
 ---
 title: "The 2015 Swiss Franc Shock: When the SNB Removed the Floor"
 slug: swiss-franc-shock-2015
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-08-22
+updated: 2026-08-22
 keyword: swiss franc shock 2015
 summary: On 15 January 2015, the Swiss National Bank stunned markets by removing its EUR/CHF 1.20 floor, sending the franc up about 30% in minutes — the most violent single-day currency move in modern history.
 faq:

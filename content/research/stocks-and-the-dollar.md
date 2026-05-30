@@ -1,8 +1,8 @@
 ---
 title: "Stocks and the Dollar: The Equity-FX Feedback Loop"
 slug: stocks-and-the-dollar
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-07-15
+updated: 2026-07-15
 keyword: stock market dollar correlation
 summary: "The stock market dollar correlation is negative on average but unstable — a strong dollar squeezes S&P 500 earnings while equity sell-offs trigger safe-haven dollar buying. Here's how the feedback loop works."
 faq:

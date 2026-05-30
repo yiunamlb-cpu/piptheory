@@ -1,8 +1,8 @@
 ---
 title: "The 2022 Dollar Wrecking Ball: When King Dollar Broke Markets"
 slug: strong-dollar-2022
-date: 2099-12-31
-updated: 2099-12-31
+date: 2026-09-01
+updated: 2026-09-01
 keyword: why was the dollar so strong 2022
 summary: "The dollar hit a 20-year high in 2022 as the Fed delivered 525 basis points of hikes in 16 months — the fastest tightening cycle since the 1980s. Here is why the dollar was so strong in 2022, what it broke, and what macro traders can learn."
 faq:
