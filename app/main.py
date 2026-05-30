@@ -2221,6 +2221,19 @@ async def robots():
     return HTMLResponse(content=body, media_type="text/plain")
 
 
+# ---------- ads.txt: authorise Google AdSense to sell our inventory ----------
+
+@app.get("/ads.txt")
+async def ads_txt():
+    pub = ((_AD_CONFIG or {}).get("adsense_publisher_id") or "").strip()
+    # ads.txt uses the bare "pub-..." form (no "ca-" prefix).
+    pub_id = pub.replace("ca-pub-", "pub-") if pub.startswith("ca-pub-") else pub
+    if not pub_id.startswith("pub-"):
+        return HTMLResponse(content="", media_type="text/plain")
+    body = f"google.com, {pub_id}, DIRECT, f08c47fec0942fa0\n"
+    return HTMLResponse(content=body, media_type="text/plain")
+
+
 # ---------- markdown rendering helper for templates ----------
 
 import markdown as md_lib  # noqa: E402

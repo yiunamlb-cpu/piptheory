@@ -82,7 +82,7 @@
     </p>
   </section>
 
-  <div class="tv-ad-slot tv-ad-leaderboard">Ad Slot — Leaderboard (728×90)</div>
+  {% with ad_slot = 'top' %}{% include '_ad_slot.html' %}{% endwith %}
 
   <!-- 1. 12-MONTH TREND -->
   <section class="cs-block">
@@ -186,7 +186,7 @@
     </div>
   </section>
 
-  <div class="tv-ad-slot tv-ad-infeed">Ad Slot — In-Feed Native</div>
+  {% with ad_slot = 'in_article' %}{% include '_ad_slot.html' %}{% endwith %}
 
   <!-- 3. PAIR MATRIX -->
   <section class="cs-block">

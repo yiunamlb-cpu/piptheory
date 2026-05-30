@@ -338,12 +338,18 @@ select{font-family:inherit}
 .tv-ad-row{max-width:1480px;margin:0 auto;padding:12px 24px}
 .tv-ad-slot{display:flex;align-items:center;justify-content:center;border:2px dashed var(--border-3);border-radius:8px;color:var(--text-faint);font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;background:var(--bg-2)}
 /* _ad_slot.html partial wrapper */
-.ad-slot{width:100%;min-height:50px}
+.ad-slot{position:relative;width:100%;min-height:50px;margin:18px auto;text-align:center}
 .ad-slot .adsbygoogle{display:block}
 /* Top leaderboard — constrained so it doesn't bloat before real ads serve */
-.ad-slot-top{max-width:728px;margin:0 auto;min-height:90px}
+.ad-slot-top{max-width:728px;margin:18px auto;min-height:90px}
 /* In-article/in-feed native slot */
 .ad-slot-in_article{min-height:100px}
+/* Keep the page clean while AdSense reviews the site / when a unit is unfilled:
+   collapse empty slots and only reveal the "Advertisement" label once filled. */
+.ad-slot .ad-disclosure{display:none;position:static;margin:0 0 4px;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--text-faint)}
+.ad-slot:has(ins[data-ad-status="filled"]) .ad-disclosure{display:block}
+ins.adsbygoogle[data-ad-status="unfilled"]{display:none!important}
+.ad-slot:has(ins[data-ad-status="unfilled"]){min-height:0!important;margin:0!important}
 .ad-slot-placeholder{display:flex;align-items:center;justify-content:center;height:90px}
 .tv-ad-leaderboard{height:90px;max-width:728px;margin:0 auto}
 .tv-ad-infeed{height:100px}

@@ -62,7 +62,7 @@
   </section>
   {% endif %}
 
-  <div class="tv-ad-slot tv-ad-infeed" style="margin-top:32px">Ad Slot — In-Feed Native</div>
+  <div style="margin-top:32px">{% with ad_slot = 'in_article' %}{% include '_ad_slot.html' %}{% endwith %}</div>
 
   <footer class="cs-footer">
     <div class="cs-footer-links">

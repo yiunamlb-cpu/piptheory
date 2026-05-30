@@ -90,7 +90,7 @@
     </div>
   </section>
 
-  <div class="tv-ad-slot tv-ad-infeed">Ad Slot — In-Feed Native</div>
+  {% with ad_slot = 'in_article' %}{% include '_ad_slot.html' %}{% endwith %}
 
   <section class="cs-block">
     <div class="cs-block-head"><h2>{{ c.code }} vs the other majors</h2><span class="cs-sub">Strength gap — click for the full pair</span></div>

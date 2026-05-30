@@ -69,6 +69,7 @@ def build() -> None:
     # --- Machine endpoints ---
     _page(client, "/sitemap.xml", "sitemap.xml")
     _page(client, "/robots.txt", "robots.txt")
+    _page(client, "/ads.txt", "ads.txt")
 
     # --- Public JSON API as static files (.json so the CDN sets the type) ---
     r = client.get("/api/strength")
