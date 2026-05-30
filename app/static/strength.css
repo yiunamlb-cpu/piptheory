@@ -51,11 +51,11 @@ body.cs-page .tv-topbar{padding:0 max(24px, calc((100% - 1440px) / 2 + 24px))}
 .cs-info:hover,.cs-info.open{border-color:var(--accent);color:var(--accent)}
 .cs-h1 .cs-info{width:18px;height:18px;font-size:11px;margin-left:9px;transform:translateY(-3px)}
 .cs-info::after{content:attr(data-tip);position:absolute;top:calc(100% + 8px);left:0;
-  width:min(290px,72vw);background:var(--bg-1);border:1px solid var(--border-3);
+  width:min(290px,calc(100vw - 24px));background:var(--bg-1);border:1px solid var(--border-3);
   padding:9px 11px;font-family:var(--display);font-size:11.5px;font-weight:400;line-height:1.5;
   color:var(--text);text-align:left;letter-spacing:0;white-space:normal;z-index:60;
-  box-shadow:0 6px 20px rgba(0,0,0,.16);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .15s}
-.cs-info:hover::after,.cs-info:focus-visible::after,.cs-info.open::after{opacity:1;visibility:visible}
+  box-shadow:0 6px 20px rgba(0,0,0,.16);display:none}
+.cs-info:hover::after,.cs-info:focus-visible::after,.cs-info.open::after{display:block}
 
 /* ZONE 2 — ranked bars */
 .cs-bars{display:flex;flex-direction:column;gap:6px}
@@ -244,6 +244,8 @@ body.cs-page .tv-topbar{padding:0 max(24px, calc((100% - 1440px) / 2 + 24px))}
   .cs-range button{padding:9px 14px;min-height:40px}
   .cs-leg{padding:8px 12px;min-height:38px}
   .cs-info{width:20px;height:20px;font-size:11px}
+  /* Tooltip as a viewport-anchored bottom sheet — can't overflow the page */
+  .cs-info::after{position:fixed;left:12px;right:12px;bottom:16px;top:auto;width:auto;max-width:none}
   .cs-fulllink,.cs-post-back,.cs-breadcrumb{display:inline-block;padding:8px 0;min-height:40px}
   /* Heatmap: pin the row-label column so swiping the matrix keeps labels visible */
   .cs-hm{font-size:10px;min-width:540px}

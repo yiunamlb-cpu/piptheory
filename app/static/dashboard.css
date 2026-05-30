@@ -422,7 +422,7 @@ select{font-family:inherit}
   /* — Larger tap targets — */
   .tv-sort-btn{min-height:36px;padding:8px 14px}
   .tv-expand-all{min-height:36px;padding:8px 14px}
-  .tv-theme-toggle{width:40px;height:40px;font-size:20px}
+  .tv-theme-toggle{width:40px;height:40px;font-size:0}
   .tv-date-pick{min-height:36px}
   .tv-brief-btn{min-height:48px}
   .tv-cookie-btn{min-height:40px;padding:8px 20px}
@@ -468,10 +468,12 @@ select{font-family:inherit}
   .tv-cookie{bottom:0;left:0;right:0;transform:none;border-radius:0;max-width:100%;flex-direction:column;text-align:center;gap:10px}
   .tv-adblock-notice{top:auto;bottom:60px;left:10px;right:10px;transform:none;max-width:100%;font-size:12px}
 
-  /* — Topbar: hide verbose sync text, keep green dot — */
-  .tv-topbar-right{gap:4px}
+  /* — Topbar: keep a compact "Updated" sync; drop the divider — */
+  .tv-topbar-right{gap:6px}
   .tv-topbar-div{display:none}
-  .tv-sync-dot + span{display:none}
+  .tv-sync-dot + span{font-size:11px;white-space:nowrap}
+  .tv-sync-lbl{display:none}
+  .cs-nav{font-size:12px}
 
   /* — Sort buttons scroll if too many — */
   .tv-toolbar{overflow-x:auto;flex-wrap:nowrap}

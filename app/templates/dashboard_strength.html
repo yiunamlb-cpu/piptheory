@@ -24,7 +24,7 @@
   <div class="tv-topbar-right">
     {% if last_synced_iso %}
     <span class="tv-sync-dot"></span>
-    <span>Updated <time id="syncTime" datetime="{{ as_of }}">{{ run_date }}</time></span>
+    <span><span class="tv-sync-lbl">Updated </span><time id="syncTime" datetime="{{ as_of }}">{{ run_date }}</time></span>
     {% endif %}
     <span class="tv-topbar-div"></span>
     <a class="cs-nav" href="/research">Research</a>
