@@ -1469,9 +1469,15 @@ async def pair_page(request: Request, pair: str):
 _RESEARCH_DIR = PROJECT_ROOT / "content" / "research"
 
 
-def _load_research_posts() -> list[dict]:
+def _load_research_posts(include_unpublished: bool = False) -> list[dict]:
     """Read markdown posts from content/research/*.md with `--- yaml ---` front
-    matter (title, date, summary). Newest first."""
+    matter (title, date, summary). Newest first.
+
+    Posts dated in the future are treated as SCHEDULED: hidden from the index,
+    sitemap and static build (so they don't flood), but still reachable by
+    direct URL for preview. This powers the every-2-days drip — each 4-hourly
+    rebuild reveals any post whose date has arrived.
+    """
     posts: list[dict] = []
     if not _RESEARCH_DIR.exists():
         return posts
@@ -1489,13 +1495,21 @@ def _load_research_posts() -> list[dict]:
                 except Exception:
                     meta = {}
                 body = parts[2]
+        faq = meta.get("faq") if isinstance(meta.get("faq"), list) else []
         posts.append({
             "slug": str(meta.get("slug") or p.stem),
             "title": str(meta.get("title") or p.stem),
             "date": str(meta.get("date") or ""),
+            "updated": str(meta.get("updated") or meta.get("date") or ""),
             "summary": str(meta.get("summary") or ""),
+            "keyword": str(meta.get("keyword") or ""),
+            "faq": faq,
             "body_md": body.strip(),
         })
+    if not include_unpublished:
+        from datetime import date as _dt_date
+        today = _dt_date.today().isoformat()
+        posts = [p for p in posts if (p["date"] or "0000-00-00") <= today]
     posts.sort(key=lambda x: x["date"], reverse=True)
     return posts
 
@@ -1510,11 +1524,11 @@ async def research_index(request: Request):
 
 @app.get("/research/{slug}", response_class=HTMLResponse)
 async def research_post(request: Request, slug: str):
-    post = next((p for p in _load_research_posts() if p["slug"] == slug), None)
+    post = next((p for p in _load_research_posts(include_unpublished=True) if p["slug"] == slug), None)
     if not post:
         raise HTTPException(404, "Article not found")
     post = dict(post)
-    post["html"] = _render_markdown(post["body_md"])
+    post["html"] = _render_markdown_blog(post["body_md"])
     return templates.TemplateResponse(request, "research_post.html", {
         "surface": _detect_surface(request), "post": post,
     })
@@ -2211,6 +2225,13 @@ import markdown as md_lib  # noqa: E402
 
 _md = md_lib.Markdown(extensions=["fenced_code", "tables", "nl2br", "sane_lists"])
 
+# Blog/research posts contain rich raw HTML + inline SVG graphics. Use a
+# dedicated instance WITHOUT nl2br (which would inject <br> into multi-line
+# markup) and WITH attr_list (so authors can attach classes/ids). Raw HTML
+# blocks pass through verbatim — graphics must be wrapped in a block-level
+# <div class="pt-..."> (col 0, blank lines around it) to be preserved cleanly.
+_md_blog = md_lib.Markdown(extensions=["fenced_code", "tables", "sane_lists", "attr_list"])
+
 # ── Section-header pre-processor for card content ─────────────────────────
 # LLM output uses labels like "PRIMARY DRIVER:", "SUPPORTING EVIDENCE:" etc.
 # as plain text. Convert them to markdown ### headers so the CSS can style
@@ -2271,6 +2292,20 @@ def _render_markdown(text: str) -> str:
             stripped = "\n".join(lines[1:-1])
     _md.reset()
     return _md.convert(stripped)
+
+
+def _render_markdown_blog(text: str) -> str:
+    """Render a research/blog post: standard markdown + raw HTML/SVG graphics
+    preserved verbatim (no nl2br). Used by /research/{slug}."""
+    if not text:
+        return ""
+    stripped = text.strip()
+    if stripped.startswith("```") and stripped.rstrip().endswith("```"):
+        lines = stripped.split("\n")
+        if len(lines) >= 2 and lines[0].startswith("```") and lines[-1].strip() == "```":
+            stripped = "\n".join(lines[1:-1])
+    _md_blog.reset()
+    return _md_blog.convert(stripped)
 
 
 templates.env.filters["markdown"] = _render_markdown

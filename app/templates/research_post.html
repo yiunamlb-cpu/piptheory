@@ -8,10 +8,30 @@
   <title>{{ post.title }} — PIPTHEORY</title>
   <meta name="description" content="{{ post.summary }}">
   <link rel="canonical" href="https://piptheory.com/research/{{ post.slug }}">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="{{ post.title }}">
+  <meta property="og:description" content="{{ post.summary }}">
+  <meta property="og:url" content="https://piptheory.com/research/{{ post.slug }}">
+  <meta property="og:site_name" content="PIPTHEORY">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="{{ post.title }}">
+  <meta name="twitter:description" content="{{ post.summary }}">
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v={{ static_version }}">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/dashboard.css?v={{ static_version }}">
   <link rel="stylesheet" href="/static/strength.css?v={{ static_version }}">
+  <link rel="stylesheet" href="/static/blog.css?v={{ static_version }}">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"Article",
+   "headline":{{ post.title|tojson }},"description":{{ post.summary|tojson }},
+   "datePublished":{{ post.date|tojson }},"dateModified":{{ (post.updated or post.date)|tojson }},
+   "author":{"@type":"Organization","name":"PIPTHEORY","url":"https://piptheory.com"},
+   "publisher":{"@type":"Organization","name":"PIPTHEORY","url":"https://piptheory.com"},
+   "mainEntityOfPage":"https://piptheory.com/research/{{ post.slug }}"}
+  </script>
+  {% if post.faq %}<script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{% for f in post.faq %}{"@type":"Question","name":{{ f.q|tojson }},"acceptedAnswer":{"@type":"Answer","text":{{ f.a|tojson }}}}{{ "," if not loop.last else "" }}{% endfor %}]}
+  </script>{% endif %}
 </head>
 <body class="cs-page">
 <header class="tv-topbar">
@@ -31,6 +51,15 @@
   <a class="cs-post-back" href="/research">&larr; All articles</a>
   {% if post.date %}<div class="cs-post-meta">{{ post.date }}</div>{% endif %}
   <article class="cs-prose">{{ post.html|safe }}</article>
+
+  {% if post.faq %}
+  <section class="pt-faq cs-prose">
+    <h2 class="pt-faq-h">Frequently asked questions</h2>
+    {% for f in post.faq %}
+    <details><summary>{{ f.q }}</summary><div>{{ f.a }}</div></details>
+    {% endfor %}
+  </section>
+  {% endif %}
 
   <div class="tv-ad-slot tv-ad-infeed" style="margin-top:32px">Ad Slot — In-Feed Native</div>
 

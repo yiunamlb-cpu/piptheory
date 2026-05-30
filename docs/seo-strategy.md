@@ -232,7 +232,37 @@ Each explainer ends with: "See how PIPTHEORY scores [X] today →" (internal lin
 - Graphics inherit the site design tokens (industrial/sharp, theme-aware light/dark) and are
   responsive (mobile-first; no fixed widths that overflow).
 - **Technical pre-req:** the blog renderer must pass raw HTML/SVG (and scoped CSS) through
-  markdown — verify/enable before production.
+  markdown. **DONE** — dedicated `_md_blog` renderer (no `nl2br`, `attr_list` on); wrap each
+  graphic in a block-level `<div class="pt-...">` (col 0, blank lines around it) for clean passthrough.
+
+**GEO — Generative Engine Optimization (rank in AI answers, not just Google)**
+
+AI answer engines (ChatGPT, Perplexity, Google AI Overviews, Gemini) increasingly intercept
+search clicks — optimize every post to be *quoted and cited* by them:
+- **Answer-first:** open the post — and each major H2 — with a concise, self-contained,
+  quotable answer (1–3 sentences) before elaborating. Phrase H2/H3s as the literal question
+  ("What is the carry trade?") with the direct answer immediately below.
+- **Citable facts:** concrete, verifiable specifics (dates, figures, named entities) with the
+  primary source linked. AI engines preferentially cite content that is specific + sourced.
+- **Self-contained passages:** each section stands alone (avoid "as noted above") so a single
+  quoted block makes sense out of context.
+- **Extractable structure:** a "Key takeaways"/TL;DR box near the top, comparison tables,
+  numbered steps, and a 3–5 question **FAQ block** at the end of every post.
+- **Entities + authority:** name the people, institutions and papers explicitly; cite primary
+  data (BIS, CFTC, IMF, FRED, central banks). Entity + citation density boosts AI inclusion.
+- **Structured data:** every post emits **Article + FAQPage JSON-LD** (handled in the template).
+- Plain, declarative sentences; no filler. (Authoritative outbound links double as GEO entity signals.)
+
+**Fact-checking & accuracy (non-negotiable — case studies & trader bios are high-risk)**
+- Every factual claim — dates, magnitudes, figures, events, names, quotes — must be accurate
+  and verifiable. Verify (web search / primary source) BEFORE writing; cite the source.
+- No fabricated statistics, quotes, or attributions. If a figure is approximate, qualify it
+  ("about", "roughly") — never invent false precision.
+- Especially verify: case-study dates/magnitudes (GBP Sep 1992, CHF Jan 2015, Plaza Accord
+  Sep 1985, yen carry unwind Aug 2024, Asian crisis 1997, Brexit Jun 2016), trader biographies,
+  and any performance/return numbers.
+- Delegated authors must fact-check; the editor (Claude) re-verifies every post's hard facts
+  before it's committed/published.
 
 ---
 
