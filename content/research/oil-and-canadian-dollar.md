@@ -1,8 +1,8 @@
 ---
 title: "Oil and the Canadian Dollar: How Crude Drives the Loonie"
 slug: oil-and-canadian-dollar
-date: 2026-07-13
-updated: 2026-07-13
+date: 2026-06-23
+updated: 2026-06-23
 keyword: oil cad correlation
 summary: "The oil CAD correlation is one of the most consistent commodity-currency relationships in FX — Canada exports about 4 million barrels of oil per day, making the Loonie a liquid proxy for crude. Here's how it works and when it breaks."
 faq:

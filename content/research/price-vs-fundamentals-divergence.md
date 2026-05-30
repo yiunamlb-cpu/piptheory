@@ -1,8 +1,8 @@
 ---
 title: "Divergence Trading: When Price and Fundamentals Disagree"
 slug: price-vs-fundamentals-divergence
-date: 2026-06-29
-updated: 2026-06-29
+date: 2026-06-09
+updated: 2026-06-09
 keyword: price vs fundamentals divergence
 summary: "Price vs fundamentals divergence in forex occurs when exchange rates detach from underlying macro drivers — understanding what causes the gap, and what eventually closes it, is the core of macro FX analysis."
 faq:

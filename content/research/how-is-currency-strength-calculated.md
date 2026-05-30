@@ -1,8 +1,8 @@
 ---
 title: "How Is Currency Strength Calculated? A Plain-English Guide"
 slug: how-is-currency-strength-calculated
-date: 2026-06-01
-updated: 2026-06-01
+date: 2026-05-28
+updated: 2026-05-28
 keyword: how is currency strength calculated
 summary: Currency strength is calculated by measuring how a currency performs against every other major currency and aggregating the results into a single score. Here's exactly how both price-based and fundamental methods work.
 faq:

@@ -1,8 +1,8 @@
 ---
 title: "How Global Macro Hedge Funds Trade Currencies"
 slug: global-macro-trading
-date: 2026-08-10
-updated: 2026-08-10
+date: 2026-07-21
+updated: 2026-07-21
 keyword: global macro trading
 summary: "Global macro hedge funds trade currencies by analysing central bank policy, rate differentials, growth divergence, and positioning — then expressing those views through spot FX, forwards, futures, and options. Here's how the process works from thesis to trade."
 faq:

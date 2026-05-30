@@ -1,8 +1,8 @@
 ---
 title: "George Soros and Reflexivity, Explained Simply"
 slug: soros-reflexivity
-date: 2026-08-14
-updated: 2026-08-14
+date: 2026-07-25
+updated: 2026-07-25
 keyword: soros reflexivity
 summary: "George Soros's theory of reflexivity argues that market prices and economic fundamentals shape each other in a continuous feedback loop — not the one-way street that efficient-market theory assumes. Here's what that means for currency traders."
 faq:

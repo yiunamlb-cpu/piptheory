@@ -1,8 +1,8 @@
 ---
 title: "The 2024 Yen Carry Unwind: Anatomy of a Global Shock"
 slug: yen-carry-trade-unwind-2024
-date: 2026-08-26
-updated: 2026-08-26
+date: 2026-08-06
+updated: 2026-08-06
 keyword: yen carry trade unwind
 summary: In early August 2024, a Bank of Japan rate hike collapsed the yen carry trade, sending the Nikkei down 12.4% on 5 August — its worst day since 1987 — and spiking the VIX above 60. Here's exactly what happened and why.
 faq:

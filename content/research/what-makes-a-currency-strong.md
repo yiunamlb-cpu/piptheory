@@ -1,8 +1,8 @@
 ---
 title: "What Makes a Currency Strong? The Five Forces That Move FX"
 slug: what-makes-a-currency-strong
-date: 2026-06-03
-updated: 2026-06-03
+date: 2026-05-26
+updated: 2026-05-26
 keyword: what makes a currency strong
 summary: Five macro forces determine whether a currency strengthens or weakens against its peers — interest rates, growth, positioning, risk sentiment, and commodity terms of trade. Here's exactly how each one works.
 faq:

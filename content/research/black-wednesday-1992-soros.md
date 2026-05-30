@@ -1,8 +1,8 @@
 ---
 title: "Black Wednesday 1992: How Soros Broke the Bank of England"
 slug: black-wednesday-1992-soros
-date: 2026-08-20
-updated: 2026-08-20
+date: 2026-07-31
+updated: 2026-07-31
 keyword: soros bank of england
 summary: On 16 September 1992, George Soros pocketed over £1 billion shorting the pound as Britain was forced out of the ERM — the definitive case study in currency strength divergence and speculative attack.
 faq:

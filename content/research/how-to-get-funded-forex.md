@@ -1,8 +1,8 @@
 ---
 title: "How Forex Traders Get Funded: Prop Firms Explained (2026)"
 slug: how-to-get-funded-forex
-date: 2026-07-03
-updated: 2026-07-03
+date: 2026-06-13
+updated: 2026-06-13
 keyword: how to get funded trading forex
 summary: "Wondering how to get funded trading forex? Prop firms front you $10K–$200K or more in capital in exchange for a cut of profits — here's exactly how the model works, what it costs, and what the risks are."
 faq:

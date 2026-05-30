@@ -1,8 +1,8 @@
 ---
 title: "Currency Crises 101: Lessons from the Lira, Peso and Ruble"
 slug: currency-crisis-explained
-date: 2026-09-03
-updated: 2026-09-03
+date: 2026-08-14
+updated: 2026-08-14
 keyword: currency crisis explained
 summary: "A currency crisis is when a currency loses value rapidly and uncontrollably, forcing painful choices on governments and central banks. The Turkish lira, Mexican peso and Russian ruble all offer textbook case studies in how — and why — currency crises happen."
 faq:

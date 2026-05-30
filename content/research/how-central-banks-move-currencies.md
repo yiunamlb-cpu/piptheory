@@ -1,8 +1,8 @@
 ---
 title: "How Central Banks Move Currencies: Rates, QE and Guidance"
 slug: how-central-banks-move-currencies
-date: 2026-06-17
-updated: 2026-06-17
+date: 2026-05-12
+updated: 2026-05-12
 keyword: how central banks affect currency
 summary: "Central banks are the single most powerful force in FX markets. This guide explains the three levers — interest rates, quantitative easing, and forward guidance — and how each one moves a currency, with real examples from the Fed, ECB, BoJ and SNB."
 faq:

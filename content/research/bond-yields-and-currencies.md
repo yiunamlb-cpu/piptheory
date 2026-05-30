@@ -1,8 +1,8 @@
 ---
 title: "Bond Yields and FX: How the 2-Year Yield Leads Currencies"
 slug: bond-yields-and-currencies
-date: 2026-07-11
-updated: 2026-07-11
+date: 2026-06-21
+updated: 2026-06-21
 keyword: bond yields and currencies
 summary: "Bond yields and currencies are tightly linked — the 2-year government bond yield is the single best leading indicator for FX direction because it reflects near-term central bank rate expectations. Here's the mechanism, the evidence, and how to use it."
 faq:

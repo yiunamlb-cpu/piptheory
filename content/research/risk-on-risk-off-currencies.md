@@ -1,8 +1,8 @@
 ---
 title: "Risk-On vs Risk-Off: How Sentiment Rotates Currencies"
 slug: risk-on-risk-off-currencies
-date: 2026-07-09
-updated: 2026-07-09
+date: 2026-06-19
+updated: 2026-06-19
 keyword: risk on risk off currencies
 summary: "Risk-on risk-off currencies describe how investor sentiment drives capital into high-yielding, growth-linked currencies (risk-on) or into safe havens like JPY, CHF, and USD (risk-off). Understanding this rotation is essential for macro FX analysis."
 faq:

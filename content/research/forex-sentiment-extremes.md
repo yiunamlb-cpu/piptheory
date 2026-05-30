@@ -1,8 +1,8 @@
 ---
 title: "Sentiment Extremes: When 'Everyone Is Long' Signals a Top"
 slug: forex-sentiment-extremes
-date: 2026-07-19
-updated: 2026-07-19
+date: 2026-06-29
+updated: 2026-06-29
 keyword: forex sentiment extremes
 summary: "Forex sentiment extremes occur when speculative positioning reaches statistical outliers — often signalling a looming reversal rather than a trend continuation. Learn how to read CFTC COT data to spot crowded trades before they unwind."
 faq:

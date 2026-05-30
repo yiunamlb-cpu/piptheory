@@ -1,8 +1,8 @@
 ---
 title: "Passing a Prop Firm Challenge: A Macro-Based Approach"
 slug: pass-prop-firm-challenge
-date: 2026-07-29
-updated: 2026-07-29
+date: 2026-07-09
+updated: 2026-07-09
 keyword: pass prop firm challenge
 summary: "To pass a prop firm challenge, you need a real edge, strict risk rules, and the discipline to avoid the daily loss limit. Here's how a macro currency strength framework maps directly onto challenge success."
 faq:

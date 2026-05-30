@@ -1,8 +1,8 @@
 ---
 title: "Forex Seasonality: Month-End, Quarter-End and Year-End Flows"
 slug: forex-seasonality
-date: 2026-07-25
-updated: 2026-07-25
+date: 2026-07-05
+updated: 2026-07-05
 keyword: forex seasonality
 summary: "Forex seasonality describes recurring calendar-driven price tendencies in currency markets — month-end rebalancing, fiscal year-end repatriation, and year-end positioning shifts create patterns traders and institutions track."
 faq:

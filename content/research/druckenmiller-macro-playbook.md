@@ -1,8 +1,8 @@
 ---
 title: "Stanley Druckenmiller's Macro Playbook"
 slug: druckenmiller-macro-playbook
-date: 2026-08-16
-updated: 2026-08-16
+date: 2026-07-27
+updated: 2026-07-27
 keyword: druckenmiller trading strategy
 summary: "Stanley Druckenmiller ran Duquesne Capital for nearly 30 years with about 30% average annual returns and no down years. Here's the macro trading strategy behind that record — concentration, liquidity, and position sizing as the real edge."
 faq:

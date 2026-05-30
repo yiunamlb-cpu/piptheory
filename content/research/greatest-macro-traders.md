@@ -1,8 +1,8 @@
 ---
 title: "The Greatest Macro Traders of All Time"
 slug: greatest-macro-traders
-date: 2026-08-12
-updated: 2026-08-12
+date: 2026-07-23
+updated: 2026-07-23
 keyword: famous macro traders
 summary: "George Soros, Stanley Druckenmiller, Paul Tudor Jones, Bruce Kovner, Louis Bacon — the famous macro traders who shaped modern currency and financial markets. What each one got right, and the ideas they share."
 faq:

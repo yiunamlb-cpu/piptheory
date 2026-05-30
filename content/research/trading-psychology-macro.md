@@ -1,8 +1,8 @@
 ---
 title: "Trading Psychology for Macro Traders: Patience Over Prediction"
 slug: trading-psychology-macro
-date: 2026-07-05
-updated: 2026-07-05
+date: 2026-06-15
+updated: 2026-06-15
 keyword: trading psychology
 summary: "Trading psychology for macro traders is less about suppressing emotion and more about building a system that makes patience structurally possible. Here's how to stop predicting and start waiting."
 faq:

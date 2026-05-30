@@ -1,8 +1,8 @@
 ---
 title: "Interest Rate Differentials: The #1 Driver of Currency Strength"
 slug: interest-rate-differentials-forex
-date: 2026-06-05
-updated: 2026-06-05
+date: 2026-05-24
+updated: 2026-05-24
 keyword: interest rate differential forex
 summary: Interest rate differentials are the most powerful medium-term driver of currency strength. Here's exactly how the mechanism works, why the carry trade exists, and what to watch when differentials shift.
 faq:

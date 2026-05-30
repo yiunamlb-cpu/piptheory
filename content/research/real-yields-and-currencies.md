@@ -1,8 +1,8 @@
 ---
 title: "Inflation, Real Yields and FX: Why Real Rates Rule"
 slug: real-yields-and-currencies
-date: 2026-06-25
-updated: 2026-06-25
+date: 2026-06-05
+updated: 2026-06-05
 keyword: real yields and currencies
 summary: "Real yields — nominal interest rates minus inflation — are the single most powerful driver of currency strength. This guide explains the real-rate mechanism, why it trumps nominal rates, and how to use it as macro context."
 faq:

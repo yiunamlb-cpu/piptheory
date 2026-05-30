@@ -1,8 +1,8 @@
 ---
 title: "Value vs Momentum in Currencies: What the Research Shows"
 slug: value-vs-momentum-currencies
-date: 2026-06-23
-updated: 2026-06-23
+date: 2026-06-03
+updated: 2026-06-03
 keyword: value and momentum forex
 summary: Value and momentum are the two most studied return premia in currency markets — and they move in opposite directions. Understanding how they interact is the key to reading when a trend is sustainable and when it is overextended.
 faq:

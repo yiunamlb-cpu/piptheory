@@ -1,8 +1,8 @@
 ---
 title: "Mean Reversion vs Trend: When Each Wins in FX"
 slug: mean-reversion-vs-trend-forex
-date: 2026-07-23
-updated: 2026-07-23
+date: 2026-07-03
+updated: 2026-07-03
 keyword: mean reversion vs trend forex
 summary: "Mean reversion vs trend forex is a question of timeframe and regime: academic research shows FX trends over months to years, but mean-reverts over very short and very long horizons."
 faq:
