@@ -13,7 +13,6 @@
   <meta property="og:description" content="{{ post.summary }}">
   <meta property="og:url" content="https://piptheory.com/research/{{ post.slug }}">
   <meta property="og:site_name" content="PIPTHEORY">
-  <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="{{ post.title }}">
   <meta name="twitter:description" content="{{ post.summary }}">
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v={{ static_version }}">
@@ -32,6 +31,7 @@
   {% if post.faq %}<script type="application/ld+json">
   {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{% for f in post.faq %}{"@type":"Question","name":{{ f.q|tojson }},"acceptedAnswer":{"@type":"Answer","text":{{ f.a|tojson }}}}{{ "," if not loop.last else "" }}{% endfor %}]}
   </script>{% endif %}
+  {% include "_og.html" %}
   {% include "_analytics.html" %}
 </head>
 <body class="cs-page">
