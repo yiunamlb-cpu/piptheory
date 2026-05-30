@@ -62,19 +62,9 @@ Polls closed at 10 pm on 23 June 2016. For the first hour or two, sterling held 
 
 By 8 am on 24 June, the pound had fallen to about $1.36 — down from nearly $1.50 the previous night, a historic 8% collapse in under twelve hours. [According to the LSE's Centre for Economic Performance](https://cep.lse.ac.uk/pubs/download/dp1890.pdf), this was the biggest two-hour move sterling had ever suffered and the largest single-day loss for any G10 currency since the free-float era began.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 130" role="img" aria-label="Illustrative GBP/USD path on Brexit night, June 23-24 2016">
-  <line class="ax" x1="6" y1="10" x2="6" y2="120" stroke-width="1" stroke="#888"/>
-  <line class="ax" x1="6" y1="120" x2="314" y2="120" stroke-width="1" stroke="#888"/>
-  <path class="pt-draw" d="M6,20 C40,20 70,18 110,22 C130,23 145,24 160,30 C180,42 200,65 230,88 C250,100 270,108 314,112" pathLength="1" fill="none" stroke="#7C3AED" stroke-width="2.5"/>
-  <text class="tx" x="10" y="18" text-anchor="start" font-size="10">~$1.50</text>
-  <text class="tx" x="10" y="115" text-anchor="start" font-size="10">~$1.32</text>
-  <text class="tx" x="100" y="130" text-anchor="middle" font-size="9">10 pm</text>
-  <text class="tx" x="200" y="130" text-anchor="middle" font-size="9">2 am</text>
-  <text class="tx" x="300" y="130" text-anchor="middle" font-size="9">8 am</text>
-</svg>
-<div class="pt-fig-cap">Illustrative GBP/USD path on Brexit night, 23–24 June 2016. Real data: GBP/USD fell from ~$1.50 to ~$1.32 in under 12 hours. Source: <a href="https://cep.lse.ac.uk/pubs/download/dp1890.pdf" target="_blank" rel="noopener">LSE CEP research</a>.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["23 Jun 8pm","23 Jun 9pm","23 Jun 10pm","23 Jun 11pm","24 Jun 12am","24 Jun 1am","24 Jun 2am","24 Jun 3am","24 Jun 4am","24 Jun 5am","24 Jun 6am","24 Jun 7am","24 Jun 8am","24 Jun 10am","27 Jun (Mon open)"],"series":[{"name":"GBP/USD","color":"#7C3AED","data":[1.498,1.499,1.502,1.497,1.489,1.472,1.444,1.406,1.371,1.339,1.327,1.322,1.331,1.337,1.332]}],"annotations":[{"xi":10,"text":"Leave majority confirmed"},{"xi":2,"text":"Polls close; exit poll favours Remain"}],"alt":"Illustrative GBP/USD Brexit night 23-24 June 2016: held near $1.50 after polls closed then collapsed to $1.32 as Leave results arrived"}'>
+<figcaption>Illustrative — GBP/USD on Brexit night, 23–24 June 2016. The pound was near $1.50 when polls closed, then fell about 8% in under twelve hours as Leave results came in. The largest single-session loss for any G10 currency since free-floating rates began. Source: <a href="https://cep.lse.ac.uk/pubs/download/dp1890.pdf" target="_blank" rel="noopener">LSE Centre for Economic Performance</a>.</figcaption>
+</figure>
 
 ## Why the move was so large
 

@@ -109,17 +109,9 @@ For everyday macro traders, reflexivity is not a trading system — it is a ment
 
 The [PIPTHEORY macro currency strength meter](/) tracks the fundamental side of this equation — the real drivers of currency value. When the meter's score and recent price action diverge significantly, that is reflexivity at work: a belief-driven price trend that has outrun or lagged the underlying macro reality. Those divergences are worth tracking. You can read more about the methodology on the [about page](/about), and the broader mechanics of how macro funds exploit these gaps in the post on [how global macro hedge funds trade currencies](/research/global-macro-trading).
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 140" role="img" aria-label="Illustrative diagram of a Soros boom-bust reflexive cycle in a currency">
-  <line class="ax" x1="10" y1="100" x2="310" y2="100" stroke-width="1" stroke-dasharray="3 3"/>
-  <path class="pt-draw" d="M10,100 C40,95 70,80 110,55 C140,38 160,28 190,28 C210,28 220,35 230,55 C248,85 270,105 310,112" pathLength="1" fill="none" stroke="#2563EB" stroke-width="2.5"/>
-  <text class="tx" x="110" y="46" text-anchor="middle">Bubble peak</text>
-  <text class="tx" x="190" y="18" text-anchor="middle">(misconception)</text>
-  <text class="tx" x="10" y="115" text-anchor="start">Trend</text>
-  <text class="tx" x="305" y="125" text-anchor="end">Bust</text>
-</svg>
-<div class="pt-fig-cap">Illustrative reflexive boom-bust cycle: price climbs as belief reinforces trend, then collapses when the misconception is exposed.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Oct 90","Jan 91","Apr 91","Jul 91","Oct 91","Jan 92","Apr 92","Jul 92","Sep 92","Oct 92","Jan 93"],"series":[{"name":"GBP/DEM (indexed)","color":"#7C3AED","data":[100,101.2,100.4,102.1,101.8,103.5,102.9,104.2,104.8,88.3,85.1]},{"name":"Fair-value estimate","color":"#CA8A04","data":[100,99.6,98.8,97.9,97.2,96.1,95.3,94.0,93.1,92.8,92.5]}],"alt":"Illustrative GBP/DEM indexed from Oct 1990 ERM entry: the market price held above fair value as belief in the peg held, then collapsed violently on Black Wednesday Sep 1992","annotations":[{"xi":8,"text":"Black Wednesday"}]}'>
+<figcaption>Illustrative — GBP/DEM indexed to 100 at ERM entry (Oct 1990). The market price held above the declining fair-value estimate as belief in the peg reinforced itself; the gap closed violently when sterling was forced out on Black Wednesday, 16 Sep 1992. Real data: <a href="https://www.bis.org/statistics/eer.htm" target="_blank" rel="noopener">BIS effective exchange rates</a>.</figcaption>
+</figure>
 
 ## Why reflexivity matters beyond Soros
 

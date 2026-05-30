@@ -65,17 +65,9 @@ For macro traders, the REER is what matters for medium-to-long-term positioning.
 
 ## How to read a REER chart: overvalued and undervalued signals
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 130" role="img" aria-label="Illustrative REER chart showing a currency moving from overvalued to fair value to undervalued across time">
-  <line class="ax" x1="6" y1="65" x2="314" y2="65" stroke-width="1.5" stroke-dasharray="4 3"/>
-  <text class="tx" x="8" y="62">REER = 100 (base)</text>
-  <path class="pt-draw" d="M6,40 C50,35 80,28 110,38 C140,48 160,75 190,95 C220,112 270,108 314,90" pathLength="1" fill="none" stroke="#0D9488" stroke-width="2.5"/>
-  <text class="tx" x="100" y="26">Overvalued</text>
-  <text class="tx" x="220" y="122">Undervalued</text>
-  <text class="tx" x="316" y="92" text-anchor="end">REER</text>
-</svg>
-<div class="pt-fig-cap">Illustrative REER arc — above the 100 baseline the currency is expensive in real terms; below it, cheap. Both extremes tend to eventually mean-revert.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["2014","2015","2016","2017","2018","2019","2020","2021","2022","2023","2024","2025"],"baseline":100,"annotations":[{"xi":0,"text":"Overvalued zone"},{"xi":8,"text":"Undervalued zone"}],"series":[{"name":"REER (base = 100)","color":"#0D9488","data":[112,118,115,108,104,99,97,100,93,88,91,95]}],"alt":"Illustrative REER index for a currency: starts overvalued above 100, falls through base and becomes undervalued below 100, then begins mean-reversion"}'>
+<figcaption>Illustrative REER index — above 100 (base year) the currency is expensive in real terms and exports lose competitiveness; below 100 it is cheap and competitive. Both extremes tend to mean-revert, but timing is unpredictable. Real data: <a href="https://data.bis.org/topics/EER" target="_blank" rel="noopener">BIS effective exchange rates</a>.</figcaption>
+</figure>
 
 When a REER moves significantly above its long-run average, three things tend to follow — though the timing is unpredictable:
 
@@ -128,23 +120,12 @@ The REER enters the PIPTHEORY framework as a valuation signal. A currency tradin
 
 The interaction between REER valuation and [real yields](/research/real-yields-and-currencies) is particularly telling: a currency that is cheap on REER *and* seeing rising real yields is in a compounding positive scenario — it is both undervalued and attracting new capital. That combination shows up clearly in the rates and growth pillars of the [live macro score](/).
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 110" role="img" aria-label="Two-axis diagram showing REER valuation on horizontal axis and real-yield change on vertical axis with four quadrant labels">
-  <line class="ax" x1="6" y1="55" x2="314" y2="55" stroke-width="1" stroke-dasharray="3 3"/>
-  <line x1="160" y1="8" x2="160" y2="102" stroke-width="1" stroke-dasharray="3 3" class="ax"/>
-  <text class="tx" x="80" y="22">Cheap REER + Rising yields</text>
-  <text class="tx" x="80" y="32">→ Strongest tailwind</text>
-  <text class="tx" x="200" y="22">Expensive REER + Rising yields</text>
-  <text class="tx" x="200" y="32">→ Overvalued but bid</text>
-  <text class="tx" x="80" y="80">Cheap REER + Falling yields</text>
-  <text class="tx" x="80" y="90">→ Value trap risk</text>
-  <text class="tx" x="200" y="80">Expensive REER + Falling yields</text>
-  <text class="tx" x="200" y="90">→ Structural headwind</text>
-  <text class="tx" x="6" y="52">REER Cheap →</text>
-  <text class="tx" x="314" y="52" text-anchor="end">← REER Expensive</text>
-</svg>
-<div class="pt-fig-cap">Illustrative four-quadrant framework combining REER valuation with real-yield direction — the strongest multi-factor setups sit in the top-left quadrant.</div>
-</div>
+| | **REER cheap** (below long-run avg) | **REER expensive** (above long-run avg) |
+|---|---|---|
+| **Real yields rising** | Strongest tailwind — undervalued and attracting capital | Overvalued but bid — yield pull may sustain it short-term |
+| **Real yields falling** | Value trap risk — cheap but no catalyst yet | Structural headwind — overvalued and losing yield appeal |
+
+*Illustrative — the strongest multi-factor setups sit in the top-left quadrant: cheap REER with rising real yields.*
 
 Understanding REER also puts [carry trade](/research/carry-trade-explained) dynamics in sharper relief: a carry trade that sells a low-yielding, REER-overvalued currency against a high-yielding, REER-cheap one has valuation *and* yield carry working in the same direction — a much more robust position than yield differential alone.
 

@@ -82,23 +82,9 @@ The result is a score that changes as macro data is released — not tick by tic
 
 The most useful information from any two tools is not when they agree, but when they **disagree**. That divergence is itself a signal.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 160" role="img" aria-label="Illustrative chart showing fundamental score and price-based score converging over time after a divergence">
-  <line class="ax" x1="6" y1="80" x2="314" y2="80" stroke-width="1" stroke-dasharray="3 3"/>
-  <text class="tx" x="8" y="12">Score</text>
-  <text class="tx" x="8" y="22">High</text>
-  <text class="tx" x="8" y="148">Low</text>
-  <!-- Fundamental line: strong throughout -->
-  <path class="pt-draw" d="M6,50 C60,46 100,44 150,42 C200,40 260,38 314,36" pathLength="1" fill="none" stroke="#0D9488" stroke-width="2"/>
-  <!-- Price line: lags, then catches up -->
-  <path class="pt-draw" d="M6,110 C40,108 80,105 120,95 C160,82 220,55 314,38" pathLength="1" fill="none" stroke="#2563EB" stroke-width="2" stroke-dasharray="5 3"/>
-  <text class="tx" x="60" y="38">Fundamental</text>
-  <text class="tx" x="60" y="122">Price-based</text>
-  <text class="tx" x="148" y="76">divergence</text>
-  <line x1="148" y1="78" x2="148" y2="98" stroke="#CA8A04" stroke-width="1" stroke-dasharray="2 2"/>
-</svg>
-<div class="pt-fig-cap">Illustrative only — price-based score lagging a fundamental score before converging. Divergence periods are worth watching closely.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Wk 1","Wk 2","Wk 3","Wk 4","Wk 5","Wk 6","Wk 7","Wk 8","Wk 9","Wk 10","Wk 11","Wk 12"],"baseline":0,"annotations":[{"xi":4,"text":"Divergence peak"}],"series":[{"name":"Fundamental score","color":"#0D9488","data":[28,30,27,31,34,32,36,33,38,36,40,42]},{"name":"Price-based score","color":"#2563EB","data":[6,4,9,5,11,14,8,20,26,32,37,41]}],"alt":"Illustrative fundamental score stays elevated while price-based score lags for several weeks before catching up"}'>
+<figcaption>Illustrative only — the fundamental score holds high while the price-based reading lags, then catches up as price eventually reflects the macro backdrop. Divergence periods (marked) are where the most information lives.</figcaption>
+</figure>
 
 **When both agree:** the macro backdrop and recent price action tell the same story. This is the highest-conviction setup — the fundamental wind is at the currency's back, and price is already reflecting it. A strong fundamental score confirmed by strong price momentum means the story is clean.
 

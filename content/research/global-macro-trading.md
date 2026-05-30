@@ -129,29 +129,14 @@ The process a macro fund would follow:
 <li><span class="pt-step-h">Size for the thesis, not for excitement</span> The position size should reflect your conviction and your defined maximum loss — not the emotional pull of the trade.</li>
 </ol>
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 130" role="img" aria-label="Illustrative diagram showing the macro fund process from thesis to trade execution">
-  <rect x="10" y="10" width="70" height="35" fill="none" stroke="var(--accent)" stroke-width="1.5" rx="2"/>
-  <text class="tx" x="45" y="26" text-anchor="middle">Macro</text>
-  <text class="tx" x="45" y="38" text-anchor="middle">thesis</text>
-  <line x1="80" y1="27" x2="100" y2="27" stroke="var(--accent)" stroke-width="1.5"/>
-  <rect x="100" y="10" width="70" height="35" fill="none" stroke="var(--accent)" stroke-width="1.5" rx="2"/>
-  <text class="tx" x="135" y="26" text-anchor="middle">Instrument</text>
-  <text class="tx" x="135" y="38" text-anchor="middle">selection</text>
-  <line x1="170" y1="27" x2="190" y2="27" stroke="var(--accent)" stroke-width="1.5"/>
-  <rect x="190" y="10" width="70" height="35" fill="none" stroke="var(--accent)" stroke-width="1.5" rx="2"/>
-  <text class="tx" x="225" y="26" text-anchor="middle">Position</text>
-  <text class="tx" x="225" y="38" text-anchor="middle">sizing</text>
-  <line x1="260" y1="27" x2="280" y2="27" stroke="var(--accent)" stroke-width="1.5"/>
-  <rect x="280" y="10" width="35" height="35" fill="none" stroke="var(--bull)" stroke-width="1.5" rx="2"/>
-  <text class="tx" x="297" y="32" text-anchor="middle">Trade</text>
-  <line x1="225" y1="45" x2="225" y2="70" stroke="var(--border-3)" stroke-width="1" stroke-dasharray="3 3"/>
-  <text class="tx" x="225" y="83" text-anchor="middle">Monitor thesis,</text>
-  <text class="tx" x="225" y="95" text-anchor="middle">not P&amp;L</text>
-  <line x1="225" y1="100" x2="225" y2="118" stroke="var(--border-3)" stroke-width="1" stroke-dasharray="3 3"/>
-  <text class="tx" x="225" y="128" text-anchor="middle">Exit when thesis breaks</text>
-</svg>
-<div class="pt-fig-cap">Illustrative — the macro fund process from thesis formation to trade execution and exit discipline.</div>
+<div class="pt-flow">
+<div class="pt-flow-step"><span class="h">Macro thesis</span>Identify the dominant force: rate differential, growth divergence, positioning extreme, or regime change. Which currencies benefit?</div>
+<div class="pt-flow-arrow">→</div>
+<div class="pt-flow-step"><span class="h">Instrument selection</span>Choose spot FX, forward, futures, or options based on time horizon, leverage needs, and defined-risk requirements.</div>
+<div class="pt-flow-arrow">→</div>
+<div class="pt-flow-step"><span class="h">Position sizing</span>Size reflects conviction and the defined maximum loss — not excitement. Start small; scale as the market confirms.</div>
+<div class="pt-flow-arrow">→</div>
+<div class="pt-flow-step"><span class="h">Monitor thesis, not P&amp;L</span>Adverse price moves that do not change the fundamental picture are noise. Monitor the macro variables, not the mark-to-market. Exit when the thesis — not the position — breaks.</div>
 </div>
 
 The [PIPTHEORY macro currency strength meter](/) is designed to give individual traders access to the same fundamental framework professional macro funds use — without a Bloomberg terminal or a team of economists. The methodology is fully explained on the [about page](/about).

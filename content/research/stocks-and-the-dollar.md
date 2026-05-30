@@ -71,20 +71,9 @@ When equity markets sell off sharply, investors scramble for safety. US Treasuri
 
 This channel runs in the same direction as the earnings channel (stronger dollar when equities are under pressure) and reinforces the average negative correlation. It is the dominant driver of correlation spikes: the famous −0.6 to −0.8 correlations seen during the 2008 financial crisis and March 2020 were largely safe-haven driven, not earnings-driven.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 140" role="img" aria-label="Illustrative chart showing inverse movement between S&P 500 and the US Dollar Index during a risk-off episode">
-  <line class="ax" x1="6" y1="70" x2="314" y2="70" stroke-width="1" stroke-dasharray="3 3"/>
-  <text class="tx" x="8" y="14">S&P 500</text>
-  <text class="tx" x="8" y="130">DXY</text>
-  <!-- S&P 500: rising then falling sharply -->
-  <path class="pt-draw" d="M6,55 C60,40 110,30 160,28 C190,27 210,35 240,60 C265,80 290,95 314,105" pathLength="1" fill="none" stroke="#16A34A" stroke-width="2"/>
-  <!-- DXY: falling then rising sharply (inverse) -->
-  <path class="pt-draw" d="M6,85 C60,90 110,98 160,100 C190,101 210,90 240,72 C265,58 290,45 314,35" pathLength="1" fill="none" stroke="#2563EB" stroke-width="2"/>
-  <line x1="200" y1="12" x2="200" y2="128" stroke-width="1" stroke-dasharray="4 3" stroke="#CA8A04"/>
-  <text class="tx" x="202" y="22" fill="#CA8A04">Risk-off</text>
-</svg>
-<div class="pt-fig-cap">Illustrative risk-off episode — as equities sell off (green), safe-haven dollar buying lifts DXY (blue). Not real data.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"series":[{"name":"S&P 500 (indexed)","color":"#16A34A","data":[100,103,107,105,109,111,108,104,96,89,85,88]},{"name":"DXY (indexed)","color":"#2563EB","data":[100,99,97,98,96,95,97,100,106,111,114,112]}],"annotations":[{"xi":7,"text":"Risk-off turn"}],"alt":"Illustrative inverse: S&P 500 rises then falls while DXY weakens then surges on safe-haven buying during a risk-off episode"}'>
+<figcaption>Illustrative — S&P 500 and DXY indexed to 100. As equities sell off (green), safe-haven dollar buying lifts DXY (blue) — the classic inverse. Real data: <a href="https://fred.stlouisfed.org/series/SP500" target="_blank" rel="noopener">FRED S&P 500</a> &amp; <a href="https://fred.stlouisfed.org/series/DTWEXBGS" target="_blank" rel="noopener">FRED broad dollar index</a>.</figcaption>
+</figure>
 
 ## The capital-allocation channel: when correlation flips
 
@@ -126,23 +115,9 @@ For FX traders, the equity-dollar relationship is a real-time macro sentiment ga
 - **Divergence signal:** when the dollar is rising *and* stocks are rising, look for US growth outperformance as the driver. That is a genuinely different regime — carry trades, high-yield currencies, and commodity FX often do well simultaneously. The [carry trade explainer](/research/carry-trade-explained) covers this dynamic.
 - **Earnings season:** dollar moves in the weeks before a reporting season matter. A sharp pre-season dollar rally sets up downside EPS surprise risk for multinationals.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 120" role="img" aria-label="Bar chart showing illustrative S&P 500 EPS growth sensitivity to dollar strength">
-  <line class="ax" x1="30" y1="100" x2="314" y2="100" stroke-width="1"/>
-  <line class="ax" x1="30" y1="10" x2="30" y2="100" stroke-width="1"/>
-  <!-- bars: weak dollar, flat, strong dollar -->
-  <rect x="55" y="30" width="55" height="70" fill="var(--bull)" opacity="0.8"/>
-  <rect x="135" y="60" width="55" height="40" fill="#CA8A04" opacity="0.8"/>
-  <rect x="215" y="72" width="55" height="28" fill="var(--bear)" opacity="0.8"/>
-  <text class="tx" x="82" y="25">+8%</text>
-  <text class="tx" x="162" y="55">+4%</text>
-  <text class="tx" x="242" y="67">+1%</text>
-  <text class="tx" x="82" y="113">Weak $</text>
-  <text class="tx" x="162" y="113">Flat $</text>
-  <text class="tx" x="242" y="113">Strong $</text>
-</svg>
-<div class="pt-fig-cap">Illustrative S&P 500 EPS growth under different dollar regimes — stronger dollar compresses translated overseas earnings. Illustrative only.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"bar","x":["Weak dollar","Flat dollar","Strong dollar"],"series":[{"name":"Illustrative S&P 500 EPS growth","color":"#16A34A","data":[8.2,4.1,1.3]}],"suffix":"%","baseline":0,"alt":"Bar chart: S&P 500 EPS growth is highest in a weak-dollar year, moderate when flat, and compressed when the dollar is strong"}'>
+<figcaption>Illustrative S&P 500 EPS growth under different dollar regimes — stronger dollar compresses translated overseas earnings because ~40% of S&P 500 revenue is earned outside the US. Illustrative only.</figcaption>
+</figure>
 
 ## The dollar's dual role: headwind AND safe haven
 

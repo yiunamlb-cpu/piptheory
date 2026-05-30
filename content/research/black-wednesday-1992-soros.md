@@ -94,15 +94,9 @@ The immediate aftermath was politically catastrophic for the Conservative govern
 
 But the economic aftermath was almost the opposite of what was feared. Sterling fell about 15% after leaving the ERM, making UK exports competitive. The Bank of England pivoted to inflation targeting, interest rates fell sharply, and the British economy entered a sustained expansion. "Black Wednesday" was eventually rebranded by some economists as "White Wednesday" — the day Britain accidentally escaped a damaging straitjacket.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 120" role="img" aria-label="Illustrative GBP/DEM path: devaluation and recovery after Black Wednesday 1992">
-  <line class="ax" x1="6" y1="60" x2="314" y2="60" stroke-width="1" stroke-dasharray="3 3"/>
-  <path class="pt-draw" d="M6,30 C60,30 90,32 130,35 C160,37 180,38 200,38 C210,38 215,60 218,80 C222,100 224,105 240,95 C260,83 290,68 314,60" pathLength="1" fill="none" stroke="#7C3AED" stroke-width="2"/>
-  <text class="tx" x="202" y="18" text-anchor="middle">ERM floor</text>
-  <text class="tx" x="218" y="112" text-anchor="middle">Exit</text>
-</svg>
-<div class="pt-fig-cap">Illustrative path of GBP/DEM: held near ERM floor through early 1992, then sharp devaluation on 16 Sep, partial stabilisation thereafter.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Jan 1992","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep 1","Sep 8","16 Sep","Oct","Nov","Dec"],"series":[{"name":"GBP/DEM","color":"#7C3AED","data":[2.94,2.95,2.93,2.94,2.92,2.91,2.90,2.89,2.87,2.85,2.54,2.46,2.49,2.51]}],"annotations":[{"xi":10,"text":"ERM exit 16 Sep"}],"alt":"Illustrative GBP/DEM: held near ERM floor of 2.778 through 1992 then sharply devalued on Black Wednesday"}'>
+<figcaption>Illustrative — GBP/DEM path through 1992. Sterling held near (but above) its ERM floor, then fell sharply on 16 September 1992 when the UK withdrew from the mechanism. Realistic trajectory based on published sources: <a href="https://en.wikipedia.org/wiki/Black_Wednesday" target="_blank" rel="noopener">Wikipedia/Black Wednesday</a>.</figcaption>
+</figure>
 
 ## What this case study teaches macro traders
 

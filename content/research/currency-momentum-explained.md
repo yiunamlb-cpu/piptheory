@@ -41,17 +41,9 @@ Currency momentum is the FX equivalent of the equity momentum factor first syste
 
 The answer is yes. A currency that has appreciated against a basket of peers over the past six to twelve months tends to continue appreciating. Conversely, a currency that has depreciated tends to keep falling. The signal is not perfect — it reverses at multi-year horizons as mean reversion takes over — but within the medium-term window, it is robust enough to have earned consistent excess returns in out-of-sample tests across decades and geographies.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 130" role="img" aria-label="Illustrative diagram showing currency momentum: past winners outperform past losers over 1-12 month horizons">
-  <line class="ax" x1="6" y1="65" x2="314" y2="65" stroke-width="1" stroke-dasharray="3 3"/>
-  <path class="pt-draw" d="M6,80 C50,75 100,60 160,45 C210,33 265,20 314,14" pathLength="1" fill="none" stroke="var(--bull)" stroke-width="2.5"/>
-  <path class="pt-draw" d="M6,50 C50,56 100,70 160,85 C210,97 265,110 314,116" pathLength="1" fill="none" stroke="var(--bear)" stroke-width="2.5"/>
-  <text class="tx" x="318" y="14" text-anchor="end">Past winners</text>
-  <text class="tx" x="318" y="118" text-anchor="end">Past losers</text>
-  <text class="tx" x="160" y="12">→ Formation period (1–12 months) → Holding period →</text>
-</svg>
-<div class="pt-fig-cap">Illustrative only — cross-sectional momentum: rank currencies by past return, go long top group, short bottom group.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["M1","M2","M3","M4","M5","M6","M7","M8","M9","M10","M11","M12"],"baseline":0,"series":[{"name":"Past-winner basket","color":"#16A34A","data":[0,1.4,3.1,2.6,4.8,4.1,6.3,5.7,7.9,7.2,9.1,8.6]},{"name":"Past-loser basket","color":"#DC2626","data":[0,-0.9,-2.3,-1.7,-3.4,-4.1,-3.6,-5.2,-6.1,-5.5,-7.3,-8.8]}],"suffix":"%","alt":"Illustrative cross-sectional momentum: past-winner currencies continue outperforming while past losers continue underperforming over a 12-month holding period"}'>
+<figcaption>Illustrative — cumulative excess return of past-winner vs past-loser currency baskets over a 12-month holding period. Real evidence: <a href="https://www.sciencedirect.com/science/article/abs/pii/S0304405X12001353" target="_blank" rel="noopener">Menkhoff et al. 2012, <em>Journal of Financial Economics</em></a>.</figcaption>
+</figure>
 
 ## The academic evidence: what Menkhoff et al. found
 

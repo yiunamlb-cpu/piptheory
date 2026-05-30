@@ -65,20 +65,9 @@ The US Federal Reserve's decisions ripple far beyond US assets. Because the doll
 
 Both effects push the currency weaker. The Fed's QE programs — launched in 2008 and again in March 2020 — were each accompanied by periods of broad dollar weakness. In the 12 months following the Fed's March 2020 emergency QE announcement, the dollar index fell roughly 12–14% before reversing when taper talk began in 2021.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 120" role="img" aria-label="Illustrative chart showing dollar index falling during QE and rising during QT, with Fed balance sheet moving inversely">
-  <line class="ax" x1="6" y1="60" x2="314" y2="60" stroke-width="1" stroke-dasharray="3 3"/>
-  <text class="tx" x="8" y="14">USD index</text>
-  <text class="tx" x="8" y="24">Fed balance sheet</text>
-  <path class="pt-draw" d="M6,45 C60,42 100,55 140,75 C180,92 210,95 240,78 C270,62 295,38 314,28" pathLength="1" fill="none" stroke="#2563EB" stroke-width="2"/>
-  <path class="pt-draw" d="M6,85 C60,80 100,65 140,45 C180,28 210,25 240,42 C270,58 295,78 314,88" pathLength="1" fill="none" stroke="#E11D48" stroke-width="2" stroke-dasharray="4 2"/>
-  <text class="tx" x="70" y="110">QE phase</text>
-  <text class="tx" x="220" y="110">QT phase</text>
-  <text class="tx" x="316" y="26" text-anchor="end">USD</text>
-  <text class="tx" x="316" y="90" text-anchor="end">Balance sheet</text>
-</svg>
-<div class="pt-fig-cap">Illustrative — during QE, the central bank's balance sheet expands and the currency tends to weaken; during QT, the balance sheet contracts and the currency strengthens. The relationship is noisy in the short run.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Mar 2020","Jun 2020","Sep 2020","Dec 2020","Mar 2021","Jun 2021","Sep 2021","Dec 2021","Mar 2022","Jun 2022","Sep 2022","Dec 2022"],"annotations":[{"xi":5,"text":"Taper talk begins"},{"xi":8,"text":"QT starts"}],"series":[{"name":"USD broad index (indexed)","color":"#2563EB","data":[100,91,88,87,91,90,86,88,92,99,106,109]},{"name":"Fed balance sheet (indexed)","color":"#E11D48","data":[100,118,128,133,138,142,146,148,149,146,143,140]}],"alt":"Illustrative inverse relationship: as the Fed expands its balance sheet via QE the USD weakens; as QT begins and expectations shift the USD rallies"}'>
+<figcaption>Illustrative — as the Fed expanded its balance sheet through QE the USD weakened through 2020–2021; once taper expectations and then QT arrived in 2022, the dollar reversed sharply. The relationship is noisy but directionally consistent over multi-quarter horizons.</figcaption>
+</figure>
 
 **Quantitative tightening (QT)** is the reverse — allowing bonds to mature without reinvestment, or actively selling them. QT shrinks the balance sheet, reduces money supply and pushes yields higher, generally strengthening the currency. The Fed began QT in June 2022, which reinforced the dollar's rise alongside its aggressive rate-hike cycle.
 

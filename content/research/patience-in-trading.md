@@ -121,20 +121,9 @@ Then check [how to build a macro thesis](/research/how-to-build-a-macro-thesis) 
 
 For the broader context of why macro patience and psychology determine performance, [trading psychology for macro traders](/research/trading-psychology-macro) covers the mental framework that makes waiting structurally possible.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 120" role="img" aria-label="Illustrative chart: sparse trade entries during a long waiting period, then a concentrated high-conviction entry when factors converge">
-  <line class="ax" x1="6" y1="100" x2="314" y2="100" stroke-width="1"/>
-  <line class="ax" x1="6" y1="20" x2="6" y2="100" stroke-width="1"/>
-  <path class="pt-draw" d="M6,80 C40,75 70,85 100,70 C130,55 150,60 180,50 C200,43 220,38 250,32 C270,28 290,22 314,18" pathLength="1" fill="none" stroke="#0D9488" stroke-width="2" stroke-dasharray="none"/>
-  <circle cx="60" cy="82" r="4" fill="none" stroke="#CA8A04" stroke-width="1.5"/>
-  <circle cx="110" cy="73" r="4" fill="none" stroke="#CA8A04" stroke-width="1.5"/>
-  <circle cx="250" cy="32" r="6" fill="#2563EB" stroke="none" opacity="0.8"/>
-  <text class="tx" x="60" y="97" text-anchor="middle" font-size="7">pass</text>
-  <text class="tx" x="110" y="97" text-anchor="middle" font-size="7">pass</text>
-  <text class="tx" x="250" y="97" text-anchor="middle" font-size="7">FAT PITCH</text>
-</svg>
-<div class="pt-fig-cap">Illustrative — two low-conviction setups passed; the high-conviction moment (fat pitch) arrives later. Patience makes that entry possible.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Wk 1","Wk 2","Wk 3","Wk 4","Wk 5","Wk 6","Wk 7","Wk 8","Wk 9","Wk 10","Wk 11","Wk 12"],"baseline":0,"series":[{"name":"Macro divergence score","color":"#0D9488","data":[8,6,11,9,14,12,17,15,21,28,34,42]}],"annotations":[{"xi":1,"text":"Pass"},{"xi":4,"text":"Pass"},{"xi":9,"text":"Fat pitch"}],"alt":"Illustrative line: macro divergence score builds gradually over 12 weeks with two low-conviction moments passed and a high-conviction entry at week 10 when the score surges"}'>
+<figcaption>Illustrative — divergence score builds slowly; two low-conviction setups are passed (weeks 2 and 5). The fat pitch arrives at week 10 when multiple factors converge. Patience preserves capital and bandwidth for that entry.</figcaption>
+</figure>
 
 <div class="pt-cta">
 <span class="pt-cta-txt">Check how strongly macro factors are converging before you decide it's time to swing.</span>

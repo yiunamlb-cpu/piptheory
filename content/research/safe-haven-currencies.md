@@ -58,6 +58,10 @@ The answer is Japan's role as the **world's largest net creditor nation** and th
 <div class="pt-flow-step"><span class="h">Result</span>Yen appreciates sharply, even as Japanese assets may also fall.</div>
 </div>
 
+<figure class="pt-chart" data-chart='{"type":"line","x":["Jul","Aug wk1","Aug wk2","Aug wk3","Aug wk4","Sep","Oct","Nov","Dec"],"series":[{"name":"JPY strength (indexed)","color":"#E11D48","data":[100,107,114,111,108,106,104,102,103]},{"name":"CHF strength (indexed)","color":"#CA8A04","data":[100,104,108,107,105,104,103,101,102]},{"name":"AUD/USD (indexed)","color":"#DB2777","data":[100,94,88,91,93,95,96,97,96]}],"annotations":[{"xi":1,"text":"Aug 2024 BoJ hike"}],"alt":"Illustrative 2024 carry-unwind episode: JPY and CHF surge as risk-off hits while AUD falls — classic safe-haven vs risk-on rotation"}'>
+<figcaption>Illustrative 2024 carry-unwind episode — JPY (red) and CHF (gold) appreciate sharply as AUD (pink) sells off following the August BoJ surprise. All indexed to 100 at start of July 2024. Real data: <a href="https://fred.stlouisfed.org/series/DEXJPUS" target="_blank" rel="noopener">FRED JPY/USD</a> &amp; <a href="https://fred.stlouisfed.org/series/DEXUSAL" target="_blank" rel="noopener">FRED AUD/USD</a>.</figcaption>
+</figure>
+
 The August 2024 yen carry unwind is the clearest recent example. The <a href="https://www.bis.org/publ/bisbull90.pdf" target="_blank" rel="noopener">Bank for International Settlements documented in BIS Bulletin No. 90</a> how the Bank of Japan's unexpected 15-basis-point rate hike on 31 July 2024 — raising its policy rate from near zero to 0.25% — triggered a rapid unwinding of yen-funded carry positions. The yen surged abruptly and Japan's Nikkei 225 fell 12.4% in a single session on 5 August 2024 as the feedback loop between yen strength and margin calls cascaded through global markets.
 
 <div class="pt-timeline">
@@ -93,35 +97,14 @@ Gold's safe-haven properties are most reliable during **inflationary stress and 
 
 Gold's Achilles heel is the **liquidity crunch**. During the acute phase of the 2008 financial crisis, gold briefly sold off alongside equities as institutions facing margin calls sold their most liquid assets — including gold — to raise cash. The same pattern appeared briefly in March 2020. Gold typically recovers quickly once the acute cash-demand phase passes, but traders should not assume gold is immune to the initial selling pressure in a genuine liquidity crisis.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 130" role="img" aria-label="Comparison of JPY CHF and gold safe haven behaviour across crisis types">
-  <!-- headers -->
-  <text class="tx" x="90" y="14" text-anchor="middle">JPY</text>
-  <text class="tx" x="175" y="14" text-anchor="middle">CHF</text>
-  <text class="tx" x="260" y="14" text-anchor="middle">Gold</text>
-  <!-- row labels -->
-  <text class="tx" x="5" y="35">Equity sell-off</text>
-  <text class="tx" x="5" y="60">Geopolitical shock</text>
-  <text class="tx" x="5" y="85">Inflation spike</text>
-  <text class="tx" x="5" y="110">Liquidity crunch</text>
-  <!-- JPY cells -->
-  <rect x="60" y="22" width="60" height="18" fill="var(--bull)" opacity="0.7"/><text class="tx" x="90" y="34" text-anchor="middle">Strong</text>
-  <rect x="60" y="47" width="60" height="18" fill="var(--bull)" opacity="0.5"/><text class="tx" x="90" y="59" text-anchor="middle">Moderate</text>
-  <rect x="60" y="72" width="60" height="18" fill="#CA8A04" opacity="0.5"/><text class="tx" x="90" y="84" text-anchor="middle">Mixed</text>
-  <rect x="60" y="97" width="60" height="18" fill="var(--bull)" opacity="0.7"/><text class="tx" x="90" y="109" text-anchor="middle">Strong</text>
-  <!-- CHF cells -->
-  <rect x="145" y="22" width="60" height="18" fill="var(--bull)" opacity="0.7"/><text class="tx" x="175" y="34" text-anchor="middle">Strong</text>
-  <rect x="145" y="47" width="60" height="18" fill="var(--bull)" opacity="0.7"/><text class="tx" x="175" y="59" text-anchor="middle">Strong</text>
-  <rect x="145" y="72" width="60" height="18" fill="var(--bull)" opacity="0.5"/><text class="tx" x="175" y="84" text-anchor="middle">Moderate</text>
-  <rect x="145" y="97" width="60" height="18" fill="var(--bull)" opacity="0.6"/><text class="tx" x="175" y="109" text-anchor="middle">Strong</text>
-  <!-- Gold cells -->
-  <rect x="228" y="22" width="60" height="18" fill="var(--bull)" opacity="0.5"/><text class="tx" x="260" y="34" text-anchor="middle">Moderate</text>
-  <rect x="228" y="47" width="60" height="18" fill="var(--bull)" opacity="0.8"/><text class="tx" x="260" y="59" text-anchor="middle">Very strong</text>
-  <rect x="228" y="72" width="60" height="18" fill="var(--bull)" opacity="0.8"/><text class="tx" x="260" y="84" text-anchor="middle">Very strong</text>
-  <rect x="228" y="97" width="60" height="18" fill="var(--bear)" opacity="0.6"/><text class="tx" x="260" y="109" text-anchor="middle">Can sell off</text>
-</svg>
-<div class="pt-fig-cap">Illustrative strength of safe-haven behaviour by asset class and crisis type. Based on academic literature and observed historical patterns — not a guarantee of future behaviour.</div>
-</div>
+| Crisis type | JPY | CHF | Gold |
+|---|---|---|---|
+| Equity sell-off | Strong | Strong | Moderate |
+| Geopolitical shock | Moderate | Strong | Very strong |
+| Inflation spike | Mixed | Moderate | Very strong |
+| Liquidity crunch | Strong (carry unwind) | Strong | Can sell off |
+
+*Illustrative strength of safe-haven behaviour by asset class and crisis type. Based on academic literature and observed historical patterns — not a guarantee of future behaviour.*
 
 ## How to use the safe havens as a macro toolkit
 

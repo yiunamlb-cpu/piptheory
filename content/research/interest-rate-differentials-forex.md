@@ -94,19 +94,9 @@ Country B has the lower nominal rate but the *higher* real rate. Capital seeking
 When inflation is low and stable across all countries, nominal and real rate differentials tell the same story. But in high-inflation environments — such as 2021–2023, when inflation diverged sharply across the G10 — the real differential can diverge significantly from the nominal one and becomes the better predictor of currency direction.
 </div>
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 130" role="img" aria-label="Illustrative chart showing how a widening rate differential drives currency appreciation over time">
-  <text class="tx" x="160" y="12" text-anchor="middle">Rate differential widening → currency appreciation (illustrative)</text>
-  <line class="ax" x1="6" y1="80" x2="314" y2="80" stroke-width="1" stroke-dasharray="3 3"/>
-  <!-- Differential line (left axis proxy) -->
-  <path class="pt-draw" d="M6,100 C60,92 120,80 180,62 C220,50 270,40 314,34" pathLength="1" fill="none" stroke="#CA8A04" stroke-width="1.5" stroke-dasharray="4 2"/>
-  <!-- Currency line (appreciating) -->
-  <path class="pt-draw" d="M6,105 C50,100 100,94 160,75 C210,58 265,44 314,30" pathLength="1" fill="none" stroke="#2563EB" stroke-width="2.5"/>
-  <text class="tx" x="220" y="26">Exchange rate</text>
-  <text class="tx" x="220" y="42">Rate differential</text>
-</svg>
-<div class="pt-fig-cap">Illustrative only — widening rate differentials tend to drive sustained currency appreciation over months.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"annotations":[{"xi":2,"text":"Hike cycle begins"},{"xi":8,"text":"Differential peaks"}],"series":[{"name":"USD/JPY rate differential (pp)","color":"#CA8A04","data":[1.2,1.4,2.1,2.8,3.3,3.9,4.2,4.6,4.9,5.1,5.1,4.8]},{"name":"USD/JPY exchange rate (indexed)","color":"#2563EB","data":[100,99,101,104,106,109,110,114,116,118,117,115]}],"alt":"Illustrative USD/JPY rate differential widens as Fed hikes while BoJ holds — exchange rate rises in parallel with bumps and stalls"}'>
+<figcaption>Illustrative — as the rate differential between two central banks widens (here: Fed hiking, BoJ holding), the higher-rate currency tends to appreciate, though the move is noisy and non-linear.</figcaption>
+</figure>
 
 ## Covered vs uncovered interest rate parity
 

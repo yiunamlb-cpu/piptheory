@@ -60,38 +60,9 @@ A price-based meter measures **what prices have already done**. The mechanics, e
 
 The most common variants use **RSI aggregation** (average each currency's 14-period RSI across its 7 pairs), **rate-of-change aggregation** (average percentage change), or **moving-average deviation** (how far each pair sits above or below its MA). All three produce broadly similar rankings because they are all measuring the same underlying phenomenon: momentum.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 140" role="img" aria-label="Illustrative bar chart showing currency strength scores after price-based calculation — illustrative values only">
-  <line class="ax" x1="6" y1="70" x2="314" y2="70" stroke-width="1" stroke-dasharray="3 3"/>
-  <text class="tx" x="16" y="10">Illustrative price-based scores</text>
-  <!-- Bars above/below zero line at y=70 -->
-  <!-- USD +40 -->
-  <rect x="20" y="30" width="22" height="40" fill="#2563EB" opacity="0.8"/>
-  <text class="tx" x="31" y="26" text-anchor="middle">USD</text>
-  <!-- GBP +25 -->
-  <rect x="56" y="45" width="22" height="25" fill="#7C3AED" opacity="0.8"/>
-  <text class="tx" x="67" y="41" text-anchor="middle">GBP</text>
-  <!-- CAD +10 -->
-  <rect x="92" y="60" width="22" height="10" fill="#16A34A" opacity="0.8"/>
-  <text class="tx" x="103" y="56" text-anchor="middle">CAD</text>
-  <!-- EUR -5 -->
-  <rect x="128" y="70" width="22" height="5" fill="#0D9488" opacity="0.8"/>
-  <text class="tx" x="139" y="84" text-anchor="middle">EUR</text>
-  <!-- AUD -15 -->
-  <rect x="164" y="70" width="22" height="15" fill="#DB2777" opacity="0.8"/>
-  <text class="tx" x="175" y="94" text-anchor="middle">AUD</text>
-  <!-- NZD -20 -->
-  <rect x="200" y="70" width="22" height="20" fill="#0891B2" opacity="0.8"/>
-  <text class="tx" x="211" y="99" text-anchor="middle">NZD</text>
-  <!-- CHF -15 -->
-  <rect x="236" y="70" width="22" height="15" fill="#CA8A04" opacity="0.8"/>
-  <text class="tx" x="247" y="94" text-anchor="middle">CHF</text>
-  <!-- JPY -20 -->
-  <rect x="272" y="70" width="22" height="20" fill="#E11D48" opacity="0.8"/>
-  <text class="tx" x="283" y="99" text-anchor="middle">JPY</text>
-</svg>
-<div class="pt-fig-cap">Illustrative only — the eight scores always sum to zero relative to the basket mean.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"bar","x":["USD","GBP","CAD","EUR","AUD","NZD","CHF","JPY"],"baseline":0,"series":[{"name":"Price-based score","color":"#2563EB","data":[38,22,9,-4,-14,-19,-16,-24]}],"alt":"Illustrative price-based currency strength scores across the 8 majors — scores sum to zero by construction"}'>
+<figcaption>Illustrative only — the eight price-based scores always sum to zero relative to the basket mean, with positives outperforming and negatives underperforming the average.</figcaption>
+</figure>
 
 ## Method 2: Fundamental (macro) calculation
 
@@ -118,18 +89,9 @@ A 5% policy rate is high if recent rates were 0%, but low if recent rates were 1
 
 The fundamental score for a given currency could be strongly positive even if that currency has been falling in price — for example, if the central bank has been hiking rates but markets are distracted by a political shock. Conversely, a currency could score highly on a price-based meter purely because of a momentum move driven by speculation, even if the underlying fundamentals are weak.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 120" role="img" aria-label="Illustrative line chart comparing a fundamental score (smoother, slower) versus a price-based score (noisier, faster) for the same currency over time">
-  <line class="ax" x1="6" y1="60" x2="314" y2="60" stroke-width="1" stroke-dasharray="3 3"/>
-  <!-- Fundamental score: smooth uptrend -->
-  <path class="pt-draw" d="M6,85 C50,80 90,72 140,60 C190,48 250,38 314,32" pathLength="1" fill="none" stroke="#0D9488" stroke-width="2.5"/>
-  <!-- Price-based score: noisy but same trend -->
-  <path class="pt-draw" d="M6,88 C30,70 50,90 80,68 C100,55 120,78 150,58 C180,42 210,60 240,38 C265,25 295,42 314,30" pathLength="1" fill="none" stroke="#2563EB" stroke-width="1.5" stroke-dasharray="4 2"/>
-  <text class="tx" x="200" y="28">Fundamental</text>
-  <text class="tx" x="200" y="44">Price-based</text>
-</svg>
-<div class="pt-fig-cap">Illustrative only — fundamental scores tend to trend more smoothly; price-based scores are noisier and more reactive to short-term moves.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"baseline":0,"series":[{"name":"Fundamental score","color":"#0D9488","data":[-8,-5,-2,3,6,4,10,8,14,12,18,20]},{"name":"Price-based score","color":"#2563EB","data":[-10,4,-6,2,14,-2,8,18,6,22,12,21]}],"alt":"Illustrative comparison: fundamental score trends gradually higher while price-based score is noisier around the same general direction"}'>
+<figcaption>Illustrative only — fundamental scores move in a slow, deliberate trend as macro data accumulates; price-based scores are noisier and more reactive, but track the same underlying direction over time.</figcaption>
+</figure>
 
 This difference in character is not a bug — it is the point. Use whichever lens is appropriate for your time horizon. For a more detailed breakdown of the strategic trade-offs between the two, see [Fundamentals vs Price-Based Currency Strength: Which Should You Trust?](/research/fundamentals-vs-price-based-currency-strength).
 

@@ -40,19 +40,9 @@ Canada's oil sands — centred in Alberta — hold the world's third-largest pro
 
 The United States is Canada's overwhelmingly dominant trading partner and the destination for virtually all of Canada's pipeline oil exports. This bilateral relationship creates an almost one-to-one link between WTI crude prices and the revenue flowing into Canada — and therefore the demand for Canadian dollars.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 140" role="img" aria-label="Illustrative positive correlation between WTI crude oil price and CAD strength over time">
-  <line class="ax" x1="30" y1="110" x2="314" y2="110" stroke-width="1"/>
-  <line class="ax" x1="30" y1="10" x2="30" y2="110" stroke-width="1"/>
-  <line class="gl" x1="30" y1="60" x2="314" y2="60" stroke-width="1" stroke-dasharray="3 3"/>
-  <path class="pt-draw" d="M30,90 C60,82 90,65 120,50 C150,38 160,70 190,55 C220,42 260,30 314,22" pathLength="1" fill="none" stroke="#E07B00" stroke-width="2"/>
-  <path class="pt-draw" d="M30,88 C60,80 90,68 120,54 C150,42 160,68 190,58 C220,46 260,36 314,28" pathLength="1" fill="none" stroke="#16A34A" stroke-width="2" stroke-dasharray="5 3"/>
-  <text class="tx" x="318" y="26" text-anchor="end">CAD str.</text>
-  <text class="tx" x="318" y="18" text-anchor="end">WTI ↑</text>
-  <text class="tx" x="30" y="122">Time →</text>
-</svg>
-<div class="pt-fig-cap">Illustrative positive co-movement between WTI crude oil prices and CAD strength (USD/CAD falling). Both series from <a href="https://fred.stlouisfed.org" target="_blank" rel="noopener">FRED</a>.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"series":[{"name":"WTI crude (indexed)","color":"#CA8A04","data":[100,97,103,108,106,112,117,113,119,122,118,125]},{"name":"CAD strength (indexed)","color":"#16A34A","data":[100,98,101,106,104,110,114,109,116,120,115,121]}],"alt":"Illustrative co-movement between WTI crude oil price and CAD — both indexed to 100, rising and falling together with natural wobble"}'>
+<figcaption>Illustrative — both series indexed to 100. When WTI rises, CAD typically strengthens (USD/CAD falls). Real data: <a href="https://fred.stlouisfed.org/series/DCOILWTICO" target="_blank" rel="noopener">FRED WTI crude</a> &amp; <a href="https://fred.stlouisfed.org/series/DEXCAUS" target="_blank" rel="noopener">FRED USD/CAD</a>.</figcaption>
+</figure>
 
 ## The Mechanics: How Oil Becomes CAD Demand
 
@@ -127,21 +117,9 @@ CAD's oil sensitivity makes it different from other commodity currencies in the 
 
 The <a href="/research/commodity-currencies-explained">commodity currencies explainer</a> covers AUD and NZD in more depth. For CAD specifically, oil is the single most important commodity factor by a wide margin.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 100" role="img" aria-label="Bar chart showing commodity sensitivity of four commodity currencies illustratively">
-  <line class="ax" x1="10" y1="80" x2="310" y2="80" stroke-width="1"/>
-  <rect x="20" y="20" width="50" height="60" fill="#16A34A" opacity="0.85"/>
-  <rect x="90" y="40" width="50" height="40" fill="#DB2777" opacity="0.85"/>
-  <rect x="160" y="62" width="50" height="18" fill="#0891B2" opacity="0.85"/>
-  <rect x="230" y="25" width="50" height="55" fill="#6B7280" opacity="0.85"/>
-  <text class="tx" x="45" y="92" text-anchor="middle">CAD</text>
-  <text class="tx" x="115" y="92" text-anchor="middle">AUD</text>
-  <text class="tx" x="185" y="92" text-anchor="middle">NZD</text>
-  <text class="tx" x="255" y="92" text-anchor="middle">NOK</text>
-  <text class="tx" x="45" y="16" text-anchor="middle">High</text>
-</svg>
-<div class="pt-fig-cap">Illustrative relative oil sensitivity of commodity currencies. CAD and NOK have the highest direct oil exposure in G10 FX.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"hbar","x":["CAD","NOK","AUD","NZD"],"series":[{"name":"Oil sensitivity (illustrative %)","color":"#16A34A","data":[78,72,34,18]}],"suffix":"%","alt":"Horizontal bar chart — illustrative oil sensitivity by commodity currency: CAD highest, then NOK, AUD moderate, NZD low"}'>
+<figcaption>Illustrative relative oil sensitivity of commodity currencies. CAD and NOK have the highest direct oil exposure in G10 FX.</figcaption>
+</figure>
 
 ## Using the Oil CAD Correlation in Practice
 

@@ -83,16 +83,9 @@ Compounding your own capital works in both directions: gains compound, but so do
 
 Funded account trading has a different compounding profile. When you request a payout, the funded account returns to its original balance and the drawdown clock effectively resets. You compound your personal savings (funded income withdrawn), not the funded balance itself.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 120" role="img" aria-label="Illustrative 24-month capital comparison between funded account income compounded into own capital versus own capital traded directly">
-  <line class="ax" x1="6" y1="100" x2="314" y2="100" stroke-width="1" stroke-dasharray="3 3"/>
-  <path class="pt-draw" d="M6,100 C60,92 100,80 140,65 C180,50 230,32 314,18" pathLength="1" fill="none" stroke="#0D9488" stroke-width="2"/>
-  <path class="pt-draw" d="M6,100 C80,98 140,95 200,90 C240,87 280,83 314,78" pathLength="1" fill="none" stroke="#CA8A04" stroke-width="2"/>
-  <text class="tx" x="318" y="20" text-anchor="end" fill="#0D9488">funded income → own capital</text>
-  <text class="tx" x="318" y="80" text-anchor="end" fill="#CA8A04">own $10K traded directly</text>
-</svg>
-<div class="pt-fig-cap">Illustrative only — assumes consistent monthly returns and successful funded account management. Actual results depend heavily on pass rate and payout consistency.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"area","x":["M0","M2","M4","M6","M8","M10","M12","M14","M16","M18","M20","M22","M24"],"series":[{"name":"Funded income reinvested into own capital","color":"#0D9488","data":[10000,14600,19800,24300,29100,32800,37200,40500,44700,48600,52100,55900,59400]},{"name":"Own $10K traded directly","color":"#CA8A04","data":[10000,10580,11100,11540,12010,12320,12790,13180,13550,13870,14210,14520,14830]}],"alt":"Illustrative 24-month comparison: reinvesting funded account payouts into own capital (teal) grows personal savings from $10K to roughly $59K; trading only own $10K directly (gold) reaches roughly $15K over the same period"}'>
+<figcaption>Illustrative only — assumes a consistent 3% net monthly return, 80% profit split on a $100K funded account, and no failed evaluations. Actual results depend heavily on pass rate and payout consistency.</figcaption>
+</figure>
 
 ## The real opportunity: using both in sequence
 

@@ -134,18 +134,9 @@ One of the most useful mental models is to think of the carry trade as **equival
 
 This reframing has practical implications. Just as a volatility seller watches realised vol and skew carefully, a carry trader should monitor funding-liquidity conditions. When the cost of crash protection rises (negative risk reversals widen), the market is signalling elevated crash probability.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 120" role="img" aria-label="Illustrative carry trade payoff: many small gains followed by a sudden large loss">
-  <line class="ax" x1="6" y1="70" x2="314" y2="70" stroke-width="1" stroke-dasharray="3 3"/>
-  <!-- Slow grind up -->
-  <path class="pt-draw" d="M6,70 C40,65 80,58 130,50 C160,44 190,40 220,35" pathLength="1" fill="none" stroke="var(--bull, #16A34A)" stroke-width="2"/>
-  <!-- Sudden crash -->
-  <path class="pt-draw" d="M220,35 C235,36 245,38 255,52 C265,68 275,90 290,108" pathLength="1" fill="none" stroke="var(--bear, #DC2626)" stroke-width="2.5"/>
-  <text class="tx" x="100" y="42">steady carry gains</text>
-  <text class="tx" x="260" y="106">crash</text>
-</svg>
-<div class="pt-fig-cap">Illustrative only — typical carry trade payoff profile: slow grind higher, sudden reversal.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"area","x":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan+","Feb+","Mar+","Apr+","May+","Jun+","Jul+","Aug+"],"baseline":0,"series":[{"name":"AUD/JPY carry return (indexed)","color":"#DB2777","data":[0,0.4,0.9,0.6,1.3,1.8,1.5,2.1,2.7,2.4,3.1,2.8,3.4,3.9,3.6,4.3,4.8,4.4,5.1,-8.7]}],"suffix":"%","annotations":[{"xi":19,"text":"Crash"}],"alt":"Illustrative AUD/JPY carry trade return: 19 months of small steady gains then a sudden large loss in the final period"}'>
+<figcaption>Illustrative — carry trade return profile: small, steady gains accumulate over months, then a single crash event erases them rapidly. The negatively-skewed payoff is the defining characteristic. Evidence: <a href="https://www.nber.org/papers/w14473" target="_blank" rel="noopener">Brunnermeier, Nagel &amp; Pedersen (2008)</a>.</figcaption>
+</figure>
 
 ## Carry crash risk and the macro strength meter
 

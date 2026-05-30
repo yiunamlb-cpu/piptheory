@@ -57,17 +57,9 @@ The Japanese yen's safe-haven status has a clear structural explanation rooted i
 
 When fear spikes, those carry trades unwind simultaneously. Investors sell the high-yielding assets, buy back yen to repay the loans, and the yen surges — often violently. Japan is also the world's largest net creditor nation; <a href="https://www.mof.go.jp/english/policy/international_policy/reference/iip/index.htm" target="_blank" rel="noopener">Japan's Ministry of Finance</a> reports net foreign assets of over $3 trillion, meaning Japanese investors hold vast overseas portfolios. In a risk-off environment, they repatriate capital, again buying yen.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 130" role="img" aria-label="Illustrative chart showing AUD/JPY falling sharply in risk-off episodes and rising in risk-on periods">
-  <line class="ax" x1="20" y1="100" x2="314" y2="100" stroke-width="1"/>
-  <line class="ax" x1="20" y1="10" x2="20" y2="100" stroke-width="1"/>
-  <path class="pt-draw" d="M20,60 C50,50 80,38 110,32 C130,28 140,25 150,24 C155,70 160,88 180,90 C200,88 220,72 250,50 C275,35 295,25 314,20" pathLength="1" fill="none" stroke="#DB2777" stroke-width="2"/>
-  <text class="tx" x="148" y="20" text-anchor="middle">← Risk-off spike</text>
-  <text class="tx" x="316" y="18" text-anchor="end">AUD/JPY</text>
-  <text class="tx" x="20" y="112">Time →</text>
-</svg>
-<div class="pt-fig-cap">Illustrative AUD/JPY showing a sharp risk-off dip and recovery. AUD/JPY is widely used as a risk-sentiment barometer in macro trading.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"series":[{"name":"AUD/JPY (indexed)","color":"#DB2777","data":[100,102,105,107,103,99,88,82,86,92,97,101]}],"annotations":[{"xi":5,"text":"Risk-off: carry unwind"}],"alt":"Illustrative AUD/JPY indexed to 100 — rises in risk-on months, then drops sharply in a risk-off episode before recovering"}'>
+<figcaption>Illustrative — AUD/JPY indexed to 100. The mid-year dip shows a classic risk-off carry-unwind: AUD sold, yen bought simultaneously. Real data: <a href="https://fred.stlouisfed.org/series/DEXUSAL" target="_blank" rel="noopener">FRED AUD/USD</a> &amp; <a href="https://fred.stlouisfed.org/series/DEXJPUS" target="_blank" rel="noopener">FRED JPY/USD</a>.</figcaption>
+</figure>
 
 The pair AUD/JPY is widely used as a risk-sentiment barometer precisely because it captures both ends of the spectrum: AUD is the high-beta risk-on currency; JPY is the carry-trade funding currency. A falling AUD/JPY is a reliable signal of deteriorating risk appetite.
 

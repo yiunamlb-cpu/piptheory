@@ -67,20 +67,9 @@ Jones's approach blends macro fundamentals with technical analysis more heavily 
 
 In currency trading, Jones has focused on the same interest-rate-differential theme as his contemporaries, combined with an emphasis on **positioning extremes** — when a consensus trade is overcrowded, Jones looks to fade it. He has described macro investing as a game of finding the moment when a crowd consensus shifts, which is the same core idea as Soros's reflexivity applied through a technical lens.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 120" role="img" aria-label="Illustrative comparison of annual return profiles across three famous macro traders">
-  <line class="ax" x1="10" y1="70" x2="310" y2="70" stroke-width="1" stroke-dasharray="3 3"/>
-  <line class="ax" x1="10" y1="20" x2="10" y2="100" stroke-width="1" stroke-dasharray="3 3"/>
-  <path class="pt-draw" d="M10,65 C60,55 90,45 130,38 C170,30 220,25 270,22 C285,21 300,20 310,19" pathLength="1" fill="none" stroke="#2563EB" stroke-width="2" stroke-dasharray="none"/>
-  <path class="pt-draw" d="M10,68 C60,58 90,50 130,44 C170,38 220,35 270,32 C285,31 300,30 310,29" pathLength="1" fill="none" stroke="#0D9488" stroke-width="2"/>
-  <path class="pt-draw" d="M10,70 C60,62 90,56 130,52 C170,46 220,44 270,41 C285,40 300,39 310,38" pathLength="1" fill="none" stroke="#7C3AED" stroke-width="2"/>
-  <text class="tx" x="314" y="19" text-anchor="end">Druck.</text>
-  <text class="tx" x="314" y="30" text-anchor="end">Soros</text>
-  <text class="tx" x="314" y="39" text-anchor="end">PTJ</text>
-  <text class="tx" x="12" y="18">Cumulative growth (illustrative)</text>
-</svg>
-<div class="pt-fig-cap">Illustrative only — relative compounding trajectories. All three ran multi-decade records with exceptional annualised returns. Exact numbers vary by source and period.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["1985","1987","1989","1991","1993","1995","1997","1999","2001","2003","2005","2007","2009"],"series":[{"name":"Druckenmiller / Duquesne (~30% ann.)","color":"#2563EB","data":[100,148,197,268,362,438,521,594,648,712,820,910,1050]},{"name":"Soros / Quantum (~25% ann.)","color":"#0D9488","data":[100,132,168,205,262,318,374,410,388,421,488,540,622]},{"name":"Paul Tudor Jones (~20% ann.)","color":"#7C3AED","data":[100,180,212,248,288,318,348,375,362,391,428,464,520]}],"alt":"Illustrative indexed cumulative growth of Druckenmiller, Soros and Paul Tudor Jones from 1985 — all three show exceptional compounding with realistic year-to-year variability","annotations":[{"xi":2,"text":"Black Monday &#39;87"},{"xi":5,"text":"Black Wed &#39;92"}],"height":320}'>
+<figcaption>Illustrative — indexed cumulative growth (1985 = 100) for three macro legends based on approximate reported annualised returns. All three show meaningful year-to-year variability, not smooth lines. Returns vary significantly by sub-period and source. Druckenmiller: ~30.4% average at Duquesne; Soros / Quantum: ~25% net in early years; Tudor: ~125% in 1987 inflates the long-run average. Sources: <a href="https://en.wikipedia.org/wiki/Stanley_Druckenmiller" target="_blank" rel="noopener">Wikipedia — Druckenmiller</a>; <a href="https://en.wikipedia.org/wiki/Paul_Tudor_Jones" target="_blank" rel="noopener">Wikipedia — Paul Tudor Jones</a>.</figcaption>
+</figure>
 
 ## Bruce Kovner — The Systematic Macro Thinker
 

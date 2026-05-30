@@ -57,35 +57,9 @@ The TFF report splits reportable open interest into four categories. Each tells 
 
 For macro forex analysis, **Leveraged Funds net positioning** is the primary signal. When hedge funds are heavily net long a currency, the trade is crowded. When they are heavily net short, there is latent covering pressure.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 130" role="img" aria-label="Bar chart showing illustrative Leveraged Funds net positioning across the 7 major currency futures">
-  <line class="ax" x1="6" y1="65" x2="314" y2="65" stroke-width="1" stroke-dasharray="3 3"/>
-  <!-- EUR -->
-  <rect x="20" y="30" width="28" height="35" fill="#0D9488" opacity="0.85"/>
-  <text class="tx" x="34" y="80" text-anchor="middle">EUR</text>
-  <!-- GBP -->
-  <rect x="60" y="45" width="28" height="20" fill="#7C3AED" opacity="0.85"/>
-  <text class="tx" x="74" y="80" text-anchor="middle">GBP</text>
-  <!-- AUD -->
-  <rect x="100" y="65" width="28" height="25" fill="#DB2777" opacity="0.85"/>
-  <text class="tx" x="114" y="80" text-anchor="middle">AUD</text>
-  <!-- CAD -->
-  <rect x="140" y="65" width="28" height="30" fill="#16A34A" opacity="0.85"/>
-  <text class="tx" x="154" y="80" text-anchor="middle">CAD</text>
-  <!-- JPY -->
-  <rect x="180" y="65" width="28" height="45" fill="#E11D48" opacity="0.85"/>
-  <text class="tx" x="194" y="80" text-anchor="middle">JPY</text>
-  <!-- CHF -->
-  <rect x="220" y="42" width="28" height="23" fill="#CA8A04" opacity="0.85"/>
-  <text class="tx" x="234" y="80" text-anchor="middle">CHF</text>
-  <!-- NZD -->
-  <rect x="260" y="65" width="28" height="18" fill="#0891B2" opacity="0.85"/>
-  <text class="tx" x="274" y="80" text-anchor="middle">NZD</text>
-  <text class="tx" x="6" y="28">Net long ↑</text>
-  <text class="tx" x="6" y="118">Net short ↓</text>
-</svg>
-<div class="pt-fig-cap">Illustrative only — net Leveraged Fund positioning by currency future. Above the axis = net long (bullish); below = net short (bearish).</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"hbar","x":["EUR","GBP","CHF","AUD","NZD","CAD","JPY"],"series":[{"name":"Leveraged Funds net position (000 contracts)","color":"#2563EB","data":[42,-8,17,-19,-23,-31,-68]}],"baseline":0,"alt":"Illustrative Leveraged Funds net positioning across seven major currency futures: EUR and CHF net long; JPY deeply net short"}'>
+<figcaption>Illustrative — Leveraged Funds net position (thousands of contracts) across the seven major CME currency futures. Positive = net long (bullish); negative = net short (bearish). Real data: <a href="https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm" target="_blank" rel="noopener">CFTC Traders in Financial Futures report</a>.</figcaption>
+</figure>
 
 ## How to read the numbers: net positioning and open interest
 

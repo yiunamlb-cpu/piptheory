@@ -42,19 +42,9 @@ When a central bank signals it is about to hike rates, the 2-year yield moves *i
 
 The 10-year yield reflects a different mix of signals — long-run growth prospects, inflation expectations over a decade, term premium. These matter for long-term asset allocation but are less directly actionable for FX positioning in the 1-12 month timeframe most macro traders focus on.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 140" role="img" aria-label="Illustrative chart showing 2-year yield differential between two countries leading the exchange rate">
-  <line class="ax" x1="30" y1="110" x2="314" y2="110" stroke-width="1"/>
-  <line class="ax" x1="30" y1="10" x2="30" y2="110" stroke-width="1"/>
-  <line class="gl" x1="30" y1="60" x2="314" y2="60" stroke-width="1" stroke-dasharray="3 3"/>
-  <path class="pt-draw" d="M30,75 C70,68 110,52 150,38 C180,28 210,22 250,18 C275,16 295,15 314,14" pathLength="1" fill="none" stroke="#2563EB" stroke-width="2.5"/>
-  <path class="pt-draw" d="M30,78 C70,73 110,57 150,43 C180,34 210,28 250,24 C275,22 295,20 314,19" pathLength="1" fill="none" stroke="#2563EB" stroke-width="1" stroke-dasharray="6 3" opacity="0.5"/>
-  <text class="tx" x="316" y="14" text-anchor="end">USD/X rate</text>
-  <text class="tx" x="316" y="22" text-anchor="end">2yr diff (lead)</text>
-  <text class="tx" x="30" y="122">Time →</text>
-</svg>
-<div class="pt-fig-cap">Illustrative: the 2-year yield differential (dashed, lead) anticipates the exchange rate (solid) by weeks to months. FRED tracks bilateral 2-year yield differentials; EUR-US data at <a href="https://fred.stlouisfed.org/series/DGS2" target="_blank" rel="noopener">series DGS2</a>.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"series":[{"name":"US-Germany 2yr differential (bp)","color":"#2563EB","data":[185,192,198,207,214,209,221,228,235,219,242,238]},{"name":"EUR/USD (inverted, indexed)","color":"#0D9488","data":[100,99,98,96,95,96,94,93,92,94,91,92]}],"alt":"Illustrative: as the US-Germany 2-year yield differential widens, EUR/USD falls — the differential leads the exchange rate"}'>
+<figcaption>Illustrative — US-Germany 2yr spread (bp, left concept) and EUR/USD indexed to 100 (right concept). Widening US yield advantage pulls EUR/USD lower. Real data: <a href="https://fred.stlouisfed.org/series/DGS2" target="_blank" rel="noopener">FRED US 2yr (DGS2)</a> &amp; <a href="https://www.ecb.europa.eu/stats/financial_markets_and_interest_rates/euro_area_yield_curves/html/index.en.html" target="_blank" rel="noopener">ECB euro area yields</a>.</figcaption>
+</figure>
 
 ## Interest Rate Differentials: The Master Variable
 
@@ -111,21 +101,9 @@ Beyond the 2-year yield level, the shape of the yield curve carries information:
 
 The US yield curve inverted sharply in 2022–2023 for the first time since 2006–2007, signalling the market's expectation that the Fed would eventually cut rates as economic growth slowed. The subsequent 2024 Fed rate-cut cycle was closely tracked by <a href="/currency/usd">USD</a> traders as the inversion eventually un-inverted and rate-cut expectations adjusted.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 110" role="img" aria-label="Illustrative yield curve shapes: normal, flat, and inverted">
-  <line class="ax" x1="20" y1="85" x2="300" y2="85" stroke-width="1"/>
-  <line class="ax" x1="20" y1="10" x2="20" y2="85" stroke-width="1"/>
-  <path class="pt-draw" d="M20,70 C80,55 160,38 300,28" pathLength="1" fill="none" stroke="#16A34A" stroke-width="2"/>
-  <path class="pt-draw" d="M20,55 C80,54 160,54 300,53" pathLength="1" fill="none" stroke="#CA8A04" stroke-width="2" stroke-dasharray="5 3"/>
-  <path class="pt-draw" d="M20,38 C80,50 160,65 300,72" pathLength="1" fill="none" stroke="#E11D48" stroke-width="2" stroke-dasharray="2 2"/>
-  <text class="tx" x="305" y="28" text-anchor="end">Normal</text>
-  <text class="tx" x="305" y="52" text-anchor="end">Flat</text>
-  <text class="tx" x="305" y="72" text-anchor="end">Inverted</text>
-  <text class="tx" x="20" y="97">Short-term</text>
-  <text class="tx" x="300" y="97" text-anchor="end">Long-term</text>
-</svg>
-<div class="pt-fig-cap">Illustrative yield curve shapes. An inverted curve (red) historically precedes recession and eventual central-bank rate cuts — bearish for the currency over a 12–18 month horizon.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["3m","6m","1yr","2yr","5yr","10yr","30yr"],"series":[{"name":"Normal (bearish hiking cycle)","color":"#16A34A","data":[2.1,2.4,2.8,3.2,3.7,4.0,4.2]},{"name":"Flat (cycle peak)","color":"#CA8A04","data":[3.8,3.9,4.0,4.1,4.1,4.1,4.2]},{"name":"Inverted (recession pricing)","color":"#E11D48","data":[5.2,5.1,4.8,4.6,4.1,3.8,3.5]}],"suffix":"%","alt":"Illustrative yield curve shapes — normal upward slope, flat, and inverted (short rates above long rates)"}'>
+<figcaption>Illustrative yield curve shapes (%) across maturities. An inverted curve (red, 2yr yield &gt; 10yr) historically precedes recession and central-bank rate cuts — bearish for the currency over 12–18 months. US yield curve data: <a href="https://fred.stlouisfed.org/series/T10Y2Y" target="_blank" rel="noopener">FRED 10Y-2Y spread (T10Y2Y)</a>.</figcaption>
+</figure>
 
 ## Case Studies: Rate Differentials in Action
 

@@ -56,19 +56,9 @@ Academic research generally confirms that PPP-based value signals predict return
 
 The difficulty is that currencies can remain fundamentally cheap for a long time. The Japanese yen, for instance, has appeared cheap on PPP metrics for many years, yet it continued depreciating through 2022–2024 as the Bank of Japan maintained ultra-loose policy while other central banks hiked. Fundamental cheapness is a necessary condition for eventual appreciation, not a sufficient one for near-term appreciation.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 120" role="img" aria-label="Illustrative chart showing value and momentum return cycles: momentum positive while value negative, then reversing">
-  <line class="ax" x1="6" y1="60" x2="314" y2="60" stroke-width="1" stroke-dasharray="3 3"/>
-  <!-- Momentum line: rises then falls -->
-  <path class="pt-draw" d="M6,80 C60,40 100,20 150,30 C190,40 230,70 314,90" pathLength="1" fill="none" stroke="#2563EB" stroke-width="2"/>
-  <!-- Value line: falls then rises (negative correlation) -->
-  <path class="pt-draw" d="M6,40 C60,80 100,95 150,80 C190,60 230,38 314,25" pathLength="1" fill="none" stroke="#7C3AED" stroke-width="2"/>
-  <text class="tx" x="314" y="88" text-anchor="end">Momentum</text>
-  <text class="tx" x="314" y="23" text-anchor="end">Value</text>
-  <text class="tx" x="160" y="10">Negative correlation across the cycle (illustrative)</text>
-</svg>
-<div class="pt-fig-cap">Illustrative — value and momentum returns tend to run in opposite phases of the cycle, making them natural portfolio complements.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Q1 Y1","Q2 Y1","Q3 Y1","Q4 Y1","Q1 Y2","Q2 Y2","Q3 Y2","Q4 Y2","Q1 Y3","Q2 Y3","Q3 Y3","Q4 Y3"],"baseline":0,"series":[{"name":"Momentum return","color":"#2563EB","data":[1.8,3.4,5.9,7.1,8.3,6.9,5.2,3.1,1.7,-0.8,-2.4,-1.3]},{"name":"Value return","color":"#7C3AED","data":[-1.2,-2.9,-4.1,-5.6,-4.8,-3.4,-1.9,0.4,2.1,3.8,5.7,4.9]}],"suffix":"%","alt":"Illustrative: momentum and value returns run in opposite phases across a three-year cycle, demonstrating their negative correlation"}'>
+<figcaption>Illustrative — momentum and value returns over a representative three-year cycle. When momentum is working (trending markets), value lags; when the trend exhausts, value reasserts. Evidence: <a href="https://onlinelibrary.wiley.com/doi/10.1111/jofi.12021" target="_blank" rel="noopener">Asness, Moskowitz &amp; Pedersen (2013), <em>Journal of Finance</em></a>.</figcaption>
+</figure>
 
 ### Momentum in currencies
 

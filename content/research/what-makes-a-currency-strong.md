@@ -96,30 +96,12 @@ Safe-haven currencies — the Swiss franc (CHF), Japanese yen (JPY), and to a le
 
 Risk-sensitive currencies — the Australian dollar (AUD), New Zealand dollar (NZD), and Canadian dollar (CAD) — do the opposite. They carry higher interest rates (historically), correlate positively with global equity markets, and tend to weaken sharply when risk appetite collapses.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 130" role="img" aria-label="Illustrative diagram showing safe-haven and risk-on currencies responding to a risk-off spike in volatility">
-  <text class="tx" x="160" y="12" text-anchor="middle">Risk-OFF spike (VIX rises)</text>
-  <!-- Risk-off zone -->
-  <rect x="6" y="20" width="140" height="40" fill="none" stroke="var(--bear,#E11D48)" stroke-width="1" opacity="0.4"/>
-  <text class="tx" x="76" y="32" text-anchor="middle" fill="#E11D48">Safe Havens — STRENGTHEN</text>
-  <text class="tx" x="76" y="44" text-anchor="middle">JPY · CHF · USD</text>
-  <!-- Risk-on zone -->
-  <rect x="174" y="20" width="140" height="40" fill="none" stroke="var(--bull,#16A34A)" stroke-width="1" opacity="0.4"/>
-  <text class="tx" x="244" y="32" text-anchor="middle" fill="#16A34A">Risk Currencies — WEAKEN</text>
-  <text class="tx" x="244" y="44" text-anchor="middle">AUD · NZD · CAD</text>
-  <!-- Arrow -->
-  <line x1="150" y1="40" x2="170" y2="40" stroke="#CA8A04" stroke-width="1.5" marker-end="url(#arr)"/>
-  <!-- Risk-ON label -->
-  <text class="tx" x="160" y="82" text-anchor="middle">Risk-ON (equities rally)</text>
-  <rect x="6" y="90" width="140" height="34" fill="none" stroke="var(--bull,#16A34A)" stroke-width="1" opacity="0.4"/>
-  <text class="tx" x="76" y="104" text-anchor="middle" fill="#16A34A">Safe Havens — WEAKEN</text>
-  <text class="tx" x="76" y="116" text-anchor="middle">JPY · CHF</text>
-  <rect x="174" y="90" width="140" height="34" fill="none" stroke="var(--bull,#16A34A)" stroke-width="1" opacity="0.4"/>
-  <text class="tx" x="244" y="104" text-anchor="middle" fill="#16A34A">Risk Currencies — STRENGTHEN</text>
-  <text class="tx" x="244" y="116" text-anchor="middle">AUD · NZD · CAD</text>
-</svg>
-<div class="pt-fig-cap">Illustrative — risk sentiment rotates demand between safe-haven and risk-sensitive currencies.</div>
-</div>
+| Risk environment | Safe havens (JPY · CHF · USD) | Risk-sensitive (AUD · NZD · CAD) |
+|---|---|---|
+| **Risk-OFF** — VIX spikes, equities fall | Strengthen — safe-haven demand surges | Weaken — capital retreats from high-yielders |
+| **Risk-ON** — equities rally, volatility falls | Weaken — safe-haven premium unwinds | Strengthen — yield and growth appetite returns |
+
+*Illustrative — risk sentiment rotates demand between safe-haven and risk-sensitive currencies.*
 
 The safe-haven status of JPY and CHF is primarily structural: both countries run persistent current account surpluses and are net creditors to the world, meaning their residents repatriate foreign investment in crises, which mechanically buys JPY or CHF. The dollar's safe-haven role is different — it derives from the USD's status as the world's reserve currency and the depth of US Treasury markets.
 

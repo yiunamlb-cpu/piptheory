@@ -54,19 +54,9 @@ The 1980s were the formative decade of the modern foreign exchange market. The <
 
 His edge was not prediction accuracy alone — it was **position construction**. He thought carefully about how to structure a currency trade so that even if he was wrong on timing, he was not wiped out, and if he was right, the payoff was large relative to the risk he had accepted.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 130" role="img" aria-label="Diagram of Lipschutz's asymmetric risk principle — small downside, large upside">
-  <line class="ax" x1="60" y1="65" x2="280" y2="65" stroke-width="1" stroke-dasharray="3 3"/>
-  <rect x="80" y="75" width="40" height="35" fill="var(--bear)" opacity="0.7" rx="2"/>
-  <rect x="160" y="20" width="40" height="45" fill="var(--bull)" opacity="0.7" rx="2"/>
-  <text class="tx" x="100" y="120" text-anchor="middle">Max loss</text>
-  <text class="tx" x="100" y="128" text-anchor="middle">(defined)</text>
-  <text class="tx" x="180" y="15" text-anchor="middle">Target gain</text>
-  <text class="tx" x="180" y="23" text-anchor="middle">(3–5× risk)</text>
-  <text class="tx" x="62" y="64" text-anchor="start">Entry</text>
-</svg>
-<div class="pt-fig-cap">Illustrative — Lipschutz's asymmetric risk structure: potential gains are targeted at several multiples of the maximum defined loss on entry.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"hbar","x":["Max loss (1× risk)","Break-even trade","2:1 reward","3:1 reward (target min)","5:1 reward (exceptional)"],"series":[{"name":"Outcome vs. 1 unit of risk","color":"#2563EB","data":[-1,0,2,3,5]}],"baseline":0,"alt":"Illustrative bar chart showing Lipschutz asymmetric risk outcomes: max loss is defined at 1 unit of risk; target trades offer 3 to 5 times that in reward"}'>
+<figcaption>Illustrative — Lipschutz&apos;s asymmetric risk principle. Every trade is sized so the maximum loss is a defined unit; the target reward is 3–5× that unit. A 3:1 reward-to-risk ratio means the trader can be right on only 1 in 3 trades and still break even. This structure — not prediction accuracy alone — is what produced sustained performance at Salomon Brothers.</figcaption>
+</figure>
 
 ## The three pillars of Lipschutz's risk philosophy
 

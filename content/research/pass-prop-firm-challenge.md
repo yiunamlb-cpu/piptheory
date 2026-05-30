@@ -89,16 +89,9 @@ Use a macro strength framework to identify the 3–5 pairs with the clearest fun
 **2. Position sizing**
 During a challenge, size conservatively: risk no more than 0.5–1% of account equity per trade. On a $100,000 account that means $500–$1,000 per trade. This allows you to be wrong five to ten consecutive times before reaching the daily loss limit — giving your edge time to play out statistically.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 120" role="img" aria-label="Illustrative equity curve comparison: aggressive vs conservative position sizing in a prop challenge">
-  <line class="ax" x1="6" y1="60" x2="314" y2="60" stroke-width="1" stroke-dasharray="3 3"/>
-  <path class="pt-draw" d="M6,60 C40,50 60,30 90,65 C120,95 130,110 155,50 C170,20 200,70 240,30 C260,15 290,55 314,25" pathLength="1" fill="none" stroke="#E11D48" stroke-width="2"/>
-  <path class="pt-draw" d="M6,60 C60,55 110,50 160,44 C210,38 260,33 314,28" pathLength="1" fill="none" stroke="#16A34A" stroke-width="2"/>
-  <text class="tx" x="318" y="28" text-anchor="end" fill="#16A34A">conservative</text>
-  <text class="tx" x="318" y="26" text-anchor="end" dy="12" fill="#E11D48">aggressive</text>
-</svg>
-<div class="pt-fig-cap">Illustrative only — conservative sizing (green) produces a smoother curve and stays well inside drawdown limits; aggressive sizing (red) risks daily limit breaches.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Day 0","Day 5","Day 8","Day 12","Day 15","Day 19","Day 22","Day 26","Day 30","Day 35","Day 40","Day 45"],"series":[{"name":"Conservative (0.5–1% risk)","color":"#16A34A","data":[100000,101200,101800,102600,103100,104000,104800,105500,106200,107100,107800,108400]},{"name":"Aggressive (3–5% risk)","color":"#E11D48","data":[100000,103500,96200,104800,91000,99500,107200,89400,104600,111300,94700,102800]}],"annotations":[{"xi":4,"text":"Daily limit breach"},{"xi":7,"text":"Max DD risk"}],"alt":"Illustrative equity curves over 45 days: conservative sizing produces a smooth upward path while aggressive sizing swings violently, twice approaching the daily loss limit"}'>
+<figcaption>Illustrative only — conservative sizing (green) stays well inside drawdown limits and reaches the profit target smoothly; aggressive sizing (red) oscillates violently and twice risks the daily loss limit. Real results will vary.</figcaption>
+</figure>
 
 **3. News event rules**
 High-impact data releases (central bank rate decisions, NFP, CPI prints) can move major pairs 50–200 pips in seconds. During a challenge, the rule should be binary: either be flat before the release or have a hard stop that keeps the total daily loss well inside the limit if the move goes against you. There is no macro argument that justifies being stopped out through a $5,000 daily limit on a single news candle.

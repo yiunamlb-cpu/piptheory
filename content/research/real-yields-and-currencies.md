@@ -71,18 +71,9 @@ A surprise CPI print that exceeds forecasts compresses real yields instantly, ev
 
 In the US, the Treasury market offers a direct read on real yields through **Treasury Inflation-Protected Securities (TIPS)**. Unlike nominal Treasuries, TIPS principal adjusts with CPI, so their yield is already a real yield — no arithmetic required. The <a href="https://fred.stlouisfed.org/series/DFII10" target="_blank" rel="noopener">10-year TIPS yield (DFII10)</a> published daily by the Federal Reserve Bank of St. Louis is one of the most closely watched signals in FX.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 140" role="img" aria-label="Illustrative chart showing USD index rising as TIPS real yields move from negative to positive">
-  <line class="ax" x1="6" y1="70" x2="314" y2="70" stroke-width="1" stroke-dasharray="3 3"/>
-  <text class="tx" x="10" y="12">USD Index (illustrative)</text>
-  <text class="tx" x="10" y="24">TIPS Real Yield (illustrative)</text>
-  <path class="pt-draw" d="M6,100 C60,95 120,90 160,75 C200,60 260,30 314,18" pathLength="1" fill="none" stroke="#2563EB" stroke-width="2"/>
-  <path class="pt-draw" d="M6,110 C60,108 120,100 160,78 C200,58 260,30 314,22" pathLength="1" fill="none" stroke="#E11D48" stroke-width="2" stroke-dasharray="4 2"/>
-  <text class="tx" x="316" y="20" text-anchor="end">USD</text>
-  <text class="tx" x="316" y="34" text-anchor="end">TIPS</text>
-</svg>
-<div class="pt-fig-cap">Illustrative — when TIPS real yields rise from negative to positive (as in 2022), the USD typically strengthens in parallel.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Jan 2021","Apr 2021","Jul 2021","Oct 2021","Jan 2022","Apr 2022","Jul 2022","Oct 2022","Jan 2023","Apr 2023","Jul 2023","Oct 2023"],"baseline":0,"annotations":[{"xi":4,"text":"Fed pivot — hike cycle starts"}],"series":[{"name":"USD broad index (indexed)","color":"#2563EB","data":[100,98,101,97,99,106,110,113,108,105,109,107]},{"name":"US 10-yr TIPS yield (%)","color":"#E11D48","data":[-1.0,-0.9,-1.1,-1.2,-0.5,0.3,0.8,1.7,1.5,1.2,1.9,2.1]}],"alt":"Illustrative USD index and 10-year TIPS real yield from 2021 to 2023: both rise sharply from early 2022 as the Fed begins hiking"}'>
+<figcaption>Illustrative — indexed USD broad index and US 10-year TIPS real yield (%). When the Fed began hiking in early 2022, real yields rose from deeply negative to positive and the dollar surged in parallel. Real data: <a href="https://fred.stlouisfed.org/series/DFII10" target="_blank" rel="noopener">FRED DFII10 (TIPS yield)</a> &amp; <a href="https://fred.stlouisfed.org/series/DTWEXBGS" target="_blank" rel="noopener">FRED DTWEXBGS (broad dollar)</a>.</figcaption>
+</figure>
 
 During the 2020–2021 period of near-zero interest rates and expanding Fed balance sheet, 10-year TIPS yields fell to around −1.1%, a historic low. The dollar weakened materially. When the Fed then began its rate-hike cycle in March 2022, real yields surged toward positive territory and the <a href="https://fred.stlouisfed.org/series/DTWEXBGS" target="_blank" rel="noopener">broad dollar index</a> hit 20-year highs by late 2022, according to Federal Reserve data. The co-movement was stark — and it was the real yield, not the nominal rate alone, that explained the timing.
 

@@ -69,26 +69,9 @@ Quarter-end amplifies the month-end effect because equity returns over three mon
 
 The USD often faces specific pressure at quarter-end when U.S. equities have been the global outperformer for the quarter (which is common). A significant equity rally creates a large FX hedge mismatch that institutional investors mechanically correct in the final days of March, June, September, and December.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 120" role="img" aria-label="Illustrative chart showing quarterly equity-driven rebalancing flow pattern: USD under pressure in final days of each quarter when US stocks outperform">
-  <line class="ax" x1="6" y1="70" x2="314" y2="70" stroke-width="1" stroke-dasharray="3 3"/>
-  <!-- Tick markers for quarter boundaries -->
-  <line x1="80" y1="66" x2="80" y2="74" stroke="#888" stroke-width="1"/>
-  <line x1="160" y1="66" x2="160" y2="74" stroke="#888" stroke-width="1"/>
-  <line x1="240" y1="66" x2="240" y2="74" stroke="#888" stroke-width="1"/>
-  <text class="tx" x="40" y="84">Q1</text>
-  <text class="tx" x="120" y="84">Q2</text>
-  <text class="tx" x="200" y="84">Q3</text>
-  <text class="tx" x="276" y="84">Q4</text>
-  <!-- USD drift up then dip at each quarter end -->
-  <path class="pt-draw" d="M6,70 C25,60 55,50 72,46 C75,45 78,44 80,50 C82,56 85,68 90,70 C105,65 130,55 148,50 C153,48 157,47 160,53 C163,59 166,68 170,70 C185,65 210,57 228,52 C234,50 238,49 240,56 C242,63 245,70 250,70 C268,65 290,58 310,54" pathLength="1" fill="none" stroke="#2563EB" stroke-width="2"/>
-  <text class="tx" x="180" y="30">USD index (illustrative)</text>
-  <text class="tx" x="80" y="43" fill="#E11D48">↓ QE</text>
-  <text class="tx" x="160" y="43" fill="#E11D48">↓ QE</text>
-  <text class="tx" x="240" y="43" fill="#E11D48">↓ QE</text>
-</svg>
-<div class="pt-fig-cap">Illustrative only — in quarters where U.S. equities outperform globally, month-end and quarter-end rebalancing can create a systematic USD headwind near period-end (QE = quarter-end).</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"bar","x":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"baseline":0,"series":[{"name":"Avg USD/JPY monthly return %","color":"#2563EB","data":[0.7,0.3,-0.5,0.4,0.6,0.2,-0.4,-0.7,0.1,0.3,0.2,-0.6]}],"suffix":"%","alt":"Illustrative average monthly USD/JPY returns showing seasonal weakness in March (Japan fiscal year-end), August (risk-off tendency) and December (year-end position squaring)"}'>
+<figcaption>Illustrative — average monthly USD/JPY return by calendar month. March and August show seasonal yen-strength bias; December shows year-end USD weakness. Based on multi-decade post-Bretton Woods patterns. Real data: <a href="https://fred.stlouisfed.org/series/DEXJPUS" target="_blank" rel="noopener">FRED USD/JPY daily</a>.</figcaption>
+</figure>
 
 ## Japan's fiscal year-end: the March yen bid
 

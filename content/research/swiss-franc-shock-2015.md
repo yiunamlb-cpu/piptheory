@@ -71,18 +71,9 @@ The SNB simultaneously lowered its sight deposit rate from –0.25% to **–0.75
 
 To put the 30% move in context: the euro typically moves about 0.5% against the franc on an active trading day. A 30% intraday swing is the equivalent of 60 "normal" days of volatility occurring simultaneously. Several retail FX brokers were made insolvent by client losses that exceeded their deposited margin. In Switzerland itself, exporters saw their competitive position deteriorate overnight.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 140" role="img" aria-label="Illustrative EUR/CHF chart showing the 2015 floor removal and spike">
-  <line class="ax" x1="6" y1="70" x2="314" y2="70" stroke-width="1" stroke-dasharray="3 3"/>
-  <!-- SNB floor line -->
-  <line x1="6" y1="50" x2="180" y2="50" stroke="#CA8A04" stroke-width="1" stroke-dasharray="4 2"/>
-  <text class="tx" x="90" y="46" text-anchor="middle">1.20 floor</text>
-  <!-- EUR/CHF path: flat near floor, then spike down, partial recovery -->
-  <path class="pt-draw" d="M6,52 C50,52 100,53 150,53 C165,53 175,54 180,55 C185,56 186,120 190,125 C194,128 198,115 205,100 C215,82 250,72 314,68" pathLength="1" fill="none" stroke="#CA8A04" stroke-width="2.5"/>
-  <text class="tx" x="190" y="135" text-anchor="middle">15 Jan 2015</text>
-</svg>
-<div class="pt-fig-cap">Illustrative EUR/CHF: held near SNB's 1.20 floor for over three years, then near-instantaneous collapse when the floor was removed on 15 January 2015.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Sep 2011","Dec 2011","Mar 2012","Jun 2012","Sep 2012","Dec 2012","Mar 2013","Jun 2013","Sep 2013","Dec 2013","Mar 2014","Jun 2014","Sep 2014","Dec 2014","14 Jan 2015","15 Jan (open)","15 Jan (low)","15 Jan (close)","Feb 2015","Mar 2015"],"series":[{"name":"EUR/CHF","color":"#CA8A04","data":[1.22,1.21,1.21,1.20,1.21,1.21,1.22,1.23,1.22,1.22,1.22,1.21,1.21,1.20,1.20,1.19,0.81,1.04,1.06,1.07]}],"annotations":[{"xi":16,"text":"Floor removed 15 Jan 2015"}],"alt":"Illustrative EUR/CHF: flat near 1.20 SNB floor from Sep 2011, then instantaneous collapse to 0.81 when floor removed on 15 January 2015, partial recovery to 1.04"}'>
+<figcaption>Illustrative — EUR/CHF held tightly above the SNB&#39;s 1.20 floor for over three years before collapsing approximately 30% in minutes on 15 January 2015. The intraday low of ~0.805 and partial recovery to ~1.04 are based on published market data: <a href="https://www.snb.ch/en/publications/communication/speeches/2015/ref_20150424_tjn" target="_blank" rel="noopener">SNB chairman Thomas Jordan, April 2015</a>.</figcaption>
+</figure>
 
 ## What the strength meter shows about the CHF
 

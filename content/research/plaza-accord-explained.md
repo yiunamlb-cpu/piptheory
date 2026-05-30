@@ -73,18 +73,9 @@ The accord also required the central bank governors of each nation, making it si
 
 The dollar's fall after the Plaza Accord was driven not just by actual G5 intervention but by market *anticipation* of future intervention. Once traders understood that the five largest economies were committed to dollar depreciation, the path of least resistance was to get short dollars. The announcement itself moved markets more than the subsequent buying of yen and Deutsche Marks. This is a recurring lesson: stated policy intent, when credible, drives markets toward the target before governments spend a dollar of reserves.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 130" role="img" aria-label="Illustrative USD/JPY decline after the Plaza Accord 1985">
-  <line class="ax" x1="6" y1="65" x2="314" y2="65" stroke-width="1" stroke-dasharray="3 3"/>
-  <!-- USD/JPY falling from ~240 to ~120 -->
-  <path class="pt-draw" d="M6,15 C40,15 70,16 90,18 C115,21 130,30 155,50 C175,65 200,80 230,95 C260,108 285,115 314,118" pathLength="1" fill="none" stroke="#2563EB" stroke-width="2.5"/>
-  <text class="tx" x="10" y="12">USD/JPY ~240</text>
-  <text class="tx" x="310" y="128" text-anchor="end">~120</text>
-  <text class="tx" x="95" y="35" text-anchor="middle">Plaza Accord</text>
-  <line x1="95" y1="37" x2="95" y2="20" stroke="#2563EB" stroke-width="1" stroke-dasharray="2 2"/>
-</svg>
-<div class="pt-fig-cap">Illustrative USD/JPY: dollar weakened from ~240 yen in September 1985 to ~120 yen by 1987 — the yen approximately doubled against the dollar. (Illustrative trajectory; source: <a href="https://en.wikipedia.org/wiki/Plaza_Accord" target="_blank" rel="noopener">Plaza Accord, Wikipedia</a>.)</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Jan 1985","Apr 1985","Jul 1985","22 Sep 1985","Dec 1985","Mar 1986","Jun 1986","Sep 1986","Dec 1986","Mar 1987","22 Feb 1987","Jun 1987","Sep 1987","Dec 1987"],"series":[{"name":"USD/JPY","color":"#2563EB","data":[254,248,242,238,203,185,168,155,160,152,153,144,141,122]}],"annotations":[{"xi":3,"text":"Plaza Accord 22 Sep 1985"},{"xi":10,"text":"Louvre Accord 22 Feb 1987"}],"alt":"Illustrative USD/JPY declining from ~240 in mid-1985 to ~122 by end 1987 after the Plaza Accord coordinated dollar depreciation"}'>
+<figcaption>Illustrative — USD/JPY path 1985–1987. The dollar declined from roughly 238 at the time of the Plaza Accord to around 122 by end-1987 — the yen approximately doubled. Trajectory is illustrative with realistic wobble; figures consistent with <a href="https://en.wikipedia.org/wiki/Plaza_Accord" target="_blank" rel="noopener">Plaza Accord, Wikipedia</a> and <a href="https://www.nber.org/system/files/working_papers/w21813/w21813.pdf" target="_blank" rel="noopener">Frankel (2015), NBER</a>.</figcaption>
+</figure>
 
 ## The Louvre Accord: when the dollar fell too far
 

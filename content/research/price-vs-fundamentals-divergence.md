@@ -92,22 +92,9 @@ The flip side of the yen undervaluation was dollar overvaluation. By multiple me
 
 This illustrates a crucial point: **a currency can be overvalued and keep appreciating** if the fundamental driver that caused the overvaluation is still strengthening. The divergence from long-run fair value (PPP, REER) does not stop the trend when the near-term driver (rate differentials) is still moving in the same direction.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 140" role="img" aria-label="Illustrative diagram showing price diverging above fundamental fair value, then converging back as fundamentals catch up or price corrects">
-  <line class="ax" x1="10" y1="100" x2="310" y2="100" stroke-width="1" stroke-dasharray="3 3"/>
-  <text class="tx" x="314" y="103" text-anchor="end">Fair value</text>
-  <!-- Fundamental fair value line (slowly rising) -->
-  <path d="M10,100 C80,98 160,95 250,90 C280,88 300,87 310,86" fill="none" stroke="#0D9488" stroke-width="1.5" stroke-dasharray="5 3"/>
-  <text class="tx" x="200" y="82" fill="#0D9488">fundamental fair value</text>
-  <!-- Price: diverges above, then snaps back -->
-  <path class="pt-draw" d="M10,100 C40,90 80,70 130,50 C160,37 190,30 220,28 C240,30 255,45 270,65 C285,82 300,88 310,86" pathLength="1" fill="none" stroke="#2563EB" stroke-width="2.5"/>
-  <text class="tx" x="160" y="25" fill="#2563EB">exchange rate</text>
-  <!-- Divergence annotation -->
-  <line x1="220" y1="28" x2="220" y2="75" stroke="#E11D48" stroke-width="1" stroke-dasharray="3 2"/>
-  <text class="tx" x="226" y="52" fill="#E11D48">divergence</text>
-</svg>
-<div class="pt-fig-cap">Illustrative only — exchange rate diverges from fundamental fair value during a structural driver (e.g., rate differential), then converges when the driver reverses or market positioning becomes extreme.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Mar 22","Jun 22","Sep 22","Dec 22","Mar 23","Jun 23","Sep 23","Dec 23","Mar 24","Jun 24","Sep 24","Dec 24"],"series":[{"name":"USD/JPY spot (indexed to 100)","color":"#2563EB","data":[100,106.4,114.8,113.2,116.7,121.3,120.8,117.4,115.9,122.6,107.3,110.1]},{"name":"PPP fair value (indexed)","color":"#0D9488","data":[100,100.4,100.9,101.3,101.7,102.1,102.4,102.8,103.1,103.5,103.8,104.1]}],"annotations":[{"xi":9,"text":"Aug 24 unwind"}],"alt":"Illustrative USD/JPY spot vs PPP fair value indexed to 100 in March 2022: spot surges far above fair value through mid-2024 then collapses partway back in the August 2024 carry unwind"}'>
+<figcaption>Illustrative — USD/JPY spot vs estimated PPP fair value, both indexed to 100 at March 2022. The gap widened to over 20 points as the U.S.–Japan rate differential peaked; the August 2024 carry unwind closed part of the divergence. Real REER data: <a href="https://data.bis.org/topics/EER" target="_blank" rel="noopener">BIS Effective Exchange Rates</a>.</figcaption>
+</figure>
 
 ## How to spot and track divergence
 

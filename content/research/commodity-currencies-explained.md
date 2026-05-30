@@ -65,21 +65,9 @@ Canada's primary commodity is crude oil and bitumen. The energy sector accounts 
 
 The CAD-oil relationship is more complex than it appears, however. Canada's oil production (primarily Alberta oil sands) is landlocked — it reaches refineries via pipeline, not deepwater tanker — and the infrastructure constraints mean the Canadian heavy crude blend (Western Canadian Select) often trades at a significant discount to WTI. That discount can decouple CAD from the headline WTI move. The Bank of Canada has also noted that the CAD has become somewhat less purely "petro-currency" over time as Canada's service and tech sectors have grown relative to energy.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 120" role="img" aria-label="Illustrative line chart showing AUD, CAD and NZD divergence as their respective commodities move differently">
-  <line class="ax" x1="6" y1="60" x2="314" y2="60" stroke-width="1" stroke-dasharray="3 3"/>
-  <!-- AUD: iron ore surge then fall -->
-  <path class="pt-draw" d="M6,65 C50,55 90,35 150,25 C190,18 230,32 280,55 C300,62 310,65 314,66" pathLength="1" fill="none" stroke="#DB2777" stroke-width="2"/>
-  <!-- CAD: oil-correlated, different shape -->
-  <path class="pt-draw" d="M6,62 C50,58 90,55 150,52 C190,50 230,42 280,40 C300,38 310,38 314,38" pathLength="1" fill="none" stroke="#16A34A" stroke-width="2"/>
-  <!-- NZD: dairy-correlated -->
-  <path class="pt-draw" d="M6,60 C50,62 90,65 150,68 C190,70 230,68 280,65 C300,63 310,62 314,62" pathLength="1" fill="none" stroke="#0891B2" stroke-width="2"/>
-  <text class="tx" x="314" y="64" text-anchor="end">AUD</text>
-  <text class="tx" x="314" y="36" text-anchor="end">CAD</text>
-  <text class="tx" x="314" y="60" text-anchor="end">NZD</text>
-</svg>
-<div class="pt-fig-cap">Illustrative divergence of AUD, CAD, and NZD over time as different commodity cycles play out. Not real data — commodity fundamentals drive each currency independently.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["2020","2021","Q1 22","Q2 22","Q3 22","Q4 22","Q1 23","Q2 23","Q3 23","Q4 23"],"series":[{"name":"AUD (iron ore cycle)","color":"#DB2777","data":[100,115,113,106,100,103,107,104,97,99]},{"name":"CAD (oil cycle)","color":"#16A34A","data":[100,106,113,117,112,108,106,104,101,103]},{"name":"NZD (dairy cycle)","color":"#0891B2","data":[100,109,107,103,97,99,101,98,93,95]}],"alt":"Illustrative indexed performance of AUD, CAD and NZD — each driven by a different commodity cycle, so they diverge substantially at key turning points"}'>
+<figcaption>Illustrative — AUD, CAD, and NZD indexed to 100 at end-2020. AUD surges on the 2021 iron ore boom then softens; CAD outperforms in 2022 on the oil shock; NZD lags as dairy prices soften. Real data: <a href="https://fred.stlouisfed.org/series/DEXUSAL" target="_blank" rel="noopener">FRED AUD/USD</a>, <a href="https://fred.stlouisfed.org/series/DEXCAUS" target="_blank" rel="noopener">USD/CAD</a>, <a href="https://fred.stlouisfed.org/series/DEXUSNZ" target="_blank" rel="noopener">USD/NZD</a>.</figcaption>
+</figure>
 
 ## The New Zealand dollar: dairy, soft commodities and China
 

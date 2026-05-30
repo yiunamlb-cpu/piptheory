@@ -60,29 +60,9 @@ The most actionable public window into smart money positioning is the <a href="h
 
 For directional trend-following, **leveraged fund positioning** is the cleanest signal. These are the macro funds and CTAs betting with conviction. When leveraged funds are net long EUR at a multi-year extreme, that reflects the consensus macro view at institutional scale.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 120" role="img" aria-label="Illustrative diagram showing four COT participant categories and their position directions">
-  <rect x="6" y="10" width="65" height="44" fill="none" stroke="#2563EB" stroke-width="1.5"/>
-  <text class="tx" x="38" y="27" text-anchor="middle" fill="#2563EB">Dealer</text>
-  <text class="tx" x="38" y="40" text-anchor="middle">Intermediary</text>
-  <text class="tx" x="38" y="53" text-anchor="middle">Market-maker</text>
-  <rect x="86" y="10" width="65" height="44" fill="none" stroke="#0D9488" stroke-width="1.5"/>
-  <text class="tx" x="118" y="27" text-anchor="middle" fill="#0D9488">Asset</text>
-  <text class="tx" x="118" y="40" text-anchor="middle">Manager</text>
-  <text class="tx" x="118" y="53" text-anchor="middle">Long-only</text>
-  <rect x="166" y="10" width="65" height="44" fill="none" stroke="#7C3AED" stroke-width="1.5"/>
-  <text class="tx" x="198" y="27" text-anchor="middle" fill="#7C3AED">Leveraged</text>
-  <text class="tx" x="198" y="40" text-anchor="middle">Funds</text>
-  <text class="tx" x="198" y="53" text-anchor="middle">Hedge funds</text>
-  <rect x="246" y="10" width="65" height="44" fill="none" stroke="#CA8A04" stroke-width="1.5"/>
-  <text class="tx" x="278" y="27" text-anchor="middle" fill="#CA8A04">Other</text>
-  <text class="tx" x="278" y="40" text-anchor="middle">Reportable</text>
-  <text class="tx" x="278" y="53" text-anchor="middle">Smaller inst.</text>
-  <text class="tx" x="6" y="80">COT data reflects Tuesday positions; published Friday 3:30 pm ET.</text>
-  <text class="tx" x="6" y="93">Leveraged funds = most directional speculative group.</text>
-</svg>
-<div class="pt-fig-cap">The four participant categories in the CFTC Traders in Financial Futures (TFF) report. Source: CFTC.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"hbar","x":["Dealer / Intermediary","Asset Manager","Leveraged Funds","Other Reportable"],"series":[{"name":"Directional signal strength (illustrative)","color":"#2563EB","data":[15,45,85,30]}],"suffix":"%","alt":"Illustrative bar chart showing relative directional signal strength of each CFTC TFF participant category; leveraged funds are the most directional"}'>
+<figcaption>Illustrative — relative directional signal strength of the four CFTC Traders in Financial Futures categories. Leveraged funds (hedge funds and CTAs) carry the highest directional signal; dealer/intermediary positions are primarily market-making offsets. Real data: <a href="https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm" target="_blank" rel="noopener">CFTC.gov</a> TFF report, Friday 3:30 pm ET (Tuesday positions).</figcaption>
+</figure>
 
 For the full mechanics of reading the COT report, the sibling post [how to read the COT report for forex](/research/how-to-read-cot-report-forex) covers the step-by-step process. The companion post on [forex sentiment extremes](/research/forex-sentiment-extremes) explains what happens when positioning hits outlier levels.
 

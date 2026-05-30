@@ -96,20 +96,9 @@ He looks at:
 
 The [macro currency strength meter](/) at PIPTHEORY scores each of these forces for all eight major currencies. When the meter shows a wide gap between the top-ranked and bottom-ranked currency, it is identifying exactly the kind of fundamental divergence Druckenmiller looks for.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 130" role="img" aria-label="Illustrative chart showing how Druckenmiller scales into a position as conviction grows">
-  <line class="ax" x1="10" y1="100" x2="310" y2="100" stroke-width="1" stroke-dasharray="3 3"/>
-  <line class="ax" x1="10" y1="20" x2="10" y2="105" stroke-width="1" stroke-dasharray="3 3"/>
-  <path class="pt-draw" d="M10,95 L80,90 L130,70 L180,42 L240,25 L310,18" pathLength="1" fill="none" stroke="#2563EB" stroke-width="2.5"/>
-  <text class="tx" x="30" y="88">Initial</text>
-  <text class="tx" x="30" y="96">position</text>
-  <text class="tx" x="160" y="36">Scale in as</text>
-  <text class="tx" x="160" y="46">thesis confirmed</text>
-  <text class="tx" x="250" y="13">Full size</text>
-  <text class="tx" x="12" y="18">Position size</text>
-</svg>
-<div class="pt-fig-cap">Illustrative only — Druckenmiller's approach: start small, scale aggressively as the macro thesis is confirmed by price action.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"bar","x":["Entry","Week 2","Week 3","Week 4","Week 6","Week 8","Full size"],"series":[{"name":"Position size (% of max)","color":"#2563EB","data":[8,12,10,22,38,55,100]}],"suffix":"%","alt":"Illustrative position sizing over time as Druckenmiller scales into a high-conviction macro trade — small entry, pauses on noise, aggressive scaling as thesis is confirmed","baseline":0}'>
+<figcaption>Illustrative — Druckenmiller&apos;s scaling approach: a small initial position (around 8–12% of eventual max size) that builds slowly, dips back when the market tests the thesis, then scales aggressively once price action confirms the macro view. The final position is several times the initial entry. Not a depiction of any specific trade.</figcaption>
+</figure>
 
 ## Capital preservation: the other half of the equation
 

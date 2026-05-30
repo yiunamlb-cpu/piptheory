@@ -75,18 +75,9 @@ The raw reports live at <a href="https://www.cftc.gov/MarketReports/Commitmentso
 
 A concrete example brings this to life. As USD sentiment deteriorated through early 2025, speculative capital rotated aggressively into the euro. By early 2026, gross long exposure in EUR futures had climbed to its highest level since at least July 2023 — with the <a href="https://www.forex.com/en-us/news-and-analysis/usd-positioning-hints-at-sentiment-extreme-cot-report/" target="_blank" rel="noopener">net long position approaching its 2023 peaks</a>. Simultaneously, the collective USD short across eight IMM futures contracts reached around $22.7 billion — a five-year high as of early March 2026.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 130" role="img" aria-label="Illustrative chart showing EUR net long positions building to an extreme then reversing">
-  <line class="ax" x1="6" y1="100" x2="314" y2="100" stroke-width="1" stroke-dasharray="3 3"/>
-  <line class="gl" x1="6" y1="30" x2="314" y2="30" stroke-width="1" stroke-dasharray="4 2"/>
-  <path class="pt-draw" d="M6,95 C50,90 90,80 130,60 C160,45 180,33 210,28 C240,24 270,26 295,32" pathLength="1" fill="none" stroke="#0D9488" stroke-width="2.5"/>
-  <text class="tx" x="314" y="26" text-anchor="end" fill="#0D9488">EUR longs</text>
-  <text class="tx" x="130" y="22">Extreme zone</text>
-  <text class="tx" x="6" y="112">Early 2024</text>
-  <text class="tx" x="260" y="112">Early 2026</text>
-</svg>
-<div class="pt-fig-cap">Illustrative only — EUR net long positioning building toward a sentiment extreme as dollar weakness accelerated. Real data: CFTC.gov.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Jan 24","Mar 24","May 24","Jul 24","Sep 24","Nov 24","Jan 25","Mar 25","May 25","Jul 25","Sep 25","Nov 25","Jan 26","Mar 26"],"series":[{"name":"EUR net long (pct-rank)","color":"#0D9488","data":[42,38,45,51,47,53,58,62,67,71,68,74,81,88]},{"name":"Caution threshold (90th pct)","color":"#E11D48","data":[90,90,90,90,90,90,90,90,90,90,90,90,90,90]}],"suffix":"%","alt":"Illustrative EUR speculative net long positioning percentile rank climbing toward the 90th-percentile caution zone by early 2026","annotations":[{"xi":7,"text":"BOJ hike Aug 24"}]}'>
+<figcaption>Illustrative — EUR net long positioning percentile rank (3-year window) rising toward the sentiment extreme zone as USD weakness dominated. The yen carry unwind in August 2024 briefly interrupted the trend before EUR longs resumed climbing. Real positioning data: <a href="https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm" target="_blank" rel="noopener">CFTC.gov</a>.</figcaption>
+</figure>
 
 What does this tell a macro trader? That the bullish EUR / bearish USD trade had become extremely popular. The risk-reward of adding to that position deteriorates sharply when everyone already holds it: upside surprises are smaller (there are few new buyers left to push it further) while downside surprises are larger (any negative catalyst triggers simultaneous selling by all the crowded longs). This is the structural logic of sentiment extremes — it is a *risk* lens, not a price prediction.
 

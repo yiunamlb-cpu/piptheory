@@ -76,23 +76,14 @@ Non-Farm Payrolls is the headline figure in the monthly US Employment Situation 
 
 The FX impact of NFP runs through a simple chain: more jobs → stronger wage growth → higher inflation → less need for Fed rate cuts. Conversely, a weak print raises the prospect of looser policy, reducing the yield advantage of dollar-denominated assets.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 120" role="img" aria-label="Illustrative NFP transmission mechanism from jobs data to USD price">
-  <rect x="6" y="20" width="72" height="36" fill="none" stroke="#2563EB" stroke-width="1.5"/>
-  <text class="tx" x="42" y="36" text-anchor="middle" fill="#2563EB">Jobs beat</text>
-  <text class="tx" x="42" y="50" text-anchor="middle">consensus</text>
-  <line x1="80" y1="38" x2="100" y2="38" stroke="#2563EB" stroke-width="1.5" marker-end="url(#arr)"/>
-  <rect x="102" y="20" width="72" height="36" fill="none" stroke="#2563EB" stroke-width="1.5"/>
-  <text class="tx" x="138" y="36" text-anchor="middle" fill="#2563EB">Fed rate-cut</text>
-  <text class="tx" x="138" y="50" text-anchor="middle">odds fall</text>
-  <line x1="176" y1="38" x2="196" y2="38" stroke="#2563EB" stroke-width="1.5"/>
-  <rect x="198" y="20" width="72" height="36" fill="none" stroke="#2563EB" stroke-width="1.5"/>
-  <text class="tx" x="234" y="36" text-anchor="middle" fill="#2563EB">USD yield</text>
-  <text class="tx" x="234" y="50" text-anchor="middle">premium rises</text>
-  <text class="tx" x="20" y="78">Result: USD rallies vs. currencies with lower rates</text>
-  <text class="tx" x="20" y="92">Reverse if NFP misses consensus</text>
-</svg>
-<div class="pt-fig-cap">Illustrative transmission: how an NFP beat flows through rate expectations to USD strength.</div>
+<div class="pt-flow">
+<div class="pt-flow-step"><span class="h">NFP beats consensus</span>More jobs added than forecast — labour market tighter than expected.</div>
+<div class="pt-flow-arrow">→</div>
+<div class="pt-flow-step"><span class="h">Fed rate-cut odds fall</span>Fed futures reprice; fewer cuts expected in the next 12 months.</div>
+<div class="pt-flow-arrow">→</div>
+<div class="pt-flow-step"><span class="h">USD yield premium rises</span>Higher for-longer rates make dollar-denominated assets more attractive.</div>
+<div class="pt-flow-arrow">→</div>
+<div class="pt-flow-step"><span class="h">USD rallies</span>Capital flows in; EUR/USD, GBP/USD, AUD/USD typically fall. Reverse if NFP misses.</div>
 </div>
 
 The magnitude of the dollar move scales with the size of the surprise. A miss or beat of 50,000+ jobs reliably generates sharp intraday moves. Beyond 100,000 jobs versus expectations, the repricing can extend across multiple sessions as the market recalibrates its entire rate-path view.

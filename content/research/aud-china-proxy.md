@@ -39,29 +39,14 @@ Australia is one of the world's largest mining exporters. Iron ore and concentra
 
 The structural dependency runs both ways, but the FX consequence is asymmetric: because Australia is small relative to China, changes in Chinese demand create outsized moves in Australian export income and hence in the AUD.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 130" role="img" aria-label="Flow diagram showing how China's economy transmits to AUD via iron ore and the yuan">
-  <!-- nodes -->
-  <rect x="4" y="50" width="70" height="32" fill="none" stroke="#DB2777" stroke-width="1.5"/>
-  <text class="tx" x="39" y="63" text-anchor="middle" font-size="9">China GDP /</text>
-  <text class="tx" x="39" y="74" text-anchor="middle" font-size="9">PMI expands</text>
-  <rect x="88" y="50" width="70" height="32" fill="none" stroke="#CA8A04" stroke-width="1.5"/>
-  <text class="tx" x="123" y="63" text-anchor="middle" font-size="9">Steel demand</text>
-  <text class="tx" x="123" y="74" text-anchor="middle" font-size="9">rises</text>
-  <rect x="172" y="50" width="70" height="32" fill="none" stroke="#CA8A04" stroke-width="1.5"/>
-  <text class="tx" x="207" y="63" text-anchor="middle" font-size="9">Iron ore price</text>
-  <text class="tx" x="207" y="74" text-anchor="middle" font-size="9">climbs</text>
-  <rect x="256" y="50" width="60" height="32" fill="none" stroke="#DB2777" stroke-width="1.5"/>
-  <text class="tx" x="286" y="63" text-anchor="middle" font-size="9">AUD</text>
-  <text class="tx" x="286" y="74" text-anchor="middle" font-size="9">strengthens</text>
-  <!-- arrows -->
-  <line x1="74" y1="66" x2="88" y2="66" stroke="#CA8A04" stroke-width="1.5" marker-end="url(#arr)"/>
-  <line x1="158" y1="66" x2="172" y2="66" stroke="#CA8A04" stroke-width="1.5"/>
-  <line x1="242" y1="66" x2="256" y2="66" stroke="#CA8A04" stroke-width="1.5"/>
-  <text class="tx" x="160" y="112" text-anchor="middle" font-size="8">Reverse: China slowdown → iron ore falls → AUD weakens</text>
-  <line x1="160" y1="82" x2="160" y2="100" stroke="#E11D48" stroke-width="1" stroke-dasharray="3 2"/>
-</svg>
-<div class="pt-fig-cap">Transmission chain from Chinese growth to the AUD via iron ore demand. Illustrative flow — real-world lags vary.</div>
+<div class="pt-flow">
+<div class="pt-flow-step"><span class="h">China GDP / PMI expands</span>Industrial activity accelerates; construction and manufacturing ramp up.</div>
+<div class="pt-flow-arrow">→</div>
+<div class="pt-flow-step"><span class="h">Steel demand rises</span>Mills need more iron ore — China produces ~54% of global steel.</div>
+<div class="pt-flow-arrow">→</div>
+<div class="pt-flow-step"><span class="h">Iron ore price climbs</span>Australia supplies ~54% of global seaborne iron ore; export revenue surges.</div>
+<div class="pt-flow-arrow">→</div>
+<div class="pt-flow-step"><span class="h">AUD strengthens</span>USD inflows convert to AUD; terms of trade improves; RBA may tighten.</div>
 </div>
 
 ## Why iron ore is the key link
@@ -79,6 +64,10 @@ The empirical correlation confirms this: the AUD/iron ore spot correlation is ap
 </div>
 
 <div class="pt-fig-cap" style="margin-top:-1em;font-size:12px;color:var(--text-faint);font-family:var(--mono)">Indicative spot correlations between commodity currencies and their primary export commodity. Sources: academic literature, broker research. Approximate figures; vary over sample period.</div>
+
+<figure class="pt-chart" data-chart='{"type":"line","x":["Q1 2020","Q2 2020","Q3 2020","Q4 2020","Q1 2021","Q2 2021","Q3 2021","Q4 2021","Q1 2022","Q2 2022","Q3 2022","Q4 2022","Q1 2023","Q2 2023","Q3 2023","Q4 2023"],"series":[{"name":"Iron ore (indexed)","color":"#CA8A04","data":[100,88,112,131,148,162,188,154,162,147,118,128,138,131,112,107]},{"name":"AUD/USD (indexed)","color":"#DB2777","data":[100,94,106,112,118,123,131,119,124,112,102,108,112,107,97,99]}],"alt":"Illustrative AUD and iron ore indexed to 100 from Q1 2020 — both surge into 2021 on China stimulus, then soften together as property sector stress deepens in 2022-23"}'>
+<figcaption>Illustrative — AUD/USD and iron ore indexed to 100 at Q1 2020. The 2021 surge (China infrastructure stimulus) and 2022–23 softening (property sector stress) show the tight co-movement. Real data: <a href="https://fred.stlouisfed.org/series/DEXUSAL" target="_blank" rel="noopener">FRED AUD/USD</a> &amp; <a href="https://www.rba.gov.au/statistics/frequency/commodity-prices.html" target="_blank" rel="noopener">RBA commodity price index</a>.</figcaption>
+</figure>
 
 ## The yuan transmission belt
 

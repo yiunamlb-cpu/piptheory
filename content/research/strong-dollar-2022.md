@@ -55,16 +55,9 @@ Between March 2022 and July 2023, the FOMC raised rates **11 times** for a total
 
 The dollar is the world's reserve currency, so when US rates rise sharply while other major central banks lag, the effect is amplified: dollar-denominated debt becomes more expensive to service for borrowers worldwide, dollar assets become more attractive, and the safe-haven demand for dollars in a period of global uncertainty adds further fuel.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 120" role="img" aria-label="Illustrative DXY dollar index path through 2022, rising from about 96 to 114.78 peak in late September then declining">
-  <line class="ax" x1="6" y1="110" x2="314" y2="110" stroke-width="1" stroke-dasharray="3 3"/>
-  <path class="pt-draw" d="M6,100 C40,96 80,85 130,62 C160,50 180,38 210,28 C220,25 225,22 232,22 C242,23 260,35 290,55 C304,65 310,72 314,78" pathLength="1" fill="none" stroke="#2563EB" stroke-width="2.5"/>
-  <text class="tx" x="10" y="100" text-anchor="start" font-size="9">~96 Jan</text>
-  <text class="tx" x="230" y="18" text-anchor="middle" font-size="9">114.78 peak 27 Sep</text>
-  <text class="tx" x="314" y="75" text-anchor="end" font-size="9">~103 Dec</text>
-</svg>
-<div class="pt-fig-cap">Illustrative DXY path through 2022. Real data: DXY peaked at 114.78 on 27 September 2022. Source: <a href="https://www.cnbc.com/amp/2022/09/21/forex-markets-dollar-fed-rate-hikes-us-yields.html" target="_blank" rel="noopener">CNBC</a>.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Jan 2022","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep 1","Sep 22","27 Sep","Oct","Nov","Dec"],"series":[{"name":"DXY (USD index)","color":"#2563EB","data":[96.2,96.6,99.1,100.3,103.2,104.7,106.5,108.8,109.6,113.0,114.78,112.0,107.2,103.5]}],"annotations":[{"xi":10,"text":"DXY peak 114.78 — 27 Sep 2022"},{"xi":9,"text":"Japan intervenes 22 Sep"}],"alt":"Illustrative DXY dollar index path 2022: rose from 96 in January to a 20-year peak of 114.78 on 27 September then declined to 103 by December"}'>
+<figcaption>Illustrative — DXY dollar index path through 2022. The dollar rose roughly 19% from January to its 20-year high of 114.78 on 27 September 2022, driven by the Fed&#39;s 525bp tightening cycle, before retreating to ~103 by year-end. Real data: <a href="https://www.cnbc.com/amp/2022/09/21/forex-markets-dollar-fed-rate-hikes-us-yields.html" target="_blank" rel="noopener">CNBC</a> and <a href="https://fred.stlouisfed.org/series/DTWEXBGS" target="_blank" rel="noopener">FRED dollar index</a>.</figcaption>
+</figure>
 
 ## What the strong dollar broke
 

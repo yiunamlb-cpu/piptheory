@@ -50,22 +50,9 @@ Trend following in forex is buying currencies with rising momentum and selling t
 
 Critically, this momentum premium was not explained by standard risk factors — not business cycle risk, not liquidity risk, not the carry trade factor. It appears to reflect investor under-reaction followed by gradual correction — a pattern that trend-following strategies systematically harvest.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 130" role="img" aria-label="Illustrative diagram: trend following earns in trending regime; mean reversion earns in ranging regime">
-  <!-- Trending phase (left) -->
-  <text class="tx" x="80" y="14" text-anchor="middle" font-weight="600">Trending regime</text>
-  <path class="pt-draw" d="M10,110 C30,100 50,85 80,65 C100,50 120,40 150,28" pathLength="1" fill="none" stroke="#2563EB" stroke-width="2"/>
-  <text class="tx" x="120" y="24" fill="#2563EB">trend up</text>
-  <!-- Divider -->
-  <line x1="160" y1="10" x2="160" y2="120" stroke="#888" stroke-width="1" stroke-dasharray="4 3"/>
-  <!-- Ranging phase (right) -->
-  <text class="tx" x="240" y="14" text-anchor="middle" font-weight="600">Ranging regime</text>
-  <path class="pt-draw" d="M165,60 C178,45 192,75 205,55 C218,35 232,70 245,50 C258,30 272,65 310,55" pathLength="1" fill="none" stroke="#0D9488" stroke-width="2"/>
-  <text class="tx" x="240" y="90" fill="#0D9488">mean reversion</text>
-  <line class="ax" x1="165" y1="55" x2="310" y2="55" stroke-width="1" stroke-dasharray="3 3"/>
-</svg>
-<div class="pt-fig-cap">Illustrative only — trend following profits from the left; mean reversion profits from oscillation around a mean in the right panel.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan+","Feb+","Mar+","Apr+","May+","Jun+","Jul+","Aug+","Sep+","Oct+","Nov+","Dec+"],"series":[{"name":"EUR/USD (indexed)","color":"#0D9488","data":[100,98.4,96.7,94.2,93.1,91.8,90.3,88.9,87.4,86.2,85.7,84.9,84.3,85.1,83.8,84.6,85.3,84.1,85.8,84.4,85.9,84.7,85.2,84.6]}],"annotations":[{"xi":11,"text":"Regime shift"}],"alt":"Illustrative EUR/USD indexed: strong downtrend in first 12 months (trending regime) then oscillation around a mean in the next 12 months (ranging regime)"}'>
+<figcaption>Illustrative — EUR/USD indexed to 100. Left half: a sustained trend driven by macro divergence (e.g., Fed hiking while ECB holds). Right half: the range phase after the divergence closes. Real historical parallel: EUR/USD 2014–2016 trend, then 2016–2021 range. Source for the academic evidence: <a href="https://www.bis.org/publ/work366.pdf" target="_blank" rel="noopener">Menkhoff et al. (2012)</a>.</figcaption>
+</figure>
 
 ## The evidence: timeframe determines which wins
 

@@ -47,24 +47,9 @@ The foundation of every risk management system is the same: determine the maximu
 <li><span class="pt-step-h">Adjust for conviction level</span> The calculated size is your maximum for this setup. For a high-conviction setup — where rates, positioning, the macro cycle and the <a href="/">strength meter</a> all align — use the full calculated size. For a low-conviction or exploratory position, use one-third to one-half.</li>
 </ol>
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 120" role="img" aria-label="Illustrative position sizing: conviction level determines how much of the maximum position size to deploy">
-  <line class="ax" x1="6" y1="100" x2="314" y2="100" stroke-width="1"/>
-  <rect x="20" y="60" width="50" height="40" fill="#2563EB" opacity="0.25" rx="2"/>
-  <rect x="90" y="40" width="50" height="60" fill="#2563EB" opacity="0.5" rx="2"/>
-  <rect x="160" y="20" width="50" height="80" fill="#2563EB" opacity="0.8" rx="2"/>
-  <rect x="230" y="10" width="50" height="90" fill="#2563EB" rx="2"/>
-  <text class="tx" x="45" y="55" text-anchor="middle" font-size="8">1 factor</text>
-  <text class="tx" x="115" y="35" text-anchor="middle" font-size="8">2 factors</text>
-  <text class="tx" x="185" y="15" text-anchor="middle" font-size="8">3 factors</text>
-  <text class="tx" x="255" y="8" text-anchor="middle" font-size="8">4–5 factors</text>
-  <text class="tx" x="45" y="113" text-anchor="middle" font-size="8">33% size</text>
-  <text class="tx" x="115" y="113" text-anchor="middle" font-size="8">50% size</text>
-  <text class="tx" x="185" y="113" text-anchor="middle" font-size="8">75% size</text>
-  <text class="tx" x="255" y="113" text-anchor="middle" font-size="8">Full size</text>
-</svg>
-<div class="pt-fig-cap">Illustrative only — position size scales with the number of aligning macro factors, up to your maximum risk ceiling.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"bar","x":["1 factor","2 factors","3 factors","4–5 factors"],"series":[{"name":"Position size (% of max)","color":"#2563EB","data":[33,50,75,100]}],"suffix":"%","alt":"Illustrative bar chart: position size as a percentage of maximum scales from 33% with one aligning factor up to 100% with four or five factors"}'>
+<figcaption>Illustrative only — position size scales with the number of aligning macro factors, up to your maximum risk ceiling.</figcaption>
+</figure>
 
 ## Thesis-based stops vs price-based stops
 

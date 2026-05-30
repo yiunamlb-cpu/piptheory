@@ -82,17 +82,9 @@ The reason carry trade unwinds are so violent is the self-reinforcing feedback l
 
 The <a href="https://www.bis.org/publ/bisbull90.pdf" target="_blank" rel="noopener">BIS Bulletin No. 90</a> described it precisely: "an example of volatility exacerbated by procyclical deleveraging and margin increases." The BIS estimated roughly ¥40 trillion (about $250 billion) in yen-funded carry positions entering the event — making the available fuel for the unwind enormous.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 130" role="img" aria-label="Illustrative USD/JPY path: rise to 161 peak then sharp fall during August 2024 carry unwind">
-  <line class="ax" x1="6" y1="65" x2="314" y2="65" stroke-width="1" stroke-dasharray="3 3"/>
-  <!-- USD/JPY: rising from left, peak near 161, then rapid fall -->
-  <path class="pt-draw" d="M6,90 C40,85 80,70 130,45 C155,35 170,28 190,26 C195,26 198,26 200,26 C205,30 210,55 220,80 C228,98 250,108 314,112" pathLength="1" fill="none" stroke="#E11D48" stroke-width="2.5"/>
-  <text class="tx" x="192" y="20">~161 peak</text>
-  <text class="tx" x="192" y="42" text-anchor="middle">Jul 2024</text>
-  <text class="tx" x="310" y="125" text-anchor="end">~141</text>
-</svg>
-<div class="pt-fig-cap">Illustrative USD/JPY: multi-year rise to ~161 in July 2024 followed by ~12% fall in roughly three weeks during the carry unwind. (Illustrative trajectory based on published sources.)</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Jan 2024","Feb","Mar","Apr","May","Jun","3 Jul","10 Jul","17 Jul","24 Jul","31 Jul","2 Aug","5 Aug","12 Aug","19 Aug"],"series":[{"name":"USD/JPY","color":"#E11D48","data":[144.2,149.7,151.4,154.8,157.0,159.4,161.0,161.9,158.3,155.6,149.6,146.5,143.7,147.1,145.2]}],"annotations":[{"xi":6,"text":"BoJ hike 31 Jul"},{"xi":8,"text":"US payrolls shock 2 Aug"},{"xi":10,"text":"Nikkei −12.4% 5 Aug"}],"alt":"Illustrative USD/JPY: gradual rise to 161.9 peak in July 2024 followed by rapid drop to ~142 during the carry trade unwind, partial recovery"}'>
+<figcaption>Illustrative — USD/JPY path January–August 2024. The yen weakened steadily to a 37-year low near 161.95 then fell about 12% in three weeks as the carry trade unwound after the BoJ&#39;s 31 July rate hike and the weak US payrolls report on 2 August. Based on: <a href="https://www.bis.org/publ/bisbull90.pdf" target="_blank" rel="noopener">BIS Bulletin No. 90</a> and <a href="https://www.cnbc.com/2024/07/31/boj-raises-benchmark-interest-rate-outlines-roadmap-for-trimming-bond-buying-program.html" target="_blank" rel="noopener">CNBC/BoJ July 2024</a>.</figcaption>
+</figure>
 
 ## The Nikkei's Black Monday echo
 
