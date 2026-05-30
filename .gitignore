@@ -53,6 +53,7 @@ data/raw/
 
 # --- Static-site build output (Cloudflare Pages publishes this; not committed) ---
 dist/
+.wrangler/
 
 # --- Runtime state (cost tracking, agent memory snapshots, etc.) ---
 state/
