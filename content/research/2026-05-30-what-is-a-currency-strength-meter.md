@@ -38,7 +38,7 @@ At its simplest, a strength meter answers one question for each currency: *is gl
 
 Because the score is relative, the eight majors always "fan out" from the middle: some are pulling up, some are pulling down, and the gaps between them are what matter. The chart below is an illustrative sketch of how three currencies might separate over time as their fundamentals diverge.
 
-<figure class="pt-chart" data-chart='{"type":"line","x":["Jan","Feb","Mar","Apr","May","Jun"],"baseline":0,"series":[{"name":"USD","color":"#2563EB","data":[5,12,22,30,38,45]},{"name":"EUR","color":"#0D9488","data":[4,2,5,1,3,0]},{"name":"JPY","color":"#E11D48","data":[-8,-18,-28,-36,-44,-52]}],"alt":"Illustrative: three currencies diverging in macro strength score over time"}'>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"baseline":0,"series":[{"name":"USD","color":"#2563EB","data":[6,2,11,9,18,14,12,21,28,24,33,38]},{"name":"EUR","color":"#0D9488","data":[8,12,5,9,2,-3,4,-2,-7,-3,-9,-6]},{"name":"JPY","color":"#E11D48","data":[-5,-2,-12,-9,-17,-22,-15,-26,-31,-27,-36,-44]}],"alt":"Illustrative macro strength scores for three currencies that wobble, cross, and gradually separate over a year"}'>
 <figcaption>Illustrative only — macro strength scores (−100 to +100) separate as fundamental drivers diverge.</figcaption>
 </figure>
 

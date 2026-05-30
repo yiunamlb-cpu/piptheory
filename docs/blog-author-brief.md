@@ -164,6 +164,20 @@ Illustrative data is fine — label it in the caption. Keep the JSON on ONE line
 - If two series have very different scales (an index ~100 vs a price ~2000), **index both to 100**
   at the start so they share one axis. Escape apostrophes inside labels.
 
+**Design mindset — data must be realistic and purposeful (this is the #1 quality bar):**
+- **Never plot smooth, monotonic, perfectly-diverging lines — they look fake and amateur.**
+  Real markets are noisy. Illustrative time series MUST wobble: include bumps, a stall or
+  pullback, and at least one crossover or convergence where the story allows. Mirror the
+  jagged shape of the live meter's trend chart, not a textbook arrow.
+- **Believable magnitudes:** strength scores roughly −60…+60; FX spot % moves single-to-low
+  double digits; rebased indices a few percent; correlations −1…+1. No round-number fantasies.
+- **Right chart for the point:** `line`/`area` for a path over time; `bar`/`hbar` to compare
+  magnitudes across currencies/categories; use `annotations` to mark THE key event on a
+  case-study line (e.g. a rate decision, a crisis date). For relationships, show the two real
+  series and let the inverse/co-move be visible — don't draw a cartoon.
+- **Every chart must teach ONE specific thing the prose already claims.** If a graphic doesn't
+  add real insight, cut it — fewer, better graphics beat decorative filler.
+
 **Raw inline `<svg>` is ONLY for genuine schematic diagrams** (e.g. a labelled cycle), and even
 then prefer the CSS components (`pt-flow`, `pt-timeline`, `pt-stats`). **NEVER** hand-draw squiggly
 "line charts" with floating `<text>` labels — they overlap, clip, and look amateur. Use `pt-chart`.
