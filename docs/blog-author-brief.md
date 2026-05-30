@@ -148,17 +148,25 @@ The quotable sentence.
 </div>
 ```
 
-**Animated SVG line chart** (the path "draws in"; add `pathLength="1"` + class `pt-draw`):
+**Data charts — use the `pt-chart` component. DO NOT hand-draw chart SVGs.** For any line/area/
+bar chart, write a `<figure>` with a `data-chart` JSON spec; `blog.js` renders a clean,
+axis-labelled, gridded, legend'd, animated chart with proper margins (no label/line overlap).
+Illustrative data is fine — label it in the caption. Keep the JSON on ONE line.
 ```
-<div class="pt-fig">
-<svg viewBox="0 0 320 120" role="img" aria-label="Describe the chart">
-  <line class="ax" x1="6" y1="60" x2="314" y2="60" stroke-width="1" stroke-dasharray="3 3"/>
-  <path class="pt-draw" d="M6,90 C90,80 200,40 314,20" pathLength="1" fill="none" stroke="#2563EB" stroke-width="2"/>
-  <text class="tx" x="318" y="20" text-anchor="end">label</text>
-</svg>
-<div class="pt-fig-cap">Caption (say "illustrative" if not real data).</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Jan","Feb","Mar","Apr","May","Jun"],"series":[{"name":"USD","color":"#2563EB","data":[100,101,102.5,104,105,107]},{"name":"JPY","color":"#E11D48","data":[100,99,97,95,94,92]}],"suffix":"","alt":"short description for screen readers"}'>
+<figcaption>Illustrative — short caption. Real data: <a href="https://fred.stlouisfed.org/..." target="_blank" rel="noopener">source</a>.</figcaption>
+</figure>
 ```
+- `type`: `"line"`, `"area"`, `"bar"` (vertical) or `"hbar"` (horizontal). `x`: x-axis labels.
+  `series`: `[{name,color,data:[...]}]` (colors = palette hexes). Optional: `"suffix":"%"`,
+  `"baseline":0` (force axis through zero), `"annotations":[{"xi":3,"text":"Event"}]` (dashed marker),
+  `"height":320`.
+- If two series have very different scales (an index ~100 vs a price ~2000), **index both to 100**
+  at the start so they share one axis. Escape apostrophes inside labels.
+
+**Raw inline `<svg>` is ONLY for genuine schematic diagrams** (e.g. a labelled cycle), and even
+then prefer the CSS components (`pt-flow`, `pt-timeline`, `pt-stats`). **NEVER** hand-draw squiggly
+"line charts" with floating `<text>` labels — they overlap, clip, and look amateur. Use `pt-chart`.
 
 **Animated CSS bar chart** (set `width:%`; `pos`=green, `neg`=red; bars grow on load):
 ```

@@ -42,19 +42,9 @@ Gold pays no coupon or dividend. Every day you hold it, you forgo the yield you 
 
 The dollar and real rates tend to move together: a Federal Reserve tightening cycle raises nominal rates faster than inflation expectations adjust, pushing real yields up and the dollar higher. This is why gold often falls when the Fed hikes — it is not just the dollar doing the work, but the underlying real-yield regime that drives both.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 140" role="img" aria-label="Illustrative inverse relationship between USD index and gold price over time">
-  <line class="ax" x1="30" y1="110" x2="314" y2="110" stroke-width="1"/>
-  <line class="ax" x1="30" y1="10" x2="30" y2="110" stroke-width="1"/>
-  <line class="gl" x1="30" y1="60" x2="314" y2="60" stroke-width="1" stroke-dasharray="3 3"/>
-  <path class="pt-draw" d="M30,80 C80,72 130,55 180,42 C230,32 270,28 314,22" pathLength="1" fill="none" stroke="#2563EB" stroke-width="2"/>
-  <path class="pt-draw" d="M30,40 C80,50 130,65 180,78 C230,88 270,96 314,102" pathLength="1" fill="none" stroke="#CA8A04" stroke-width="2" stroke-dasharray="5 3"/>
-  <text class="tx" x="318" y="22" text-anchor="end">USD ↑</text>
-  <text class="tx" x="318" y="102" text-anchor="end">Gold ↓</text>
-  <text class="tx" x="30" y="122">Time →</text>
-</svg>
-<div class="pt-fig-cap">Illustrative inverse relationship between the USD index and gold price. Real data available via <a href="https://fred.stlouisfed.org/series/GOLDAMGBD228NLBM" target="_blank" rel="noopener">FRED (gold price series)</a>.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"series":[{"name":"US Dollar (indexed)","color":"#2563EB","data":[100,100.6,101.3,102.1,102.6,103.4,104.1,104.9,105.6,106.3,107,107.6]},{"name":"Gold (indexed)","color":"#CA8A04","data":[100,98.8,97.2,95.9,94,92.6,91.1,89.3,88.1,86.6,85,83.6]}],"alt":"Illustrative inverse relationship: as the dollar index rises, gold falls"}'>
+<figcaption>Illustrative — both series indexed to 100 at the start of the year. As the dollar strengthens, gold weakens. Real data: <a href="https://fred.stlouisfed.org/series/GOLDAMGBD228NLBM" target="_blank" rel="noopener">FRED gold price</a> &amp; <a href="https://fred.stlouisfed.org/series/DTWEXBGS" target="_blank" rel="noopener">FRED dollar index</a>.</figcaption>
+</figure>
 
 ## The Mechanics: Real Yields Are the Master Variable
 

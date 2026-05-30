@@ -38,17 +38,9 @@ At its simplest, a strength meter answers one question for each currency: *is gl
 
 Because the score is relative, the eight majors always "fan out" from the middle: some are pulling up, some are pulling down, and the gaps between them are what matter. The chart below is an illustrative sketch of how three currencies might separate over time as their fundamentals diverge.
 
-<div class="pt-fig">
-<svg viewBox="0 0 320 120" role="img" aria-label="Illustrative chart of three currencies diverging in strength over time">
-  <line class="ax" x1="6" y1="60" x2="314" y2="60" stroke-width="1" stroke-dasharray="3 3"/>
-  <path class="pt-draw" d="M6,60 C70,52 130,40 200,30 C250,23 290,18 314,16" pathLength="1" fill="none" stroke="#2563EB" stroke-width="2"/>
-  <path class="pt-draw" d="M6,60 C70,60 130,62 200,60 C250,59 290,61 314,60" pathLength="1" fill="none" stroke="#CA8A04" stroke-width="2"/>
-  <path class="pt-draw" d="M6,60 C70,70 130,82 200,92 C250,99 290,104 314,108" pathLength="1" fill="none" stroke="#E11D48" stroke-width="2"/>
-  <text class="tx" x="318" y="18" text-anchor="end">strengthening</text>
-  <text class="tx" x="318" y="112" text-anchor="end">weakening</text>
-</svg>
-<div class="pt-fig-cap">Illustrative only — currencies separate as their fundamental drivers diverge.</div>
-</div>
+<figure class="pt-chart" data-chart='{"type":"line","x":["Jan","Feb","Mar","Apr","May","Jun"],"baseline":0,"series":[{"name":"USD","color":"#2563EB","data":[5,12,22,30,38,45]},{"name":"EUR","color":"#0D9488","data":[4,2,5,1,3,0]},{"name":"JPY","color":"#E11D48","data":[-8,-18,-28,-36,-44,-52]}],"alt":"Illustrative: three currencies diverging in macro strength score over time"}'>
+<figcaption>Illustrative only — macro strength scores (−100 to +100) separate as fundamental drivers diverge.</figcaption>
+</figure>
 
 ## How is currency strength scored?
 

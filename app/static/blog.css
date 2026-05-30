@@ -109,8 +109,17 @@
 .pt-cta a{display:inline-block;background:var(--accent);color:#fff;padding:10px 18px;text-decoration:none;font-weight:600;white-space:nowrap}
 .pt-cta a:hover{filter:brightness(1.06)}
 
+/* --- Declarative charts (blog.js renders into figure.pt-chart) --- */
+figure.pt-chart{margin:1.6em 0;border:1px solid var(--border-2);background:var(--bg-1);padding:16px}
+.pt-chart-svg svg{display:block;width:100%;height:auto}
+.pt-chart-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:12px}
+.pt-chart-key{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-dim);font-family:var(--mono)}
+.pt-chart-dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0}
+figure.pt-chart figcaption{font-size:12px;color:var(--text-faint);margin-top:12px;font-family:var(--mono);line-height:1.5}
+.pt-cdraw{stroke-dasharray:1;stroke-dashoffset:1;animation:ptdraw 1.6s ease-out forwards}
+
 /* --- reduced motion --- */
 @media(prefers-reduced-motion:reduce){
   .pt-bar-fill{animation:none}
-  .pt-draw{animation:none;stroke-dashoffset:0}
+  .pt-draw,.pt-cdraw{animation:none;stroke-dashoffset:0}
 }
