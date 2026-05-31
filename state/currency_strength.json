@@ -599,6 +599,18 @@
         "risk": 38.5
       },
       "rank": 1
+    },
+    {
+      "composite": 48.3,
+      "date": "2026-05-31",
+      "pillars": {
+        "commodity": 10.3,
+        "growth": 44.3,
+        "monetary": 69.7,
+        "positioning": 56.1,
+        "risk": 38.5
+      },
+      "rank": 1
     }
   ],
   "CAD": [
@@ -1201,6 +1213,18 @@
         "risk": 23.1
       },
       "rank": 4
+    },
+    {
+      "composite": 5.3,
+      "date": "2026-05-31",
+      "pillars": {
+        "commodity": 19.4,
+        "growth": -36.4,
+        "monetary": -2.5,
+        "positioning": 34.5,
+        "risk": 23.1
+      },
+      "rank": 4
     }
   ],
   "CHF": [
@@ -1745,6 +1769,16 @@
         "risk": -38.5
       },
       "rank": 8
+    },
+    {
+      "composite": -41.3,
+      "date": "2026-05-31",
+      "pillars": {
+        "monetary": -66.2,
+        "positioning": -6.1,
+        "risk": -38.5
+      },
+      "rank": 8
     }
   ],
   "EUR": [
@@ -2233,6 +2267,16 @@
     {
       "composite": -12.1,
       "date": "2026-05-30",
+      "pillars": {
+        "monetary": -17.0,
+        "positioning": -13.9,
+        "risk": -0.0
+      },
+      "rank": 6
+    },
+    {
+      "composite": -12.1,
+      "date": "2026-05-31",
       "pillars": {
         "monetary": -17.0,
         "positioning": -13.9,
@@ -2787,6 +2831,17 @@
         "risk": 7.7
       },
       "rank": 5
+    },
+    {
+      "composite": -5.4,
+      "date": "2026-05-31",
+      "pillars": {
+        "growth": -43.0,
+        "monetary": 5.9,
+        "positioning": 5.4,
+        "risk": 7.7
+      },
+      "rank": 5
     }
   ],
   "JPY": [
@@ -3275,6 +3330,16 @@
     {
       "composite": -38.9,
       "date": "2026-05-30",
+      "pillars": {
+        "monetary": -16.3,
+        "positioning": -73.1,
+        "risk": -38.5
+      },
+      "rank": 7
+    },
+    {
+      "composite": -38.9,
+      "date": "2026-05-31",
       "pillars": {
         "monetary": -16.3,
         "positioning": -73.1,
@@ -3883,6 +3948,18 @@
         "risk": 38.5
       },
       "rank": 3
+    },
+    {
+      "composite": 9.8,
+      "date": "2026-05-31",
+      "pillars": {
+        "commodity": 23.4,
+        "growth": 1.2,
+        "monetary": 11.2,
+        "positioning": -15.3,
+        "risk": 38.5
+      },
+      "rank": 3
     }
   ],
   "USD": [
@@ -4424,6 +4501,17 @@
     {
       "composite": 15.1,
       "date": "2026-05-30",
+      "pillars": {
+        "growth": 33.9,
+        "monetary": 15.1,
+        "positioning": 24.9,
+        "risk": -23.1
+      },
+      "rank": 2
+    },
+    {
+      "composite": 15.1,
+      "date": "2026-05-31",
       "pillars": {
         "growth": 33.9,
         "monetary": 15.1,
