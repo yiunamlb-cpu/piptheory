@@ -26,7 +26,7 @@
   <div class="tv-topbar-right">
     {% if last_synced_iso %}
     <span class="tv-sync-dot"></span>
-    <span><span class="tv-sync-lbl">Updated </span><time id="syncTime" datetime="{{ as_of }}">{{ run_date }}</time></span>
+    <span class="tv-sync"><span class="tv-sync-lbl">Updated </span><time id="syncTime" class="js-synctime" datetime="{{ as_of }}">{{ run_date }}</time></span>
     {% endif %}
     <span class="tv-topbar-div"></span>
     <a class="cs-nav" href="/research">Research</a>
@@ -38,7 +38,8 @@
 
   <!-- HEADER / METHODOLOGY -->
   <section class="cs-explain">
-    <h1 class="cs-h1">Macro Currency Strength Meter <button class="cs-info" type="button" aria-label="What is this?" data-tip="A single score from -100 to +100 for each major currency, built from interest rates, growth, institutional positioning, risk sentiment and commodities. Higher means fundamentally stronger than the others — macro context, not a trade signal.">?</button></h1>
+    <h1 class="cs-h1">Macro Currency Strength <span class="cs-h1-nb">Meter <button class="cs-info" type="button" aria-label="What is this?" data-tip="A single score from -100 to +100 for each major currency, built from interest rates, growth, institutional positioning, risk sentiment and commodities. Higher means fundamentally stronger than the others — macro context, not a trade signal.">?</button></span></h1>
+    {% if last_synced_iso %}<div class="cs-sync-m"><span class="cs-sync-dot"></span>Updated <time class="js-synctime" datetime="{{ as_of }}">{{ run_date }}</time></div>{% endif %}
     {% if currencies %}
     <div class="cs-readout">
       <div class="cs-ro">
@@ -463,10 +464,9 @@ window.PSTR = {{ price_strength_json|safe }};
   document.addEventListener('click',function(){document.querySelectorAll('.cs-info.open').forEach(function(x){x.classList.remove('open');});});
   document.addEventListener('keydown',function(e){if(e.key==='Escape')document.querySelectorAll('.cs-info.open').forEach(function(x){x.classList.remove('open');});});
   // Show the update time in the viewer's local timezone (reflects the 4-hourly refresh)
-  var t=document.getElementById('syncTime');
-  if(t){var d=new Date(t.getAttribute('datetime'));if(!isNaN(d)){
+  document.querySelectorAll('.js-synctime').forEach(function(t){var d=new Date(t.getAttribute('datetime'));if(!isNaN(d)){
     t.textContent=d.toLocaleString(undefined,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
-  }}
+  }});
 })();
 </script>
 {% include "_cs_cookie.html" %}
